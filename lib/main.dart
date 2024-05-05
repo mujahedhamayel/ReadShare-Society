@@ -1,45 +1,83 @@
-import 'package:bookv_app/screens/personal.dart';
-import 'package:bookv_app/screens/splash.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:firebase_core/firebase_core.dart';
-import 'firebase_options.dart';
+import 'package:untitled/SignInPage.dart';
 
-import 'package:bookv_app/screens/auth.dart';
-
-void main() async {
-  WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp(
-    options: DefaultFirebaseOptions.currentPlatform,
+void main() {
+  runApp(
+    MaterialApp(home: WelcomePage()), // use MaterialApp
   );
-  runApp(const App());
 }
 
-class App extends StatelessWidget {
-  const App({super.key});
+class WelcomePage extends StatelessWidget {
+  const WelcomePage({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'FlutterChat',
-      theme: ThemeData().copyWith(
-        useMaterial3: true,
-        colorScheme: ColorScheme.fromSeed(
-            seedColor: const Color.fromARGB(255, 63, 17, 177)),
+    return Scaffold(
+      body: Stack(
+        children: [
+          Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                _Logo(),
+                _text(),
+              ],
+            ),
+          ),
+        ],
       ),
-      home: StreamBuilder(
-        stream: FirebaseAuth.instance.authStateChanges(),
-        builder: (ctx, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return const SplashScerrn();
-          }
+    );
+  }
+}
 
-          if (snapshot.hasData) {
-            return const PersonalScerrn();
-          }
-          return const AuthScreen();
-        },
-      ),
+class _Logo extends StatelessWidget {
+  const _Logo({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    final bool isSmallScreen = MediaQuery.of(context).size.width < 600;
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Image.asset(
+          'img/back.jpg', // Adjust the path to match your logo image
+          width: isSmallScreen ? 600 : 700,
+          height: isSmallScreen ? 600 : 700,
+        ),
+      ],
+    );
+  }
+}
+
+class _text extends StatelessWidget {
+  const _text({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        ElevatedButton.icon(
+          onPressed: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => SignInPage()),
+            );
+          },
+          icon: Icon(Icons.arrow_forward, color: Colors.white), // Icon widget
+          label: Text(''), // Empty text to make space for icon
+          style: ButtonStyle(
+            backgroundColor: MaterialStateProperty.all<Color>(
+                Color.fromRGBO(226, 124, 126, 0.978)), // Button color
+            padding: MaterialStateProperty.all<EdgeInsetsGeometry>(
+                EdgeInsets.symmetric(
+                    vertical: 15, horizontal: 25)), // Padding around icon
+            shape: MaterialStateProperty.all<OutlinedBorder>(
+                RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(30))), // Button shape
+          ),
+        ),
+      ],
     );
   }
 }
