@@ -1,18 +1,18 @@
+import '/screens/screens.dart';
 import 'package:flutter/material.dart';
-import 'package:untitled/SignInPage.dart';
 
 void main() {
   runApp(
-    MaterialApp(home: WelcomePage()), // use MaterialApp
+    const MaterialApp(home: WelcomePage()), // use MaterialApp
   );
 }
 
 class WelcomePage extends StatelessWidget {
-  const WelcomePage({Key? key}) : super(key: key);
+  const WelcomePage({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return const Scaffold(
       body: Stack(
         children: [
           Center(
@@ -31,7 +31,7 @@ class WelcomePage extends StatelessWidget {
 }
 
 class _Logo extends StatelessWidget {
-  const _Logo({Key? key}) : super(key: key);
+  const _Logo();
 
   @override
   Widget build(BuildContext context) {
@@ -50,7 +50,7 @@ class _Logo extends StatelessWidget {
 }
 
 class _text extends StatelessWidget {
-  const _text({Key? key}) : super(key: key);
+  const _text();
 
   @override
   Widget build(BuildContext context) {
@@ -61,18 +61,19 @@ class _text extends StatelessWidget {
           onPressed: () {
             Navigator.push(
               context,
-              MaterialPageRoute(builder: (context) => SignInPage()),
+              MaterialPageRoute(builder: (context) => const SignInPage()),
             );
           },
-          icon: Icon(Icons.arrow_forward, color: Colors.white), // Icon widget
-          label: Text(''), // Empty text to make space for icon
+          icon: const Icon(Icons.arrow_forward,
+              color: Colors.white), // Icon widget
+          label: const Text(''), // Empty text to make space for icon
           style: ButtonStyle(
-            backgroundColor: MaterialStateProperty.all<Color>(
-                Color.fromRGBO(226, 124, 126, 0.978)), // Button color
-            padding: MaterialStateProperty.all<EdgeInsetsGeometry>(
-                EdgeInsets.symmetric(
+            backgroundColor: WidgetStateProperty.all<Color>(
+                const Color.fromRGBO(226, 124, 126, 0.978)), // Button color
+            padding: WidgetStateProperty.all<EdgeInsetsGeometry>(
+                const EdgeInsets.symmetric(
                     vertical: 15, horizontal: 25)), // Padding around icon
-            shape: MaterialStateProperty.all<OutlinedBorder>(
+            shape: WidgetStateProperty.all<OutlinedBorder>(
                 RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(30))), // Button shape
           ),
