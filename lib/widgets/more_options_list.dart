@@ -13,14 +13,14 @@ class MoreOptionsList extends StatelessWidget {
   final User currentUser;
 
   const MoreOptionsList({
-    Key? key,
+    super.key,
     required this.currentUser,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      constraints: BoxConstraints(maxWidth: 280.0),
+      constraints: const BoxConstraints(maxWidth: 280.0),
       child: ListView.builder(
         itemCount: 1 + _moreOptionsList.length,
         itemBuilder: (BuildContext context, int index) {
@@ -51,11 +51,11 @@ class _Option extends StatelessWidget {
   final String label;
 
   const _Option({
-    Key? key,
+    super.key,
     required this.icon,
     required this.color,
     required this.label,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

@@ -4,6 +4,8 @@ import '/screens/screens.dart';
 import '/widgets/widgets.dart';
 
 class NavScreen extends StatefulWidget {
+  const NavScreen({super.key});
+
   @override
   _NavScreenState createState() => _NavScreenState();
 }
@@ -11,11 +13,11 @@ class NavScreen extends StatefulWidget {
 class _NavScreenState extends State<NavScreen> {
   final List<Widget> _screens = [
     HomeScreen(),
-    BooksContent(), // Replace Scaffold with BooksContent
-    Scaffold(), // Placeholder for other screens
-    Scaffold(), // Placeholder for other screens
-    Scaffold(), // Placeholder for other screens
-    Scaffold(), // Placeholder for other screens
+    const BooksContent(), // Replace Scaffold with BooksContent
+    const Scaffold(), // Placeholder for other screens
+    const Scaffold(), // Placeholder for other screens
+    const Scaffold(), // Placeholder for other screens
+    const Scaffold(), // Placeholder for other screens
   ];
   final List<IconData> _icons = const [
     Icons.home,

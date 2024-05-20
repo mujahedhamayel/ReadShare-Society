@@ -8,12 +8,12 @@ class CustomTabBar extends StatelessWidget {
   final bool isBottomIndicator;
 
   const CustomTabBar({
-    Key? key,
+    super.key,
     required this.icons,
     required this.selectedIndex,
     required this.onTap,
     this.isBottomIndicator = false,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -21,13 +21,13 @@ class CustomTabBar extends StatelessWidget {
       indicatorPadding: EdgeInsets.zero,
       indicator: BoxDecoration(
         border: isBottomIndicator
-            ? Border(
+            ? const Border(
                 bottom: BorderSide(
                   color: Palette.REDcolor,
                   width: 3.0,
                 ),
               )
-            : Border(
+            : const Border(
                 top: BorderSide(
                   color: Palette.REDcolor,
                   width: 3.0,

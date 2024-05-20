@@ -10,21 +10,21 @@ class CustomAppBar extends StatelessWidget {
   final Function(int) onTap;
 
   const CustomAppBar({
-    Key? key,
+    super.key,
     required this.currentUser,
     required this.icons,
     required this.selectedIndex,
     required this.onTap,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 20.0),
       height: 65.0,
-      decoration: BoxDecoration(
+      decoration: const BoxDecoration(
         color: Colors.white,
-        boxShadow: const [
+        boxShadow: [
           BoxShadow(
             color: Colors.black12,
             offset: Offset(0, 2),
@@ -35,10 +35,10 @@ class CustomAppBar extends StatelessWidget {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Expanded(
+          const Expanded(
             child: Text(
               '',
-              style: const TextStyle(
+              style: TextStyle(
                 color: Palette.REDcolor,
                 fontSize: 32.0,
                 fontWeight: FontWeight.bold,
@@ -46,7 +46,7 @@ class CustomAppBar extends StatelessWidget {
               ),
             ),
           ),
-          Container(
+          SizedBox(
             height: double.infinity,
             width: 600.0,
             child: CustomTabBar(

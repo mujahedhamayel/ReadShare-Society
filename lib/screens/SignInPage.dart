@@ -188,7 +188,8 @@ class __FormContentState extends State<_FormContent> {
               onPressed: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => ResetPassPage()),
+                  MaterialPageRoute(
+                      builder: (context) => const ResetPassPage()),
                 );
               },
               child: const Text(
@@ -206,7 +207,8 @@ class __FormContentState extends State<_FormContent> {
                     onPressed: () {
                       Navigator.push(
                         context,
-                        MaterialPageRoute(builder: (context) => SignUpPage()),
+                        MaterialPageRoute(
+                            builder: (context) => const SignUpPage()),
                       );
                     },
                     child: const Text(

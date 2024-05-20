@@ -6,6 +6,8 @@ import '/models/models.dart';
 import '/widgets/widgets.dart';
 
 class HomeScreen extends StatefulWidget {
+  const HomeScreen({super.key});
+
   @override
   _HomeScreenState createState() => _HomeScreenState();
 }
@@ -42,9 +44,9 @@ class _HomeScreenMobile extends StatelessWidget {
   final TrackingScrollController scrollController;
 
   const _HomeScreenMobile({
-    Key? key,
+    super.key,
     required this.scrollController,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -54,9 +56,9 @@ class _HomeScreenMobile extends StatelessWidget {
         SliverAppBar(
           automaticallyImplyLeading: false,
           backgroundColor: Colors.white,
-          title: Text(
+          title: const Text(
             'ReadShare',
-            style: const TextStyle(
+            style: TextStyle(
               color: Palette.REDcolor,
               fontSize: 28.0,
               fontWeight: FontWeight.bold,
@@ -106,9 +108,9 @@ class _HomeScreenDesktop extends StatelessWidget {
   final TrackingScrollController scrollController;
 
   const _HomeScreenDesktop({
-    Key? key,
+    super.key,
     required this.scrollController,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -125,7 +127,7 @@ class _HomeScreenDesktop extends StatelessWidget {
           ),
         ),
         const Spacer(),
-        Container(
+        SizedBox(
           width: 600.0,
           child: CustomScrollView(
             controller: scrollController,

@@ -9,9 +9,9 @@ class PostContainer extends StatelessWidget {
   final Post post;
 
   const PostContainer({
-    Key? key,
+    super.key,
     required this.post,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -67,9 +67,9 @@ class _PostHeader extends StatelessWidget {
   final Post post;
 
   const _PostHeader({
-    Key? key,
+    super.key,
     required this.post,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -119,9 +119,9 @@ class _PostStats extends StatelessWidget {
   final Post post;
 
   const _PostStats({
-    Key? key,
+    super.key,
     required this.post,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -131,7 +131,7 @@ class _PostStats extends StatelessWidget {
           children: [
             Container(
               padding: const EdgeInsets.all(4.0),
-              decoration: BoxDecoration(
+              decoration: const BoxDecoration(
                 color: Palette.REDcolor,
                 shape: BoxShape.circle,
               ),
@@ -208,11 +208,11 @@ class _PostButton extends StatelessWidget {
   final VoidCallback onTap; // Change the type to VoidCallback
 
   const _PostButton({
-    Key? key,
+    super.key,
     required this.icon,
     required this.label,
     required this.onTap,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

@@ -6,11 +6,11 @@ class CircleButton extends StatelessWidget {
   final VoidCallback onPressed; // Change the type of onPressed
 
   const CircleButton({
-    Key? key,
+    super.key,
     required this.icon,
     required this.iconSize,
     required this.onPressed,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

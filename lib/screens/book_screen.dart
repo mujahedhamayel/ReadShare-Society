@@ -55,11 +55,11 @@ class _BookScreenDesktop extends StatelessWidget {
   final Function(int) onTabIndexChanged;
 
   const _BookScreenDesktop({
-    Key? key,
+    super.key,
     required this.scrollController,
     required this.tabIndex,
     required this.onTabIndexChanged,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -76,7 +76,7 @@ class _BookScreenDesktop extends StatelessWidget {
           ),
         ),
         const Spacer(),
-        Container(
+        SizedBox(
           width: 800.0,
           child: Column(
             children: [
@@ -85,12 +85,12 @@ class _BookScreenDesktop extends StatelessWidget {
                 child: tabIndex == 0
                     ? BookGridViewDesktop(
                         tabIndex,
-                        scrollController as TrackingScrollController,
+                        scrollController,
                         onTabIndexChanged,
                       )
                     : AudioBookGridViewDesktop(
                         tabIndex,
-                        scrollController as TrackingScrollController,
+                        scrollController,
                         onTabIndexChanged,
                       ),
               )
@@ -120,11 +120,11 @@ class _BookScreenMobile extends StatelessWidget {
   final Function(int) onTabIndexChanged;
 
   const _BookScreenMobile({
-    Key? key,
+    super.key,
     required this.scrollController,
     required this.tabIndex,
     required this.onTabIndexChanged,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -134,9 +134,9 @@ class _BookScreenMobile extends StatelessWidget {
           automaticallyImplyLeading: false,
           backgroundColor: Colors.transparent,
           elevation: 0,
-          title: Text(
+          title: const Text(
             'ReadShare',
-            style: const TextStyle(
+            style: TextStyle(
               color: Palette.REDcolor,
               fontSize: 28.0,
               fontWeight: FontWeight.bold,
@@ -151,12 +151,12 @@ class _BookScreenMobile extends StatelessWidget {
               child: tabIndex == 0
                   ? BookGridView(
                       tabIndex,
-                      scrollController as TrackingScrollController,
+                      scrollController,
                       onTabIndexChanged,
                     )
                   : AudioBookGridView(
                       tabIndex,
-                      scrollController as TrackingScrollController,
+                      scrollController,
                       onTabIndexChanged,
                     ),
             )

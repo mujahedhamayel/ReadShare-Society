@@ -6,9 +6,9 @@ class Rooms extends StatelessWidget {
   final List<User> onlineUsers;
 
   const Rooms({
-    Key? key,
+    super.key,
     required this.onlineUsers,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -57,20 +57,20 @@ class _CreateRoomButton extends StatelessWidget {
     return OutlinedButton(
       onPressed: () => print('Create Room'),
       style: ButtonStyle(
-        shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+        shape: WidgetStateProperty.all<RoundedRectangleBorder>(
           RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(30.0),
           ),
         ),
       ),
-      child: Row(
+      child: const Row(
         children: [
           Icon(
             Icons.video_call,
             size: 35.0,
             color: Colors.purple,
           ),
-          const SizedBox(width: 4.0),
+          SizedBox(width: 4.0),
           Text('Create\nRoom'),
         ],
       ),

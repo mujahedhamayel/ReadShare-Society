@@ -6,9 +6,9 @@ class CreatePostContainer extends StatelessWidget {
   final User currentUser;
 
   const CreatePostContainer({
-    Key? key,
+    super.key,
     required this.currentUser,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -28,7 +28,7 @@ class CreatePostContainer extends StatelessWidget {
               children: [
                 ProfileAvatar(imageUrl: currentUser.imageUrl),
                 const SizedBox(width: 8.0),
-                Expanded(
+                const Expanded(
                   child: TextField(
                     decoration: InputDecoration.collapsed(
                       hintText: 'What did you read today?',
@@ -38,7 +38,7 @@ class CreatePostContainer extends StatelessWidget {
               ],
             ),
             const Divider(height: 10.0, thickness: 0.5),
-            Container(
+            SizedBox(
               height: 40.0,
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -49,7 +49,7 @@ class CreatePostContainer extends StatelessWidget {
                       Icons.format_quote,
                       color: Colors.red,
                     ),
-                    label: Text('Quote'),
+                    label: const Text('Quote'),
                   ),
                   const VerticalDivider(width: 8.0),
                   TextButton.icon(
@@ -58,7 +58,7 @@ class CreatePostContainer extends StatelessWidget {
                       Icons.photo_library,
                       color: Colors.green,
                     ),
-                    label: Text('Photo'),
+                    label: const Text('Photo'),
                   ),
                   const VerticalDivider(width: 8.0),
                   TextButton.icon(
@@ -67,7 +67,7 @@ class CreatePostContainer extends StatelessWidget {
                       Icons.picture_as_pdf_sharp,
                       color: Colors.purpleAccent,
                     ),
-                    label: Text('PDF'),
+                    label: const Text('PDF'),
                   ),
                 ],
               ),

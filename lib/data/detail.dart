@@ -5,7 +5,7 @@ import '../models/models.dart';
 
 class DetailPage extends StatelessWidget {
   final Book book;
-  const DetailPage({required this.book, Key? key}) : super(key: key);
+  const DetailPage({required this.book, super.key});
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -24,7 +24,7 @@ class DetailPage extends StatelessWidget {
 
 class BookDetail extends StatelessWidget {
   final Book book;
-  const BookDetail({required this.book, Key? key}) : super(key: key);
+  const BookDetail({required this.book, super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -41,7 +41,7 @@ class BookDetail extends StatelessWidget {
             const SizedBox(height: 10),
             Text(
               book.name,
-              style: TextStyle(fontSize: 24, height: 1.2),
+              style: const TextStyle(fontSize: 24, height: 1.2),
             ),
             const SizedBox(height: 15),
             Row(
@@ -50,9 +50,9 @@ class BookDetail extends StatelessWidget {
                 Text.rich(
                   TextSpan(
                     children: [
-                      TextSpan(
+                      const TextSpan(
                         text: 'Published from',
-                        style: const TextStyle(color: Colors.grey),
+                        style: TextStyle(color: Colors.grey),
                       ),
                       TextSpan(
                         text: book.publisher,
