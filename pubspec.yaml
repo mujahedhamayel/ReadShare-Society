@@ -1,5 +1,5 @@
-name: bookv_app
-description: A new Flutter project.
+name: facebook
+description: "A new Flutter project."
 # The following line prevents the package from being accidentally published to
 # pub.dev using `flutter pub publish`. This is preferred for private packages.
 publish_to: 'none' # Remove this line if you wish to publish to pub.dev
@@ -19,7 +19,7 @@ publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 version: 1.0.0+1
 
 environment:
-  sdk: '>=2.19.2 <3.0.0'
+  sdk: '>=3.4.0-282.3.beta <4.0.0'
 
 # Dependencies specify other packages that your package needs in order to work.
 # To automatically upgrade your package dependencies to the latest versions
@@ -34,12 +34,12 @@ dependencies:
 
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
-  cupertino_icons: ^1.0.2
-  firebase_core: ^2.15.0
-  firebase_auth: ^4.7.2
-  firebase_storage: ^11.2.5
-  image_picker: ^1.0.2
-  cloud_firestore: ^4.8.4
+  cupertino_icons: ^1.0.6
+  material_design_icons_flutter: ^7.0.7296
+  cached_network_image: ^3.3.1
+  flutter_staggered_grid_view: ^0.7.0
+  intl: ^0.19.0
+
 
 dev_dependencies:
   flutter_test:
@@ -50,25 +50,31 @@ dev_dependencies:
   # activated in the `analysis_options.yaml` file located at the root of your
   # package. See that file for information about deactivating specific lint
   # rules and activating additional ones.
-  flutter_lints: ^2.0.0
+  flutter_lints: ^3.0.0
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
 
 # The following section is specific to Flutter packages.
 flutter:
+  assets:
+    - img/logo.jpg
+    - img/back.jpg
+    - img/google.jpg
+    - img/book1.png
+    - img/book2.jpg
+    - img/book3.jpg
+    - img/audioBook1.jpg
 
   # The following line ensures that the Material Icons font is
   # included with your application, so that you can use the icons in
   # the material Icons class.
   uses-material-design: true
 
-   # To add assets to your application, add an assets section, like this:
-  assets:
-    - assets/images/
+  # To add assets to your application, add an assets section, like this:
+  # assets:
   #   - images/a_dot_burr.jpeg
   #   - images/a_dot_ham.jpeg
-
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware
