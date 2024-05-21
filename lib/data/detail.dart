@@ -95,7 +95,7 @@ class BookReview extends StatelessWidget {
                 ),
               ),
               const SizedBox(width: 10),
-              _bulidStar(),
+              _buildStar(book.score.toDouble()),
             ],
           ),
           const SizedBox(height: 10),
@@ -128,21 +128,38 @@ class BookReview extends StatelessWidget {
     );
   }
 
-  Widget _bulidStar() {
-    final List<Color> color = [
-      Colors.amber,
-      Colors.amber,
-      Colors.amber,
-      Colors.amber,
-      Colors.grey.withOpacity(0.3),
-    ];
+  Widget _buildStar(double score) {
+    // Calculate the number of full stars
+    int fullStars = score.floor();
+
+    // Calculate the fraction of the next star's color
+    double fraction = score - fullStars;
+
+    // Generate a list of colors for the stars
+    final List<Color> colors = List.generate(
+      5,
+      (index) {
+        if (index < fullStars) {
+          return Colors.amber;
+        } else if (index == fullStars) {
+          // Mix amber with grey based on the fractional part
+          return Color.lerp(
+              Colors.amber, Colors.grey.withOpacity(0.3), fraction)!;
+        } else {
+          return Colors.grey.withOpacity(0.3);
+        }
+      },
+    );
+
     return Row(
-      children: color
-          .map((e) => Icon(
-                Icons.star,
-                size: 25,
-                color: e,
-              ))
+      children: colors
+          .map(
+            (color) => Icon(
+              Icons.star,
+              size: 25,
+              color: color,
+            ),
+          )
           .toList(),
     );
   }

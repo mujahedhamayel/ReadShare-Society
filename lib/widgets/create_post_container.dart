@@ -72,6 +72,17 @@ class CreatePostContainer extends StatelessWidget {
                 ],
               ),
             ),
+            Column(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                SizedBox(width: 8.0),
+                TextButton(
+                    onPressed: () => print('public'), child: Text('Post')),
+                SizedBox(
+                  width: 8.0,
+                )
+              ],
+            )
           ],
         ),
       ),
