@@ -80,34 +80,74 @@ class BookCover extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-        margin: const EdgeInsets.symmetric(vertical: 10),
-        padding: const EdgeInsets.only(left: 20),
-        height: 250,
-        child: Stack(
-          children: [
-            Container(
-              padding: const EdgeInsets.only(left: 50),
-              width: MediaQuery.of(context).size.width - 20,
-              decoration: const BoxDecoration(
-                borderRadius: BorderRadius.only(
-                  topLeft: Radius.circular(50),
-                  bottomLeft: Radius.circular(50),
-                ),
-                color: Color.fromARGB(200, 238, 238, 238),
+      margin: const EdgeInsets.symmetric(vertical: 10),
+      padding: const EdgeInsets.only(left: 20),
+      height: 250,
+      child: Stack(
+        children: [
+          Container(
+            padding: const EdgeInsets.only(left: 50),
+            width: MediaQuery.of(context).size.width - 20,
+            decoration: const BoxDecoration(
+              borderRadius: BorderRadius.only(
+                topLeft: Radius.circular(50),
+                bottomLeft: Radius.circular(50),
               ),
-              child: ClipRRect(
-                borderRadius: BorderRadius.only(
-                  topLeft: Radius.circular(50),
-                  bottomLeft: Radius.circular(50),
-                ),
-                child: Image.asset(
-                  book.imgUrl,
-                  fit: BoxFit.cover,
-                ),
+              color: Color.fromARGB(191, 212, 211, 211),
+            ),
+            child: ClipRRect(
+              borderRadius: BorderRadius.only(
+                topLeft: Radius.circular(50),
+                bottomLeft: Radius.circular(50),
               ),
-            )
-          ],
-        ));
+              child: Image.asset(
+                book.imgUrl,
+                fit: BoxFit.cover,
+              ),
+            ),
+          ),
+          Positioned(
+            left: 190,
+            bottom: 20,
+            child: Container(
+              padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(10),
+                  color: Color.fromRGBO(226, 124, 126, 0.978)),
+              child: const Icon(
+                Icons.info_outline,
+                color: Colors.white,
+                size: 25,
+              ),
+            ),
+          ),
+          Positioned(
+            left: 240,
+            bottom: 20,
+            child: Container(
+              padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(10),
+                color: Color.fromARGB(255, 60, 27, 110),
+              ),
+              child: const Row(
+                children: [
+                  Icon(
+                    Icons.play_arrow_outlined,
+                    color: Colors.white,
+                    size: 25,
+                  ),
+                  Text(
+                    'Audio Book',
+                    style: TextStyle(color: Colors.white),
+                  )
+                ],
+              ),
+            ),
+          )
+        ],
+      ),
+    );
   }
 }
 

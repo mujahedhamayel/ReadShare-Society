@@ -38,6 +38,7 @@ class _Logo extends StatelessWidget {
     final bool isSmallScreen = MediaQuery.of(context).size.width < 600;
     return Column(
       mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Image.asset(
           'assets/images/back.jpg', // Adjust the path to match your logo image
@@ -56,6 +57,7 @@ class _text extends StatelessWidget {
   Widget build(BuildContext context) {
     return Column(
       mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         ElevatedButton.icon(
           onPressed: () {
@@ -66,13 +68,13 @@ class _text extends StatelessWidget {
           },
           icon: const Icon(Icons.arrow_forward,
               color: Colors.white), // Icon widget
-          label: const Text(''), // Empty text to make space for icon
+          label: const Text(""), // Empty text to make space for icon
           style: ButtonStyle(
             backgroundColor: WidgetStateProperty.all<Color>(
                 const Color.fromRGBO(226, 124, 126, 0.978)), // Button color
             padding: WidgetStateProperty.all<EdgeInsetsGeometry>(
                 const EdgeInsets.symmetric(
-                    vertical: 15, horizontal: 25)), // Padding around icon
+                    vertical: 15, horizontal: 20)), // Padding around icon
             shape: WidgetStateProperty.all<OutlinedBorder>(
                 RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(30))), // Button shape
