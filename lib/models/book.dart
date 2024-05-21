@@ -155,7 +155,7 @@ class Book {
         "istudio",
         DateTime(2019, 3, 23),
         'assets/images/audioBook1.jpg',
-        4.7,
+        3.5,
         892,
         'Ifailed the first quarter of a class in school, so I ma....',
         220.0,
