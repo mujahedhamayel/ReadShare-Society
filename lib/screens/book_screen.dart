@@ -55,7 +55,6 @@ class _BookScreenDesktop extends StatelessWidget {
   final Function(int) onTabIndexChanged;
 
   const _BookScreenDesktop({
-    super.key,
     required this.scrollController,
     required this.tabIndex,
     required this.onTabIndexChanged,
@@ -120,7 +119,6 @@ class _BookScreenMobile extends StatelessWidget {
   final Function(int) onTabIndexChanged;
 
   const _BookScreenMobile({
-    super.key,
     required this.scrollController,
     required this.tabIndex,
     required this.onTabIndexChanged,

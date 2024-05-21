@@ -209,7 +209,8 @@ class __FormContentState extends State<_FormContent> {
                     onPressed: () {
                       Navigator.push(
                         context,
-                        MaterialPageRoute(builder: (context) => NavScreen()),
+                        MaterialPageRoute(
+                            builder: (context) => const NavScreen()),
                       );
                     },
                     child: const Padding(
@@ -255,7 +256,7 @@ class __FormContentState extends State<_FormContent> {
                           width: 30.0,
                           decoration: const BoxDecoration(
                             image: DecorationImage(
-                                image: AssetImage('img/google.jpg'),
+                                image: AssetImage('assets/images/google.jpg'),
                                 fit: BoxFit.cover),
                             shape: BoxShape.circle,
                           ),

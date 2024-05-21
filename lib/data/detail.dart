@@ -13,9 +13,8 @@ class DetailPage extends StatelessWidget {
         body: SingleChildScrollView(
           child: Column(
             children: [
-              BookDetail(
-                book: book,
-              ),
+              BookDetail(book: book),
+              BookCover(book: book),
             ],
           ),
         ));
@@ -51,7 +50,7 @@ class BookDetail extends StatelessWidget {
                   TextSpan(
                     children: [
                       const TextSpan(
-                        text: 'Published from',
+                        text: 'Published from ',
                         style: TextStyle(color: Colors.grey),
                       ),
                       TextSpan(
@@ -68,6 +67,44 @@ class BookDetail extends StatelessWidget {
                   ),
                 ),
               ],
+            )
+          ],
+        ));
+  }
+}
+
+class BookCover extends StatelessWidget {
+  final Book book;
+  const BookCover({super.key, required this.book});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+        margin: const EdgeInsets.symmetric(vertical: 10),
+        padding: const EdgeInsets.only(left: 20),
+        height: 250,
+        child: Stack(
+          children: [
+            Container(
+              padding: const EdgeInsets.only(left: 50),
+              width: MediaQuery.of(context).size.width - 20,
+              decoration: const BoxDecoration(
+                borderRadius: BorderRadius.only(
+                  topLeft: Radius.circular(50),
+                  bottomLeft: Radius.circular(50),
+                ),
+                color: Color.fromARGB(200, 238, 238, 238),
+              ),
+              child: ClipRRect(
+                borderRadius: BorderRadius.only(
+                  topLeft: Radius.circular(50),
+                  bottomLeft: Radius.circular(50),
+                ),
+                child: Image.asset(
+                  book.imgUrl,
+                  fit: BoxFit.cover,
+                ),
+              ),
             )
           ],
         ));

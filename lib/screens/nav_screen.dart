@@ -12,7 +12,7 @@ class NavScreen extends StatefulWidget {
 
 class _NavScreenState extends State<NavScreen> {
   final List<Widget> _screens = [
-    HomeScreen(),
+    const HomeScreen(),
     const BooksContent(), // Replace Scaffold with BooksContent
     const Scaffold(), // Placeholder for other screens
     const Scaffold(), // Placeholder for other screens

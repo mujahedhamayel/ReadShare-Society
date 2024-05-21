@@ -51,7 +51,6 @@ class _Option extends StatelessWidget {
   final String label;
 
   const _Option({
-    super.key,
     required this.icon,
     required this.color,
     required this.label,

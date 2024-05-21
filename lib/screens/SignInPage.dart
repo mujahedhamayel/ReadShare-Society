@@ -38,7 +38,7 @@ class _Logo extends StatelessWidget {
       mainAxisSize: MainAxisSize.min,
       children: [
         Image.asset(
-          'img/logo.jpg', // Adjust the path to match your logo image
+          'assets/images/logo.jpg', // Adjust the path to match your logo image
           width: isSmallScreen ? 200 : 300,
           height: isSmallScreen ? 200 : 300,
         ),

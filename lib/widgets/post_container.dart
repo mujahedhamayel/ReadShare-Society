@@ -67,7 +67,6 @@ class _PostHeader extends StatelessWidget {
   final Post post;
 
   const _PostHeader({
-    super.key,
     required this.post,
   });
 
@@ -119,7 +118,6 @@ class _PostStats extends StatelessWidget {
   final Post post;
 
   const _PostStats({
-    super.key,
     required this.post,
   });
 
@@ -208,7 +206,6 @@ class _PostButton extends StatelessWidget {
   final VoidCallback onTap; // Change the type to VoidCallback
 
   const _PostButton({
-    super.key,
     required this.icon,
     required this.label,
     required this.onTap,
