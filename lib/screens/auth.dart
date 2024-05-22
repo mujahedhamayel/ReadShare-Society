@@ -1,8 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:facebook/widgets/image_picker.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:read_share/widgets/image_picker.dart';
 import 'dart:io';
 
 final _firebase = FirebaseAuth.instance;

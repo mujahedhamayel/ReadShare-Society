@@ -1,5 +1,7 @@
 import '/screens/screens.dart';
 import 'package:flutter/material.dart';
+import 'package:read_share/SignInPage.dart';
+import 'package:read_share/home.dart';
 
 class SignUpPage extends StatelessWidget {
   const SignUpPage({super.key});

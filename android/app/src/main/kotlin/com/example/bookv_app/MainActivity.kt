@@ -1,4 +1,4 @@
-package com.example.bookv_app
+package com.example.read_share
 
 import io.flutter.embedding.android.FlutterActivity
 

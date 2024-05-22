@@ -1,9 +1,17 @@
 import '/screens/screens.dart';
 import 'package:flutter/material.dart';
+import 'package:read_share/SignInPage.dart';
+import 'package:read_share/home.dart';
 
 void main() {
   runApp(
-    const MaterialApp(home: WelcomePage()), // use MaterialApp
+    const MaterialApp(
+      home: WelcomePage(),
+      routes: {
+        '/home': (context) => const HomePage(),
+        // Define other routes here
+      },
+    ), // use MaterialApp
   );
 }
 
