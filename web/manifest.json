@@ -1,6 +1,6 @@
 {
-    "name": "bookv_app",
-    "short_name": "bookv_app",
+    "name": "read_share",
+    "short_name": "read_share",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#0175C2",
