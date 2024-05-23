@@ -8,6 +8,7 @@ void main() {
       routes: {
         '/home': (context) => HomeScreen(),
         '/signin': (context) => SignInPage(),
+        '/nav_screen': (context) => NavScreen(),
       },
     ),
   );

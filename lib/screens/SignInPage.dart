@@ -3,6 +3,7 @@ import '/screens/screens.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:facebook/constants.dart';
+import 'package:uuid/uuid.dart'; // For uuid generation if needed
 
 class SignInPage extends StatelessWidget {
   const SignInPage({super.key});
@@ -90,7 +91,7 @@ class __FormContentState extends State<_FormContent> {
       print("response ${response.body}");
       if (response.statusCode == 200) {
         // Successful login, navigate to Home screen
-        Navigator.pushReplacementNamed(context, '/home');
+        Navigator.pushReplacementNamed(context, '/nav_screen');
       } else {
         // Login failed, show error message
         ScaffoldMessenger.of(context).showSnackBar(

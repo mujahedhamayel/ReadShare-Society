@@ -1,5 +1,9 @@
-import '/screens/screens.dart';
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert'; // For jsonEncode
+import 'package:uuid/uuid.dart'; // For uuid generation if needed
+import 'package:facebook/constants.dart';
+import '/screens/screens.dart';
 
 class SignUpPage extends StatelessWidget {
   const SignUpPage({super.key});
@@ -52,6 +56,11 @@ class __FormContentState extends State<_FormContent> {
   bool _isPasswordVisible = false;
 
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+  final TextEditingController _userNameController = TextEditingController();
+  final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController();
+  final TextEditingController _confirmPasswordController =
+      TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -79,8 +88,9 @@ class __FormContentState extends State<_FormContent> {
             key: _formKey,
             child: Column(
               children: <Widget>[
-                const TextField(
-                  decoration: InputDecoration(
+                TextFormField(
+                  controller: _userNameController,
+                  decoration: const InputDecoration(
                     labelText: 'UserName',
                     hintText: 'Enter your UserName',
                     prefixIcon: Icon(Icons.person, color: Colors.black),
@@ -91,8 +101,8 @@ class __FormContentState extends State<_FormContent> {
                 ),
                 const SizedBox(height: 16),
                 TextFormField(
+                  controller: _emailController,
                   validator: (value) {
-                    // add email validation
                     if (value == null || value.isEmpty) {
                       return 'Please enter some text';
                     }
@@ -109,17 +119,15 @@ class __FormContentState extends State<_FormContent> {
                   decoration: const InputDecoration(
                     labelText: 'Email',
                     hintText: 'Enter your email',
-                    prefixIcon: Icon(Icons.email_outlined,
-                        color: Colors.black), // Adjust color here
+                    prefixIcon: Icon(Icons.email_outlined, color: Colors.black),
                     border: OutlineInputBorder(),
-                    labelStyle:
-                        TextStyle(color: Colors.black), // Adjust color here
-                    hintStyle:
-                        TextStyle(color: Colors.black), // Adjust color here
+                    labelStyle: TextStyle(color: Colors.black),
+                    hintStyle: TextStyle(color: Colors.black),
                   ),
                 ),
                 const SizedBox(height: 16),
                 TextFormField(
+                  controller: _passwordController,
                   validator: (value) {
                     if (value == null || value.isEmpty) {
                       return 'Please enter some text';
@@ -148,29 +156,27 @@ class __FormContentState extends State<_FormContent> {
                         });
                       },
                     ),
-                    labelStyle: const TextStyle(
-                        color: Colors.black), // Adjust color here
-                    hintStyle: const TextStyle(
-                        color: Colors.black), // Adjust color here
+                    labelStyle: const TextStyle(color: Colors.black),
+                    hintStyle: const TextStyle(color: Colors.black),
                   ),
-                  style: const TextStyle(
-                      color: Colors.black), // Adjust color here),
+                  style: const TextStyle(color: Colors.black),
                 ),
                 const SizedBox(height: 16),
                 TextFormField(
+                  controller: _confirmPasswordController,
                   validator: (value) {
                     if (value == null || value.isEmpty) {
                       return 'Please enter some text';
                     }
-                    if (value.length < 6) {
-                      return 'Password must be at least 6 characters';
+                    if (value != _passwordController.text) {
+                      return 'Passwords do not match';
                     }
                     return null;
                   },
                   obscureText: !_isPasswordVisible,
                   decoration: InputDecoration(
                     labelText: 'Confirm Password',
-                    hintText: 'Enter your password',
+                    hintText: 'Confirm your password',
                     prefixIcon: const Icon(Icons.lock_outline_rounded,
                         color: Colors.black),
                     border: const OutlineInputBorder(),
@@ -186,13 +192,10 @@ class __FormContentState extends State<_FormContent> {
                         });
                       },
                     ),
-                    labelStyle: const TextStyle(
-                        color: Colors.black), // Adjust color here
-                    hintStyle: const TextStyle(
-                        color: Colors.black), // Adjust color here
+                    labelStyle: const TextStyle(color: Colors.black),
+                    hintStyle: const TextStyle(color: Colors.black),
                   ),
-                  style: const TextStyle(
-                      color: Colors.black), // Adjust color here),
+                  style: const TextStyle(color: Colors.black),
                 ),
                 const SizedBox(height: 16),
                 const SizedBox(height: 16),
@@ -207,11 +210,9 @@ class __FormContentState extends State<_FormContent> {
                       ),
                     ),
                     onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => const NavScreen()),
-                      );
+                      if (_formKey.currentState!.validate()) {
+                        _signUp(context);
+                      }
                     },
                     child: const Padding(
                       padding: EdgeInsets.all(10.0),
@@ -283,6 +284,7 @@ class __FormContentState extends State<_FormContent> {
                           Navigator.push(
                             context,
                             MaterialPageRoute(
+                              
                                 builder: (context) => const SignInPage()),
                           );
                         },
@@ -300,4 +302,53 @@ class __FormContentState extends State<_FormContent> {
       ),
     );
   }
+
+  void _signUp(BuildContext context) async {
+    final url = Uri.parse('http://$ip:$port/api/users/signup');
+    final response = await http.post(
+      url,
+      headers: <String, String>{
+        'Content-Type': 'application/json; charset=UTF-8',
+      },
+      body: jsonEncode(<String, String>{
+        'name': _userNameController.text,
+        'email': _emailController.text,
+        'password': _passwordController.text,
+      }),
+    );
+
+    if (response.statusCode == 200) {
+      // Successful signup, navigate to Home screen
+      Navigator.pushReplacementNamed(context, '/nav_screen');
+    } else {
+      // If the server returns an error response, show a Snackbar with the error
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Failed to sign up: ${response.body}')),
+      );
+    }
+  }
 }
+
+// class SignInPage extends StatelessWidget {
+//   const SignInPage({super.key});
+
+//   @override
+//   Widget build(BuildContext context) {
+//     return Scaffold(
+//       appBar: AppBar(title: const Text('Sign In')),
+//       body: Center(child: const Text('Sign In Page')),
+//     );
+//   }
+// }
+
+// class NavScreen extends StatelessWidget {
+//   const NavScreen({super.key});
+
+//   @override
+//   Widget build(BuildContext context) {
+//     return Scaffold(
+//       appBar: AppBar(title: const Text('Home')),
+//       body: Center(child: const Text('Home Page')),
+//     );
+//   }
+// }
