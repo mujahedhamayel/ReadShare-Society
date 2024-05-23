@@ -9,27 +9,30 @@ class SignUpPage extends StatelessWidget {
     return Scaffold(
       body: Stack(
         children: [
-          // Content
           LayoutBuilder(
             builder: (context, constraints) {
               final isSmallScreen = constraints.maxWidth < 600;
               return Center(
                 child: isSmallScreen
-                    ? const Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          _FormContent(),
-                        ],
-                      )
-                    : Container(
-                        padding: const EdgeInsets.all(32.0),
-                        constraints: const BoxConstraints(maxWidth: 800),
-                        child: const Row(
+                    ? SingleChildScrollView(
+                        child: const Column(
+                          mainAxisSize: MainAxisSize.min,
                           children: [
-                            Expanded(
-                              child: Center(child: _FormContent()),
-                            ),
+                            _FormContent(),
                           ],
+                        ),
+                      )
+                    : SingleChildScrollView(
+                        padding: const EdgeInsets.all(32.0),
+                        child: Container(
+                          constraints: const BoxConstraints(maxWidth: 800),
+                          child: const Row(
+                            children: [
+                              Expanded(
+                                child: Center(child: _FormContent()),
+                              ),
+                            ],
+                          ),
                         ),
                       ),
               );
@@ -72,9 +75,7 @@ class __FormContentState extends State<_FormContent> {
             "Create your account",
             style: TextStyle(fontSize: 15, color: Colors.grey[700]),
           ),
-          const SizedBox(
-            height: 16,
-          ),
+          const SizedBox(height: 16),
           Form(
             key: _formKey,
             child: Column(

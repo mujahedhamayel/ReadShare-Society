@@ -6,7 +6,7 @@ void main() {
     MaterialApp(
       home: WelcomePage(),
       routes: {
-        '/home': (context) => HomeScreen(),
+        '/home': (context) => NavScreen(),
         '/signin': (context) => SignInPage(),
       },
     ),

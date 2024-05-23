@@ -1,3 +1,4 @@
+import 'package:facebook/screens/ProfilePage.dart';
 import 'package:flutter/material.dart';
 import '/models/models.dart';
 import '/widgets/widgets.dart';
@@ -6,9 +7,9 @@ class Rooms extends StatelessWidget {
   final List<User> onlineUsers;
 
   const Rooms({
-    super.key,
+    Key? key,
     required this.onlineUsers,
-  });
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -40,8 +41,16 @@ class Rooms extends StatelessWidget {
             return Padding(
               padding: const EdgeInsets.symmetric(horizontal: 8.0),
               child: ProfileAvatar(
-                imageUrl: user.imageUrl,
+                user: user,
                 isActive: true,
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => ProfilePage(user: user),
+                    ),
+                  );
+                },
               ),
             );
           },
@@ -55,9 +64,9 @@ class _CreateRoomButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return OutlinedButton(
-      onPressed: () => print('Create Room'),
+      onPressed: () => print('Create Discussion'),
       style: ButtonStyle(
-        shape: WidgetStateProperty.all<RoundedRectangleBorder>(
+        shape: MaterialStateProperty.all<RoundedRectangleBorder>(
           RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(30.0),
           ),
@@ -71,7 +80,7 @@ class _CreateRoomButton extends StatelessWidget {
             color: Colors.purple,
           ),
           SizedBox(width: 4.0),
-          Text('Create\nRoom'),
+          Text('Create\n Discussion'),
         ],
       ),
     );
