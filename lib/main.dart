@@ -3,7 +3,13 @@ import 'package:flutter/material.dart';
 
 void main() {
   runApp(
-    const MaterialApp(home: WelcomePage()), // use MaterialApp
+    MaterialApp(
+      home: WelcomePage(),
+      routes: {
+        '/home': (context) => HomeScreen(),
+        '/signin': (context) => SignInPage(),
+      },
+    ),
   );
 }
 

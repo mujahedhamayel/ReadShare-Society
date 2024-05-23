@@ -1,6 +1,8 @@
 import 'package:facebook/screens/SignUpScreen.dart';
 import '/screens/screens.dart';
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
+import 'package:facebook/constants.dart';
 
 class SignInPage extends StatelessWidget {
   const SignInPage({super.key});
@@ -62,10 +64,43 @@ class _FormContent extends StatefulWidget {
 }
 
 class __FormContentState extends State<_FormContent> {
+  final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController();
   bool _isPasswordVisible = false;
   bool _rememberMe = false;
 
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+
+  void _signIn() async {
+    if (_formKey.currentState!.validate()) {
+
+      // Form is validated, proceed with login
+      String email = _emailController.text; // بترجعلي الايميل 
+      String password = _passwordController.text;
+
+      // Make HTTP POST request to login endpoint
+      var url = Uri.parse('http://$ip:$port/api/users/login');
+      var response = await http.post(
+        url,
+        body: {
+          'email': email,
+          'password': password,
+        },
+      );
+      print("response ${response.body}");
+      if (response.statusCode == 200) {
+        // Successful login, navigate to Home screen
+        Navigator.pushReplacementNamed(context, '/home');
+      } else {
+        // Login failed, show error message
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Login failed. Please try again.'),
+          ),
+        );
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -78,6 +113,7 @@ class __FormContentState extends State<_FormContent> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
             TextFormField(
+              controller: _emailController,
               validator: (value) {
                 // add email validation
                 if (value == null || value.isEmpty) {
@@ -105,6 +141,7 @@ class __FormContentState extends State<_FormContent> {
             ),
             _gap(),
             TextFormField(
+              controller: _passwordController,
               validator: (value) {
                 if (value == null || value.isEmpty) {
                   return 'Please enter some text';
@@ -169,7 +206,7 @@ class __FormContentState extends State<_FormContent> {
                     borderRadius: BorderRadius.circular(4),
                   ),
                 ),
-                onPressed: () {},
+                onPressed: _signIn,
                 child: const Padding(
                   padding: EdgeInsets.all(10.0),
                   child: Text(
