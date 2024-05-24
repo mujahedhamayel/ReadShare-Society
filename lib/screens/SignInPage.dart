@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:facebook/constants.dart';
-//import 'package:uuid/uuid.dart'; // For uuid generation if needed
 import 'package:facebook/screens/SignUpScreen.dart';
 import 'package:facebook/screens/screens.dart';
 
@@ -13,7 +12,6 @@ class SignInPage extends StatelessWidget {
     return Scaffold(
       body: Stack(
         children: [
-          // Content
           Center(
             child: SingleChildScrollView(
               child: Column(
@@ -21,7 +19,7 @@ class SignInPage extends StatelessWidget {
                 children: [
                   const _Logo(),
                   const SizedBox(height: 20),
-                  const _FormContent(),
+                  _FormContent(),
                 ],
               ),
             ),
@@ -60,10 +58,10 @@ class _Logo extends StatelessWidget {
 }
 
 class _FormContent extends StatefulWidget {
-  const _FormContent();
+  const _FormContent({super.key});
 
   @override
-  State<_FormContent> createState() => __FormContentState();
+  __FormContentState createState() => __FormContentState();
 }
 
 class __FormContentState extends State<_FormContent> {
@@ -76,11 +74,9 @@ class __FormContentState extends State<_FormContent> {
 
   void _signIn() async {
     if (_formKey.currentState!.validate()) {
-      // Form is validated, proceed with login
-      String email = _emailController.text; // بترجعلي الايميل
+      String email = _emailController.text;
       String password = _passwordController.text;
 
-      // Make HTTP POST request to login endpoint
       var url = Uri.parse('http://$ip:$port/api/users/login');
       var response = await http.post(
         url,
@@ -91,10 +87,8 @@ class __FormContentState extends State<_FormContent> {
       );
       print("response ${response.body}");
       if (response.statusCode == 200) {
-        // Successful login, navigate to Home screen
         Navigator.pushReplacementNamed(context, '/nav_screen');
       } else {
-        // Login failed, show error message
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text('Login failed. Please try again.'),
@@ -117,7 +111,6 @@ class __FormContentState extends State<_FormContent> {
             TextFormField(
               controller: _emailController,
               validator: (value) {
-                // add email validation
                 if (value == null || value.isEmpty) {
                   return 'Please enter some text';
                 }
@@ -134,11 +127,10 @@ class __FormContentState extends State<_FormContent> {
               decoration: const InputDecoration(
                 labelText: 'Email',
                 hintText: 'Enter your email',
-                prefixIcon: Icon(Icons.email_outlined,
-                    color: Colors.black), // Adjust color here
+                prefixIcon: Icon(Icons.email_outlined, color: Colors.black),
                 border: OutlineInputBorder(),
-                labelStyle: TextStyle(color: Colors.black), // Adjust color here
-                hintStyle: TextStyle(color: Colors.black), // Adjust color here
+                labelStyle: TextStyle(color: Colors.black),
+                hintStyle: TextStyle(color: Colors.black),
               ),
             ),
             _gap(),
@@ -163,47 +155,44 @@ class __FormContentState extends State<_FormContent> {
                 border: const OutlineInputBorder(),
                 suffixIcon: IconButton(
                   icon: Icon(
-                      _isPasswordVisible
-                          ? Icons.visibility_off
-                          : Icons.visibility,
-                      color: Colors.black),
+                    _isPasswordVisible
+                        ? Icons.visibility_off
+                        : Icons.visibility,
+                    color: Colors.black,
+                  ),
                   onPressed: () {
                     setState(() {
                       _isPasswordVisible = !_isPasswordVisible;
                     });
                   },
                 ),
-                labelStyle:
-                    const TextStyle(color: Colors.black), // Adjust color here
-                hintStyle:
-                    const TextStyle(color: Colors.black), // Adjust color here
+                labelStyle: const TextStyle(color: Colors.black),
+                hintStyle: const TextStyle(color: Colors.black),
               ),
-              style:
-                  const TextStyle(color: Colors.black), // Adjust color here),
+              style: const TextStyle(color: Colors.black),
             ),
             _gap(),
             CheckboxListTile(
               value: _rememberMe,
               onChanged: (value) {
-                if (value == null) return;
-                setState(() {
-                  _rememberMe = value;
-                });
+                if (value != null) {
+                  setState(() {
+                    _rememberMe = value;
+                  });
+                }
               },
               title: const Text('Remember me',
-                  style: TextStyle(color: Colors.black)), // Adjust color here
+                  style: TextStyle(color: Colors.black)),
               controlAffinity: ListTileControlAffinity.leading,
               dense: true,
               contentPadding: const EdgeInsets.all(0),
-              activeColor: Colors.black, // Adjust color here
+              activeColor: Colors.black,
             ),
-            //_gap(),
             SizedBox(
               width: double.infinity,
               child: ElevatedButton(
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color.fromRGBO(
-                      226, 124, 126, 0.978), // Background color
+                  backgroundColor: const Color.fromRGBO(226, 124, 126, 0.978),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(4),
                   ),

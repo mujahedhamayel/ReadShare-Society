@@ -1,5 +1,6 @@
 import 'package:facebook/config/palette.dart';
 import 'package:facebook/data/data.dart';
+import '../widgets/Search.dart';
 import '/widgets/widgets.dart';
 import 'package:flutter/material.dart';
 
@@ -129,19 +130,30 @@ class _BookScreenMobile extends StatelessWidget {
     return Center(
       child: Scaffold(
         appBar: AppBar(
-          automaticallyImplyLeading: false,
-          backgroundColor: Colors.transparent,
-          elevation: 0,
-          title: const Text(
-            'ReadShare',
-            style: TextStyle(
-              color: Palette.REDcolor,
-              fontSize: 28.0,
-              fontWeight: FontWeight.bold,
-              letterSpacing: -1.2,
+            automaticallyImplyLeading: false,
+            backgroundColor: Colors.transparent,
+            elevation: 0,
+            title: const Text(
+              'ReadShare',
+              style: TextStyle(
+                color: Palette.REDcolor,
+                fontSize: 28.0,
+                fontWeight: FontWeight.bold,
+                letterSpacing: -1.2,
+              ),
             ),
-          ),
-        ),
+            actions: [
+              CircleButton(
+                icon: Icons.search,
+                iconSize: 30.0,
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => SearchPage()),
+                  );
+                },
+              ),
+            ]),
         body: Column(
           children: [
             CustomTab(tabIndex, onTabIndexChanged),
@@ -157,7 +169,7 @@ class _BookScreenMobile extends StatelessWidget {
                       scrollController,
                       onTabIndexChanged,
                     ),
-            )
+            ),
           ],
         ),
       ),

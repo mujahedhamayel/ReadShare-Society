@@ -249,7 +249,13 @@ class __FormContentState extends State<_FormContent> {
                     ],
                   ),
                   child: TextButton(
-                    onPressed: () {},
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => const NavScreen()),
+                      );
+                    },
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
@@ -285,7 +291,6 @@ class __FormContentState extends State<_FormContent> {
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                              
                                 builder: (context) => const SignInPage()),
                           );
                         },

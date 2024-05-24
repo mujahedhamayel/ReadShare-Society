@@ -1,3 +1,4 @@
+import 'package:facebook/widgets/Search.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import '/config/palette.dart';
@@ -70,7 +71,12 @@ class _HomeScreenMobile extends StatelessWidget {
             CircleButton(
               icon: Icons.search,
               iconSize: 30.0,
-              onPressed: () => print('Search'),
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => SearchPage()),
+                );
+              },
             ),
             CircleButton(
               icon: Icons.notifications,
