@@ -1,27 +1,29 @@
-import 'package:facebook/screens/SignUpScreen.dart';
-import '/screens/screens.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:facebook/constants.dart';
-import 'package:uuid/uuid.dart'; // For uuid generation if needed
+//import 'package:uuid/uuid.dart'; // For uuid generation if needed
+import 'package:facebook/screens/SignUpScreen.dart';
+import 'package:facebook/screens/screens.dart';
 
 class SignInPage extends StatelessWidget {
   const SignInPage({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return const Scaffold(
+    return Scaffold(
       body: Stack(
         children: [
           // Content
           Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                _Logo(),
-                SizedBox(height: 20),
-                _FormContent(),
-              ],
+            child: SingleChildScrollView(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const _Logo(),
+                  const SizedBox(height: 20),
+                  const _FormContent(),
+                ],
+              ),
             ),
           ),
         ],
@@ -74,9 +76,8 @@ class __FormContentState extends State<_FormContent> {
 
   void _signIn() async {
     if (_formKey.currentState!.validate()) {
-
       // Form is validated, proceed with login
-      String email = _emailController.text; // بترجعلي الايميل 
+      String email = _emailController.text; // بترجعلي الايميل
       String password = _passwordController.text;
 
       // Make HTTP POST request to login endpoint

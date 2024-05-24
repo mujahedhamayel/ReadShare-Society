@@ -1,3 +1,4 @@
+import 'package:facebook/screens/ProfilePage.dart';
 import 'package:flutter/material.dart';
 import '/models/models.dart';
 import '/widgets/widgets.dart';
@@ -6,9 +7,9 @@ class CreatePostContainer extends StatelessWidget {
   final User currentUser;
 
   const CreatePostContainer({
-    super.key,
+    Key? key,
     required this.currentUser,
-  });
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -26,7 +27,17 @@ class CreatePostContainer extends StatelessWidget {
           children: [
             Row(
               children: [
-                ProfileAvatar(imageUrl: currentUser.imageUrl),
+                ProfileAvatar(
+                  user: currentUser,
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => ProfilePage(user: currentUser),
+                      ),
+                    );
+                  },
+                ),
                 const SizedBox(width: 8.0),
                 const Expanded(
                   child: TextField(
@@ -34,7 +45,7 @@ class CreatePostContainer extends StatelessWidget {
                       hintText: 'What did you read today?',
                     ),
                   ),
-                )
+                ),
               ],
             ),
             const Divider(height: 10.0, thickness: 0.5),
@@ -75,14 +86,15 @@ class CreatePostContainer extends StatelessWidget {
             Column(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
-                SizedBox(width: 8.0),
                 TextButton(
-                    onPressed: () => print('public'), child: Text('Post')),
-                SizedBox(
-                  width: 8.0,
-                )
+                  onPressed: () => print('public'),
+                  child: const Text(
+                    'Post',
+                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+                  ),
+                ),
               ],
-            )
+            ),
           ],
         ),
       ),

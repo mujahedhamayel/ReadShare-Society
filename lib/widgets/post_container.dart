@@ -1,4 +1,5 @@
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:facebook/screens/ProfilePage.dart';
 import 'package:flutter/material.dart';
 import '/config/palette.dart';
 import '/models/models.dart';
@@ -74,7 +75,18 @@ class _PostHeader extends StatelessWidget {
   Widget build(BuildContext context) {
     return Row(
       children: [
-        ProfileAvatar(imageUrl: post.user.imageUrl),
+        ProfileAvatar(
+          user: post.user,
+          isActive: true,
+          onTap: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => ProfilePage(user: post.user),
+              ),
+            );
+          },
+        ),
         const SizedBox(width: 8.0),
         Expanded(
           child: Column(
