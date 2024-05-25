@@ -16,7 +16,6 @@ class _SearchPageState extends State<SearchPage> {
   void initState() {
     super.initState();
     _focusNode = FocusNode();
-    // التركيز على الحقل عند بدء الصفحة
     Future.delayed(Duration.zero, () {
       FocusScope.of(context).requestFocus(_focusNode);
     });
@@ -53,8 +52,8 @@ class _SearchPageState extends State<SearchPage> {
           child: Container(
             height: 45,
             decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(150),
-              border: Border.all(color: Colors.grey),
+              borderRadius: BorderRadius.circular(150.0),
+              color: Colors.grey[200],
             ),
             padding: EdgeInsets.symmetric(horizontal: 10.0),
             child: TextField(

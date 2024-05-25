@@ -1,6 +1,7 @@
 import 'package:facebook/widgets/Search.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import '../widgets/notifications.dart';
 import '/config/palette.dart';
 import '/data/data.dart';
 import '/models/models.dart';
@@ -81,7 +82,12 @@ class _HomeScreenMobile extends StatelessWidget {
             CircleButton(
               icon: Icons.notifications,
               iconSize: 30.0,
-              onPressed: () => print('notifications'),
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => NotificationPage()),
+                );
+              },
             ),
           ],
           systemOverlayStyle: SystemUiOverlayStyle.dark,
