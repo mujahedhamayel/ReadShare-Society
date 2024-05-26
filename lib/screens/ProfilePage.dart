@@ -1,15 +1,15 @@
+import 'package:facebook/providers/user_provider.dart';
 import 'package:facebook/widgets/responsive.dart';
 import 'package:flutter/material.dart';
 import 'package:facebook/models/user_model.dart';
 import 'package:facebook/widgets/post_container.dart';
+import 'package:provider/provider.dart';
 import '../config/palette.dart';
 import '../models/post_model.dart';
 
 class ProfilePage extends StatefulWidget {
-  final User user;
   const ProfilePage({
     super.key,
-    required this.user,
   });
 
   @override
@@ -19,12 +19,10 @@ class ProfilePage extends StatefulWidget {
 class _ProfilepageState extends State<ProfilePage> {
   final TrackingScrollController _trackingScrollController =
       TrackingScrollController();
-  late User user;
 
   @override
   void initState() {
     super.initState();
-    user = widget.user;
   }
 
   @override
@@ -35,19 +33,20 @@ class _ProfilepageState extends State<ProfilePage> {
 
   @override
   Widget build(BuildContext context) {
+    final user = Provider.of<UserProvider>(context).user;
     return GestureDetector(
       onTap: () => FocusScope.of(context).unfocus(),
       child: Scaffold(
         body: Responsive(
           mobile: ProfilePageMobile(
-              scrollController: _trackingScrollController, user: user),
+              scrollController: _trackingScrollController, user: user!),
           desktop: ProfilePageDesktop(
             scrollController: _trackingScrollController,
-            user: user,
+            user: user!,
           ),
           tablet: ProfilePageMobile(
             scrollController: _trackingScrollController,
-            user: user,
+            user: user!,
           ),
         ),
       ),
@@ -67,6 +66,7 @@ class ProfilePageMobile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final user = Provider.of<UserProvider>(context).user;
     return Scaffold(
       body: CustomScrollView(
         slivers: [
@@ -85,7 +85,7 @@ class ProfilePageMobile extends StatelessWidget {
               )
             ],
             flexibleSpace: FlexibleSpaceBar(
-              background: _TopPortion(user: user),
+              background: _TopPortion(user: user!),
             ),
           ),
           SliverToBoxAdapter(
@@ -115,7 +115,11 @@ class ProfilePageMobile extends StatelessWidget {
                     ],
                   ),
                   const SizedBox(height: 16),
-                  const _ProfileInfoRow(),
+                  _ProfileInfoRow(
+                    postCount: user.postCounts,
+                    followerCount: user.followersCounts,
+                    followingCount: user.followingCounts,
+                  ),
                   const SizedBox(height: 16),
                 ],
               ),
@@ -188,7 +192,7 @@ class ProfilePageDesktop extends StatelessWidget {
               )
             ],
             flexibleSpace: FlexibleSpaceBar(
-              background: _TopPortion(user: user),
+              background: _TopPortion(user: user!),
             ),
           ),
           SliverToBoxAdapter(
@@ -218,7 +222,11 @@ class ProfilePageDesktop extends StatelessWidget {
                     ],
                   ),
                   const SizedBox(height: 16),
-                  const _ProfileInfoRow(),
+                  _ProfileInfoRow(
+                    postCount: user.postCounts,
+                    followerCount: user.followersCounts,
+                    followingCount: user.followingCounts,
+                  ),
                   const SizedBox(height: 16),
                 ],
               ),
@@ -382,7 +390,7 @@ class _TopPortion extends StatelessWidget {
                         shape: BoxShape.circle,
                         image: DecorationImage(
                           fit: BoxFit.cover,
-                          image: NetworkImage(user.imageUrl),
+                          image: NetworkImage(user.imageUrl!),
                         ),
                       ),
                     ),
@@ -409,31 +417,31 @@ Future<List<Post>> fetchUserPosts(User currentUser) async {
   // Replace with your actual database fetch logic
   await Future.delayed(const Duration(seconds: 2)); // Simulate network delay
   return [
-    const Post(
-      user: User(
-        name: 'John Doe',
-        imageUrl:
-            'https://images.unsplash.com/photo-1517841905240-472988babdf9?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=634&q=80',
-      ),
-      caption: "Post 1",
-      timeAgo: "5m",
-      imageUrl: 'https://images.unsplash.com/photo-1525253086316-d0c936c814f8',
-      likes: 120,
-      comments: 20,
-      shares: 10,
-    ),
-    const Post(
-      user: User(
-        name: 'John Doe',
-        imageUrl:
-            'https://images.unsplash.com/photo-1517841905240-472988babdf9?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=634&q=80',
-      ),
-      caption: "Post 2",
-      timeAgo: "10m",
-      imageUrl: 'https://images.unsplash.com/photo-1525253086316-d0c936c814f8',
-      likes: 150,
-      comments: 30,
-      shares: 15,
-    ),
+    // const Post(
+    //   user: User(
+    //     name: 'John Doe',
+    //     imageUrl:
+    //         'https://images.unsplash.com/photo-1517841905240-472988babdf9?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=634&q=80',
+    //   ),
+    //   caption: "Post 1",
+    //   timeAgo: "5m",
+    //   imageUrl: 'https://images.unsplash.com/photo-1525253086316-d0c936c814f8',
+    //   likes: 120,
+    //   comments: 20,
+    //   shares: 10,
+    // ),
+    // const Post(
+    //   user: User(
+    //     name: 'John Doe',
+    //     imageUrl:
+    //         'https://images.unsplash.com/photo-1517841905240-472988babdf9?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=634&q=80',
+    //   ),
+    //   caption: "Post 2",
+    //   timeAgo: "10m",
+    //   imageUrl: 'https://images.unsplash.com/photo-1525253086316-d0c936c814f8',
+    //   likes: 150,
+    //   comments: 30,
+    //   shares: 15,
+    // ),
   ];
 }
