@@ -146,7 +146,7 @@ class _PostStats extends StatelessWidget {
                 shape: BoxShape.circle,
               ),
               child: const Icon(
-                Icons.thumb_up,
+                Icons.favorite,
                 size: 10.0,
                 color: Colors.white,
               ),
@@ -180,7 +180,7 @@ class _PostStats extends StatelessWidget {
           children: [
             _PostButton(
               icon: Icon(
-                MdiIcons.thumbUpOutline,
+                Icons.favorite_border_outlined,
                 color: Colors.grey[600],
                 size: 20.0,
               ),

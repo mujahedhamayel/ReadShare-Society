@@ -1,15 +1,68 @@
+import 'package:facebook/widgets/responsive.dart';
 import 'package:flutter/material.dart';
 import 'package:facebook/models/user_model.dart';
 import 'package:facebook/widgets/post_container.dart';
 import '../config/palette.dart';
 import '../models/post_model.dart';
 
-class ProfilePage extends StatelessWidget {
+class ProfilePage extends StatefulWidget {
   final User user;
-
   const ProfilePage({
     super.key,
     required this.user,
+  });
+
+  @override
+  _ProfilepageState createState() => _ProfilepageState();
+}
+
+class _ProfilepageState extends State<ProfilePage> {
+  final TrackingScrollController _trackingScrollController =
+      TrackingScrollController();
+  late User user;
+
+  @override
+  void initState() {
+    super.initState();
+    user = widget.user;
+  }
+
+  @override
+  void dispose() {
+    _trackingScrollController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: () => FocusScope.of(context).unfocus(),
+      child: Scaffold(
+        body: Responsive(
+          mobile: ProfilePageMobile(
+              scrollController: _trackingScrollController, user: user),
+          desktop: ProfilePageDesktop(
+            scrollController: _trackingScrollController,
+            user: user,
+          ),
+          tablet: ProfilePageMobile(
+            scrollController: _trackingScrollController,
+            user: user,
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class ProfilePageMobile extends StatelessWidget {
+  final User user;
+  final TrackingScrollController scrollController;
+
+  const ProfilePageMobile({
+    super.key,
+    required this.user,
+    required this.scrollController,
   });
 
   @override
@@ -99,6 +152,121 @@ class ProfilePage extends StatelessWidget {
             ),
           ),
         ],
+      ),
+    );
+  }
+}
+
+class ProfilePageDesktop extends StatelessWidget {
+  final User user;
+  final TrackingScrollController scrollController;
+
+  const ProfilePageDesktop({
+    Key? key,
+    required this.user,
+    required this.scrollController,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: CustomScrollView(
+        slivers: [
+          SliverAppBar(
+            expandedHeight: 300.0,
+            floating: false,
+            pinned: true,
+            leading: IconButton(
+              onPressed: () => Navigator.of(context).pop(),
+              icon: const Icon(Icons.arrow_back_ios_new_outlined),
+            ),
+            actions: [
+              IconButton(
+                onPressed: () {},
+                icon: const Icon(Icons.more_horiz_outlined),
+              )
+            ],
+            flexibleSpace: FlexibleSpaceBar(
+              background: _TopPortion(user: user),
+            ),
+          ),
+          SliverToBoxAdapter(
+            child: Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Column(
+                children: [
+                  const SizedBox(height: 16),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      FloatingActionButton.extended(
+                        onPressed: () {},
+                        heroTag: 'follow',
+                        elevation: 0,
+                        label: const Text("Follow"),
+                        icon: const Icon(Icons.person_add_alt_1),
+                      ),
+                      const SizedBox(width: 16.0),
+                      FloatingActionButton.extended(
+                        onPressed: () {},
+                        heroTag: 'message',
+                        elevation: 0,
+                        label: const Text("Message"),
+                        icon: const Icon(Icons.message_rounded),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 16),
+                  const _ProfileInfoRow(),
+                  const SizedBox(height: 16),
+                ],
+              ),
+            ),
+          ),
+          SliverToBoxAdapter(
+              child: Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Column(
+              children: [
+                postContainer(user),
+              ],
+            ),
+          )),
+        ],
+      ),
+    );
+  }
+}
+
+class postContainer extends StatelessWidget {
+  final User user;
+  const postContainer(this.user, {super.key});
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      constraints: const BoxConstraints(maxWidth: 600),
+      child: FutureBuilder<List<Post>>(
+        future: fetchUserPosts(user),
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Center(child: CircularProgressIndicator());
+          } else if (snapshot.hasError) {
+            return const Center(child: Text("Error loading posts"));
+          } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+            return const Center(child: Text("No posts available"));
+          }
+
+          final posts = snapshot.data!;
+          return ListView.builder(
+            physics: const NeverScrollableScrollPhysics(),
+            shrinkWrap: true,
+            itemCount: posts.length,
+            itemBuilder: (context, index) {
+              final post = posts[index];
+              return PostContainer(post: post);
+            },
+          );
+        },
       ),
     );
   }
