@@ -1,5 +1,7 @@
 import 'package:facebook/models/user_model.dart';
+import 'package:facebook/providers/user_provider.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 AppBar _buildAppBar(BuildContext context) {
   return AppBar(
@@ -17,22 +19,20 @@ AppBar _buildAppBar(BuildContext context) {
 }
 
 class ProfilePage extends StatelessWidget {
-  final User user;
-
   const ProfilePage({
     Key? key,
-    required this.user,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
+    final user = Provider.of<UserProvider>(context).user;
     return Scaffold(
       appBar: _buildAppBar(context),
       body: Column(
         children: [
           Expanded(
             flex: 2,
-            child: _TopPortion(profileImageUrl: user.imageUrl),
+            child: _TopPortion(profileImageUrl: user!.imageUrl),
           ),
           Expanded(
             flex: 3,
@@ -69,7 +69,11 @@ class ProfilePage extends StatelessWidget {
                     ],
                   ),
                   const SizedBox(height: 16),
-                  const _ProfileInfoRow(),
+                  _ProfileInfoRow(
+                    postCount: user.postCounts,
+                    followerCount: user.followersCounts,
+                    followingCount: user.followingCounts,
+                  ),
                 ],
               ),
             ),
@@ -81,16 +85,27 @@ class ProfilePage extends StatelessWidget {
 }
 
 class _ProfileInfoRow extends StatelessWidget {
-  const _ProfileInfoRow();
+  final int? postCount;
+  final int? followerCount;
+  final int? followingCount;
 
-  final List<ProfileInfoItem> _items = const [
-    ProfileInfoItem("Posts", 900),
-    ProfileInfoItem("Followers", 120),
-    ProfileInfoItem("Following", 200),
-  ];
+  const _ProfileInfoRow({
+    required this.postCount,
+    required this.followerCount,
+    required this.followingCount,
+  });
 
   @override
   Widget build(BuildContext context) {
+    print("postCount $postCount");
+    print("Followers $followerCount");
+    print("Following $followingCount");
+    final List<ProfileInfoItem> _items = [
+      ProfileInfoItem("Posts", postCount ?? 0),
+      ProfileInfoItem("Followers", followerCount ?? 0),
+      ProfileInfoItem("Following", followingCount ?? 0),
+    ];
+
     return Container(
       height: 80,
       constraints: const BoxConstraints(maxWidth: 400),
@@ -137,7 +152,7 @@ class ProfileInfoItem {
 }
 
 class _TopPortion extends StatelessWidget {
-  final String profileImageUrl;
+  final String? profileImageUrl;
 
   const _TopPortion({
     Key? key,
@@ -181,7 +196,7 @@ class _TopPortion extends StatelessWidget {
                     shape: BoxShape.circle,
                     image: DecorationImage(
                       fit: BoxFit.cover,
-                      image: NetworkImage(profileImageUrl),
+                      image: NetworkImage(profileImageUrl!),
                     ),
                   ),
                 ),

@@ -65,7 +65,8 @@ class DefaultFirebaseOptions {
     projectId: 'book-app-1356e',
     databaseURL: 'https://book-app-1356e-default-rtdb.firebaseio.com',
     storageBucket: 'book-app-1356e.appspot.com',
-    iosClientId: '1013057635854-1ade6267ggfidb8ajn6tlnq7pfr20dbv.apps.googleusercontent.com',
+    iosClientId:
+        '1013057635854-1ade6267ggfidb8ajn6tlnq7pfr20dbv.apps.googleusercontent.com',
     iosBundleId: 'com.example.bookvApp',
   );
 }

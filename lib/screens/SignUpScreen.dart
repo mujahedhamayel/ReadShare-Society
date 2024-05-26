@@ -1,3 +1,4 @@
+import 'package:facebook/helpers/auth_token.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert'; // For jsonEncode
@@ -325,6 +326,9 @@ class __FormContentState extends State<_FormContent> {
 
     if (response.statusCode == 200) {
       // Successful signup, navigate to Home screen
+      final body = jsonDecode(response.body);
+      final backendToken = body['token'];
+      AuthToken().setToken(backendToken);
       Navigator.pushReplacementNamed(context, '/nav_screen');
     } else {
       // If the server returns an error response, show a Snackbar with the error

@@ -1,15 +1,29 @@
+import 'package:facebook/providers/user_provider.dart';
+
 import '/screens/screens.dart';
 import 'package:flutter/material.dart';
-
-void main() {
+import 'package:facebook/firebase_options.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+void main() async  {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
   runApp(
-    MaterialApp(
-      home: WelcomePage(),
-      routes: {
-        '/home': (context) => NavScreen(),
-        '/signin': (context) => SignInPage(),
-        '/nav_screen': (context) => NavScreen(),
-      },
+    MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (_) => UserProvider()),
+      ],
+      child: MaterialApp(
+        home: WelcomePage(),
+        routes: {
+          '/home': (context) => NavScreen(),
+          '/signin': (context) => SignInPage(),
+          '/nav_screen': (context) => NavScreen(),
+        },
+      ),
     ),
   );
 }

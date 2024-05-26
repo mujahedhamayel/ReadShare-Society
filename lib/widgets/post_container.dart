@@ -38,21 +38,17 @@ class PostContainer extends StatelessWidget {
                 children: [
                   _PostHeader(post: post),
                   const SizedBox(height: 4.0),
-                  Text(post.caption),
-                  // ignore: unnecessary_null_comparison
-                  post.imageUrl != null
-                      ? const SizedBox.shrink()
-                      : const SizedBox(height: 6.0),
+                  Text(post.caption ),
+                  if (post.imageUrl != null && post.imageUrl!.isNotEmpty)
+                    Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 8.0),
+                      child: CachedNetworkImage(imageUrl: post.imageUrl!),
+                    )
+                  else
+                    const SizedBox.shrink(),
                 ],
               ),
             ),
-            // ignore: unnecessary_null_comparison
-            post.imageUrl != null
-                ? Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 8.0),
-                    child: CachedNetworkImage(imageUrl: post.imageUrl),
-                  )
-                : const SizedBox.shrink(),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 12.0),
               child: _PostStats(post: post),
@@ -82,7 +78,7 @@ class _PostHeader extends StatelessWidget {
             Navigator.push(
               context,
               MaterialPageRoute(
-                builder: (context) => ProfilePage(user: post.user),
+                builder: (context) => ProfilePage(),
               ),
             );
           },

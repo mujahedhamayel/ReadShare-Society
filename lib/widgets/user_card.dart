@@ -25,7 +25,7 @@ class UserCard extends StatelessWidget {
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (context) => ProfilePage(user: user),
+                  builder: (context) => ProfilePage(),
                 ),
               );
             },

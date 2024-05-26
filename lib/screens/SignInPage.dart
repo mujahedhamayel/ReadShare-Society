@@ -1,8 +1,14 @@
+import 'dart:convert';
+
+import 'package:facebook/helpers/auth_token.dart';
+import 'package:facebook/models/models.dart';
+import 'package:facebook/providers/user_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:facebook/constants.dart';
 import 'package:facebook/screens/SignUpScreen.dart';
 import 'package:facebook/screens/screens.dart';
+import 'package:provider/provider.dart';
 
 class SignInPage extends StatelessWidget {
   const SignInPage({super.key});
@@ -65,8 +71,10 @@ class _FormContent extends StatefulWidget {
 }
 
 class __FormContentState extends State<_FormContent> {
-  final TextEditingController _emailController = TextEditingController();
-  final TextEditingController _passwordController = TextEditingController();
+  final TextEditingController _emailController =
+      TextEditingController(text: "test111@test.com");
+  final TextEditingController _passwordController =
+      TextEditingController(text: "123456");
   bool _isPasswordVisible = false;
   bool _rememberMe = false;
 
@@ -85,8 +93,27 @@ class __FormContentState extends State<_FormContent> {
           'password': password,
         },
       );
-      print("response ${response.body}");
+
       if (response.statusCode == 200) {
+        print("response ${response.body}");
+        final body = jsonDecode(response.body);
+        final backendToken = body['token'];
+        AuthToken().setToken(backendToken);
+
+        url = Uri.parse('http://$ip:$port/api/users/profile');
+
+        response = await http.get(
+          url,
+          headers: <String, String>{
+            'Content-Type': 'application/json; charset=UTF-8',
+            'Authorization': 'Bearer $backendToken',
+          },
+        );
+
+        var data = jsonDecode(response.body);
+        User user = User.fromJson(
+            data['user']); // Assuming your API returns a user object
+        Provider.of<UserProvider>(context, listen: false).setUser(user);
         Navigator.pushReplacementNamed(context, '/nav_screen');
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
