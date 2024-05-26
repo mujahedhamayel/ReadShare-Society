@@ -18,8 +18,8 @@ class SignUpPage extends StatelessWidget {
               final isSmallScreen = constraints.maxWidth < 600;
               return Center(
                 child: isSmallScreen
-                    ? SingleChildScrollView(
-                        child: const Column(
+                    ? const SingleChildScrollView(
+                        child: Column(
                           mainAxisSize: MainAxisSize.min,
                           children: [
                             _FormContent(),

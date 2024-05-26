@@ -4,11 +4,11 @@ import '/screens/screens.dart';
 void main() {
   runApp(
     MaterialApp(
-      home: WelcomePage(),
+      home: const WelcomePage(),
       routes: {
-        '/home': (context) => NavScreen(),
-        '/signin': (context) => SignInPage(),
-        '/nav_screen': (context) => NavScreen(),
+        '/home': (context) => const NavScreen(),
+        '/signin': (context) => const SignInPage(),
+        '/nav_screen': (context) => const NavScreen(),
       },
     ),
   );
@@ -19,12 +19,12 @@ class WelcomePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return const Scaffold(
       body: Center(
         child: SingleChildScrollView(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
-            children: const [
+            children: [
               _Logo(),
               SizedBox(height: 20), // Adding some spacing
               _Text(), // Class names should be capitalized
@@ -80,13 +80,13 @@ class _Text extends StatelessWidget {
           ), // Icon widget
           label: const Text(""), // Empty text to make space for icon
           style: ButtonStyle(
-            backgroundColor: MaterialStateProperty.all<Color>(
+            backgroundColor: WidgetStateProperty.all<Color>(
               const Color.fromRGBO(226, 124, 126, 0.978),
             ), // Button color
-            padding: MaterialStateProperty.all<EdgeInsetsGeometry>(
+            padding: WidgetStateProperty.all<EdgeInsetsGeometry>(
               const EdgeInsets.symmetric(vertical: 15, horizontal: 20),
             ), // Padding around icon
-            shape: MaterialStateProperty.all<OutlinedBorder>(
+            shape: WidgetStateProperty.all<OutlinedBorder>(
               RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(30),
               ),

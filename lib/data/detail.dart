@@ -89,7 +89,7 @@ class BookReview extends StatelessWidget {
             children: [
               Text(
                 '${book.score}',
-                style: TextStyle(
+                style: const TextStyle(
                   fontSize: 26,
                   fontWeight: FontWeight.bold,
                 ),
@@ -118,7 +118,7 @@ class BookReview extends StatelessWidget {
                 ),
                 const TextSpan(
                   text: 'Read more',
-                  style: const TextStyle(fontSize: 16),
+                  style: TextStyle(fontSize: 16),
                 ),
               ],
             ),
@@ -188,7 +188,7 @@ class BookCover extends StatelessWidget {
               color: Color.fromARGB(191, 212, 211, 211),
             ),
             child: ClipRRect(
-              borderRadius: BorderRadius.only(
+              borderRadius: const BorderRadius.only(
                 topLeft: Radius.circular(50),
                 bottomLeft: Radius.circular(50),
               ),
@@ -205,7 +205,7 @@ class BookCover extends StatelessWidget {
               padding: const EdgeInsets.all(8),
               decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(10),
-                  color: Color.fromRGBO(226, 124, 126, 0.978)),
+                  color: const Color.fromRGBO(226, 124, 126, 0.978)),
               child: const Icon(
                 Icons.info_outline,
                 color: Colors.white,
@@ -220,7 +220,7 @@ class BookCover extends StatelessWidget {
               padding: const EdgeInsets.all(8),
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(10),
-                color: Color.fromARGB(255, 60, 27, 110),
+                color: const Color.fromARGB(255, 60, 27, 110),
               ),
               child: const Row(
                 children: [

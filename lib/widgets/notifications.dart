@@ -6,7 +6,7 @@ import '../config/palette.dart';
 
 // ignore: must_be_immutable
 class NotificationPage extends StatelessWidget {
-  NotificationPage({Key? key}) : super(key: key);
+  NotificationPage({super.key});
   List newItem = ["liked", "follow"];
   List todayItem = ["follow", "liked", "liked"];
 

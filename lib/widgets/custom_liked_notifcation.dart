@@ -46,14 +46,14 @@ class CustomLikedNotifcation extends StatelessWidget {
                     style: Theme.of(context)
                         .textTheme
                         .headlineSmall!
-                        .copyWith(color: Color(0xFF2E3E5C)),
+                        .copyWith(color: const Color(0xFF2E3E5C)),
                     children: [
                       TextSpan(
                         text: " and \n",
                         style: Theme.of(context)
                             .textTheme
                             .headlineSmall!
-                            .copyWith(color: Color(0xFF9FA5C0)),
+                            .copyWith(color: const Color(0xFF9FA5C0)),
                       ),
                       const TextSpan(text: "Sam Wincherter")
                     ]),
@@ -65,7 +65,7 @@ class CustomLikedNotifcation extends StatelessWidget {
                   style: Theme.of(context)
                       .textTheme
                       .titleMedium!
-                      .copyWith(color: Color(0xFF9FA5C0)))
+                      .copyWith(color: const Color(0xFF9FA5C0)))
             ],
           ),
         ),

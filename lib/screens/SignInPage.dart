@@ -9,7 +9,7 @@ class SignInPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return const Scaffold(
       body: Stack(
         children: [
           Center(
@@ -17,8 +17,8 @@ class SignInPage extends StatelessWidget {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  const _Logo(),
-                  const SizedBox(height: 20),
+                  _Logo(),
+                  SizedBox(height: 20),
                   _FormContent(),
                 ],
               ),
@@ -58,7 +58,7 @@ class _Logo extends StatelessWidget {
 }
 
 class _FormContent extends StatefulWidget {
-  const _FormContent({super.key});
+  const _FormContent();
 
   @override
   __FormContentState createState() => __FormContentState();
@@ -90,7 +90,7 @@ class __FormContentState extends State<_FormContent> {
         Navigator.pushReplacementNamed(context, '/nav_screen');
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
+          const SnackBar(
             content: Text('Login failed. Please try again.'),
           ),
         );

@@ -75,7 +75,7 @@ class _HomeScreenMobile extends StatelessWidget {
               onPressed: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => SearchPage()),
+                  MaterialPageRoute(builder: (context) => const SearchPage()),
                 );
               },
             ),
@@ -92,7 +92,7 @@ class _HomeScreenMobile extends StatelessWidget {
           ],
           systemOverlayStyle: SystemUiOverlayStyle.dark,
         ),
-        SliverToBoxAdapter(
+        const SliverToBoxAdapter(
           child: CreatePostContainer(currentUser: currentUser),
         ),
         SliverPadding(
@@ -126,12 +126,12 @@ class _HomeScreenDesktop extends StatelessWidget {
   Widget build(BuildContext context) {
     return Row(
       children: [
-        Flexible(
+        const Flexible(
           flex: 2,
           child: Align(
             alignment: Alignment.centerLeft,
             child: Padding(
-              padding: const EdgeInsets.all(12.0),
+              padding: EdgeInsets.all(12.0),
               child: MoreOptionsList(currentUser: currentUser),
             ),
           ),
@@ -142,7 +142,7 @@ class _HomeScreenDesktop extends StatelessWidget {
           child: CustomScrollView(
             controller: scrollController,
             slivers: [
-              SliverToBoxAdapter(
+              const SliverToBoxAdapter(
                 child: CreatePostContainer(currentUser: currentUser),
               ),
               SliverPadding(

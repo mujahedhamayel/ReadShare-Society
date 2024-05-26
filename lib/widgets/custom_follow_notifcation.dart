@@ -33,17 +33,17 @@ class _CustomFollowNotifcationState extends State<CustomFollowNotifcation> {
               style: Theme.of(context)
                   .textTheme
                   .headlineSmall!
-                  .copyWith(color: Color(0xFF2E3E5C)),
+                  .copyWith(color: const Color(0xFF2E3E5C)),
             ),
             const SizedBox(
               height: 5,
             ),
             Text(
-              "New following you  .  h1",
+              "New following you  .  1h",
               style: Theme.of(context)
                   .textTheme
                   .titleMedium!
-                  .copyWith(color: Color(0xFFFF6464)),
+                  .copyWith(color: const Color(0xFF9FA5C0)),
             ),
           ],
         ),
@@ -52,8 +52,10 @@ class _CustomFollowNotifcationState extends State<CustomFollowNotifcation> {
             padding: EdgeInsets.only(left: follow == false ? 50 : 30),
             child: CustomButton(
               height: 40,
-              color: follow == false ? Palette.REDcolor : Color(0xFFF4F5F7),
-              textColor: follow == false ? Colors.white : Color(0xFF2E3E5C),
+              color:
+                  follow == false ? Palette.REDcolor : const Color(0xFFF4F5F7),
+              textColor:
+                  follow == false ? Colors.white : const Color(0xFF2E3E5C),
               onTap: () {
                 setState(() {
                   follow = !follow;

@@ -65,12 +65,12 @@ class _BookScreenDesktop extends StatelessWidget {
   Widget build(BuildContext context) {
     return Row(
       children: [
-        Flexible(
+        const Flexible(
           flex: 2,
           child: Align(
             alignment: Alignment.centerLeft,
             child: Padding(
-              padding: const EdgeInsets.all(12.0),
+              padding: EdgeInsets.all(12.0),
               child: MoreOptionsList(currentUser: currentUser),
             ),
           ),
@@ -149,7 +149,7 @@ class _BookScreenMobile extends StatelessWidget {
                 onPressed: () {
                   Navigator.push(
                     context,
-                    MaterialPageRoute(builder: (context) => SearchPage()),
+                    MaterialPageRoute(builder: (context) => const SearchPage()),
                   );
                 },
               ),

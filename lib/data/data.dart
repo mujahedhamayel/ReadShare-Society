@@ -109,7 +109,7 @@ final List<User> onlineUsers = [
 ];
 
 final List<Post> posts = [
-  Post(
+  const Post(
     user: currentUser,
     caption: 'Check out these cool puppers',
     timeAgo: '58m',

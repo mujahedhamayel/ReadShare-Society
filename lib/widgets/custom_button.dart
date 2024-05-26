@@ -11,8 +11,8 @@ class CustomButton extends StatelessWidget {
     this.colorBorder,
     this.textColor,
     required this.height,
-    Key? key,
-  }) : super(key: key);
+    super.key,
+  });
   String? text;
   Color? color;
   Function() onTap;
