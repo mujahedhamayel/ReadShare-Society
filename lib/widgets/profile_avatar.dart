@@ -10,12 +10,12 @@ class ProfileAvatar extends StatelessWidget {
   final VoidCallback onTap;
 
   const ProfileAvatar({
-    Key? key,
+    super.key,
     required this.user,
     this.isActive = false,
     this.hasBorder = false,
     required this.onTap,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -32,24 +32,6 @@ class ProfileAvatar extends StatelessWidget {
               backgroundImage: CachedNetworkImageProvider(user.imageUrl ?? 'https://defaultimageurl.com/default.jpg'),
             ),
           ),
-          isActive
-              ? Positioned(
-                  bottom: 0.0,
-                  right: 0.0,
-                  child: Container(
-                    height: 15.0,
-                    width: 15.0,
-                    decoration: BoxDecoration(
-                      color: Palette.online,
-                      shape: BoxShape.circle,
-                      border: Border.all(
-                        width: 2.0,
-                        color: Colors.white,
-                      ),
-                    ),
-                  ),
-                )
-              : const SizedBox.shrink(),
         ],
       ),
     );

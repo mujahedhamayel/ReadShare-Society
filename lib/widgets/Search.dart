@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 class SearchPage extends StatefulWidget {
-  const SearchPage({Key? key}) : super(key: key);
+  const SearchPage({super.key});
 
   @override
   _SearchPageState createState() => _SearchPageState();
@@ -16,7 +16,6 @@ class _SearchPageState extends State<SearchPage> {
   void initState() {
     super.initState();
     _focusNode = FocusNode();
-    // التركيز على الحقل عند بدء الصفحة
     Future.delayed(Duration.zero, () {
       FocusScope.of(context).requestFocus(_focusNode);
     });
@@ -53,10 +52,10 @@ class _SearchPageState extends State<SearchPage> {
           child: Container(
             height: 45,
             decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(150),
-              border: Border.all(color: Colors.grey),
+              borderRadius: BorderRadius.circular(150.0),
+              color: Colors.grey[200],
             ),
-            padding: EdgeInsets.symmetric(horizontal: 10.0),
+            padding: const EdgeInsets.symmetric(horizontal: 10.0),
             child: TextField(
               controller: _searchController,
               focusNode: _focusNode,
@@ -64,7 +63,7 @@ class _SearchPageState extends State<SearchPage> {
                 hintText: 'Search ',
                 border: InputBorder.none,
                 suffixIcon: IconButton(
-                  icon: Icon(Icons.close),
+                  icon: const Icon(Icons.close),
                   onPressed: () {
                     _searchController.clear();
                   },

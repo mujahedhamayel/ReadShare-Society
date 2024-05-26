@@ -24,9 +24,9 @@ class CreatePostContainer extends StatefulWidget {
   final User currentUser;
 
   const CreatePostContainer({
-    Key? key,
+    super.key,
     required this.currentUser,
-  }) : super(key: key);
+  });
 
   @override
   _CreatePostContainerState createState() => _CreatePostContainerState();

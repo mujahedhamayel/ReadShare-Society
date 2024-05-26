@@ -2,6 +2,7 @@ import 'package:facebook/helpers/auth_token.dart';
 import 'package:facebook/widgets/Search.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import '../widgets/notifications.dart';
 import '/config/palette.dart';
 import '/data/data.dart';
 import '/models/models.dart';
@@ -142,19 +143,24 @@ class _HomeScreenMobile extends StatelessWidget {
               onPressed: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => SearchPage()),
+                  MaterialPageRoute(builder: (context) => const SearchPage()),
                 );
               },
             ),
             CircleButton(
               icon: Icons.notifications,
               iconSize: 30.0,
-              onPressed: () => print('notifications'),
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => NotificationPage()),
+                );
+              },
             ),
           ],
           systemOverlayStyle: SystemUiOverlayStyle.dark,
         ),
-        SliverToBoxAdapter(
+        const SliverToBoxAdapter(
           child: CreatePostContainer(currentUser: currentUser),
         ),
         SliverPadding(
@@ -196,12 +202,12 @@ class _HomeScreenDesktop extends StatelessWidget {
   Widget build(BuildContext context) {
     return Row(
       children: [
-        Flexible(
+        const Flexible(
           flex: 2,
           child: Align(
             alignment: Alignment.centerLeft,
             child: Padding(
-              padding: const EdgeInsets.all(12.0),
+              padding: EdgeInsets.all(12.0),
               child: MoreOptionsList(currentUser: currentUser),
             ),
           ),
@@ -212,7 +218,7 @@ class _HomeScreenDesktop extends StatelessWidget {
           child: CustomScrollView(
             controller: scrollController,
             slivers: [
-              SliverToBoxAdapter(
+              const SliverToBoxAdapter(
                 child: CreatePostContainer(currentUser: currentUser),
               ),
               SliverPadding(
