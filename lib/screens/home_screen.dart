@@ -1,4 +1,5 @@
-import 'package:facebook/helpers/auth_token.dart';
+import 'package:facebook/utils/api_util.dart';
+import 'package:facebook/utils/auth_token.dart';
 import 'package:facebook/widgets/Search.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -48,10 +49,7 @@ class _HomeScreenState extends State<HomeScreen> {
     try {
       final response = await http.get(
         Uri.parse('http://$ip:$port/api/posts'),
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': 'Bearer $token',
-        },
+        headers: ApiUtil.headers(token),
       );
       print('Response: ${response.body}');
       if (response.statusCode == 200) {

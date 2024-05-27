@@ -1,6 +1,6 @@
 import 'dart:convert';
 
-import 'package:facebook/helpers/auth_token.dart';
+import 'package:facebook/utils/auth_token.dart';
 import 'package:facebook/models/models.dart';
 import 'package:facebook/providers/user_provider.dart';
 import 'package:flutter/material.dart';

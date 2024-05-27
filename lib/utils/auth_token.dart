@@ -7,11 +7,11 @@ class AuthToken {
 
   AuthToken._internal();
 
-  String? token;
+  late String token;
 
   void setToken(String value) {
     token = value;
   }
 
-  String? get getToken => token;
+  String get getToken => token;
 }

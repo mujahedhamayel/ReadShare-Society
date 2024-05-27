@@ -1,7 +1,9 @@
-import 'package:facebook/helpers/auth_token.dart';
+import 'package:facebook/utils/auth_token.dart';
+import 'package:facebook/providers/user_provider.dart';
 import 'package:facebook/screens/ProfilePage.dart';
 
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import '/models/models.dart';
 import '/widgets/widgets.dart';
 import 'package:flutter/material.dart';
@@ -21,8 +23,8 @@ import '/config/palette.dart';
 
 
 class CreatePostContainer extends StatefulWidget {
-  final User currentUser;
 
+  final User currentUser;
   const CreatePostContainer({
     super.key,
     required this.currentUser,
@@ -86,6 +88,7 @@ class _CreatePostContainerState extends State<CreatePostContainer> {
 
   @override
   Widget build(BuildContext context) {
+    final user = Provider.of<UserProvider>(context).user;
     return Card(
       margin: EdgeInsets.symmetric(horizontal: 5.0),
       elevation: 1.0,
@@ -98,7 +101,7 @@ class _CreatePostContainerState extends State<CreatePostContainer> {
             Row(
               children: [
                 ProfileAvatar(
-                  user: widget.currentUser,
+                  user: user!,
                   onTap: () {
                     Navigator.push(
                       context,

@@ -417,19 +417,25 @@ Future<List<Post>> fetchUserPosts(User currentUser) async {
   // Replace with your actual database fetch logic
   await Future.delayed(const Duration(seconds: 2)); // Simulate network delay
   return [
-    // const Post(
-    //   user: User(
-    //     name: 'John Doe',
-    //     imageUrl:
-    //         'https://images.unsplash.com/photo-1517841905240-472988babdf9?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=634&q=80',
-    //   ),
-    //   caption: "Post 1",
-    //   timeAgo: "5m",
-    //   imageUrl: 'https://images.unsplash.com/photo-1525253086316-d0c936c814f8',
-    //   likes: 120,
-    //   comments: 20,
-    //   shares: 10,
-    // ),
+    const Post(
+      user: User(
+        id: '2',
+        name: 'David Brooks',
+        email: 'david@example.com',
+        imageUrl:
+            'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=634&q=80',
+        books: [],
+        likedBooks: [],
+        requests: [],
+        followedUsers: [],
+      ),
+      caption: "Post 1",
+      timeAgo: "5m",
+      imageUrl: 'https://images.unsplash.com/photo-1525253086316-d0c936c814f8',
+      likes: 120,
+      comments: 20,
+      shares: 10,
+    ),
     // const Post(
     //   user: User(
     //     name: 'John Doe',

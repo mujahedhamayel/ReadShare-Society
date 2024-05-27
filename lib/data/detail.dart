@@ -40,7 +40,7 @@ class BookDetail extends StatelessWidget {
             ),
             const SizedBox(height: 10),
             Text(
-              book.name,
+              book.title,
               style: const TextStyle(fontSize: 24, height: 1.2),
             ),
             const SizedBox(height: 15),
@@ -55,14 +55,14 @@ class BookDetail extends StatelessWidget {
                         style: TextStyle(color: Colors.grey),
                       ),
                       TextSpan(
-                        text: book.publisher,
+                        text: book.author,
                         style: const TextStyle(fontWeight: FontWeight.w500),
                       ),
                     ],
                   ),
                 ),
                 Text(
-                  DateFormat.yMMMd().format(book.date),
+                  DateFormat.yMMMd().format(book.updateDate),
                   style: const TextStyle(
                     color: Colors.grey,
                   ),
@@ -88,19 +88,19 @@ class BookReview extends StatelessWidget {
           Row(
             children: [
               Text(
-                '${book.score}',
+                '${book.author}',
                 style: const TextStyle(
                   fontSize: 26,
                   fontWeight: FontWeight.bold,
                 ),
               ),
               const SizedBox(width: 10),
-              _buildStar(book.score.toDouble()),
+              _buildStar(book.rate.toDouble()),
             ],
           ),
           const SizedBox(height: 10),
           Text(
-            '${book.ratings} The Ratings of Book',
+            '${book.rate} The Ratings of Book',
             style: const TextStyle(
               color: Colors.grey,
             ),
@@ -178,13 +178,13 @@ class BookCover extends StatelessWidget {
       child: Stack(
         children: [
           Container(
-            padding: const EdgeInsets.only(left: 50),
+            padding: const EdgeInsets.only(left: 5, right: 30),
             width: MediaQuery.of(context).size.width - 20,
             decoration: const BoxDecoration(
               borderRadius: BorderRadius.only(
                 topLeft: Radius.circular(50),
                 bottomLeft: Radius.circular(50),
-              ),
+              ), 
               color: Color.fromARGB(191, 212, 211, 211),
             ),
             child: ClipRRect(
@@ -192,9 +192,14 @@ class BookCover extends StatelessWidget {
                 topLeft: Radius.circular(50),
                 bottomLeft: Radius.circular(50),
               ),
-              child: Image.asset(
-                book.imgUrl,
-                fit: BoxFit.cover,
+              child: Container(
+                decoration: BoxDecoration(
+                  color: Colors.black,
+                  image: DecorationImage(
+                    fit: BoxFit.fill,
+                    image: NetworkImage(book.imgUrl),
+                  ),
+                ),
               ),
             ),
           ),
