@@ -55,7 +55,7 @@ class BookDetail extends StatelessWidget {
                         style: TextStyle(color: Colors.grey),
                       ),
                       TextSpan(
-                        text: book.author,
+                        text: book.owner,
                         style: const TextStyle(fontWeight: FontWeight.w500),
                       ),
                     ],
@@ -110,7 +110,7 @@ class BookReview extends StatelessWidget {
             TextSpan(
               children: [
                 TextSpan(
-                  text: book.review,
+                  text: book.review ?? '' ,
                   style: const TextStyle(
                     fontSize: 16,
                     height: 1.8,

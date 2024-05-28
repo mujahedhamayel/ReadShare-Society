@@ -35,7 +35,7 @@ class Book {
       json['location'],
       4.7, //rate
       'Ifailed the first quarter of a class in school, so I ma....',
-
+      
       // json['ratings'],
       // json['review'],
       // json['height'],
