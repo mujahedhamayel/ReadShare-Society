@@ -110,7 +110,7 @@ class BookReview extends StatelessWidget {
             TextSpan(
               children: [
                 TextSpan(
-                  text: book.review ?? '' ,
+                  text: book.review[0].toString(),
                   style: const TextStyle(
                     fontSize: 16,
                     height: 1.8,
@@ -184,7 +184,7 @@ class BookCover extends StatelessWidget {
               borderRadius: BorderRadius.only(
                 topLeft: Radius.circular(50),
                 bottomLeft: Radius.circular(50),
-              ), 
+              ),
               color: Color.fromARGB(191, 212, 211, 211),
             ),
             child: ClipRRect(

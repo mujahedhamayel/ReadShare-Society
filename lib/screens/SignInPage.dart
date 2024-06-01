@@ -1,8 +1,10 @@
 import 'dart:convert';
 
+import 'package:facebook/services/notification_service.dart';
 import 'package:facebook/utils/auth_token.dart';
 import 'package:facebook/models/models.dart';
 import 'package:facebook/providers/user_provider.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:facebook/constants.dart';
@@ -77,7 +79,8 @@ class __FormContentState extends State<_FormContent> {
       TextEditingController(text: "123456");
   bool _isPasswordVisible = false;
   bool _rememberMe = false;
-
+  final FirebaseMessaging _firebaseMessaging = FirebaseMessaging.instance;
+  final _notificationService = NotificationService();
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
   void _signIn() async {
@@ -114,6 +117,12 @@ class __FormContentState extends State<_FormContent> {
         User user = User.fromJson(
             data['user']); // Assuming your API returns a user object
         Provider.of<UserProvider>(context, listen: false).setUser(user);
+        // Get the device token
+       
+       
+      _notificationService.saveTokenToServer();
+        // Save the token to your backend server
+       
         Navigator.pushReplacementNamed(context, '/nav_screen');
       } else {
         ScaffoldMessenger.of(context).showSnackBar(

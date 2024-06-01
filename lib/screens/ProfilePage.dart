@@ -1,4 +1,5 @@
 import 'package:facebook/providers/user_provider.dart';
+import 'package:facebook/utils/auth_token.dart';
 import 'package:facebook/widgets/responsive.dart';
 import 'package:flutter/material.dart';
 import 'package:facebook/models/user_model.dart';
@@ -6,6 +7,17 @@ import 'package:facebook/widgets/post_container.dart';
 import 'package:provider/provider.dart';
 import '../config/palette.dart';
 import '../models/post_model.dart';
+
+import 'package:facebook/utils/api_util.dart';
+import 'package:flutter/services.dart';
+import '/models/models.dart';
+import '/widgets/widgets.dart';
+import 'package:facebook/constants.dart';
+import 'dart:convert';
+import 'package:cached_network_image/cached_network_image.dart';
+import 'package:facebook/screens/ProfilePage.dart';
+import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
+import 'package:http/http.dart' as http;
 
 class ProfilePage extends StatefulWidget {
   const ProfilePage({
@@ -20,15 +32,56 @@ class _ProfilepageState extends State<ProfilePage> {
   final TrackingScrollController _trackingScrollController =
       TrackingScrollController();
 
+  List<Post> _posts = [];
+  bool isLoading = true;
+
   @override
   void initState() {
     super.initState();
+    _fetchPosts();
   }
 
   @override
   void dispose() {
     _trackingScrollController.dispose();
     super.dispose();
+  }
+
+  Future<void> _fetchPosts() async {
+    String? token = AuthToken().getToken;
+
+    try {
+      final response = await http.get(
+        Uri.parse('http://$ip:$port/api/posts/me'),
+        headers: ApiUtil.headers(token),
+      );
+      print('Response: ${response.body}');
+      if (response.statusCode == 200) {
+        final List<dynamic> data = jsonDecode(response.body)['posts'];
+
+        // Add a check to see if data is null
+        if (data == null) {
+          print('No posts found');
+          setState(() {
+            _posts = [];
+            isLoading = false;
+          });
+          return;
+        }
+
+        setState(() {
+          _posts = data.map((json) => Post.fromJson(json)).toList();
+          print('Loaded ${_posts.length} posts');
+          isLoading = false; // Set loading to false
+        });
+      } else {
+        print('Failed to load posts: ${response.statusCode}');
+        throw Exception('Failed to load posts');
+      }
+    } catch (e) {
+      print('Error fetching posts: $e');
+      throw Exception('Error fetching posts');
+    }
   }
 
   @override
@@ -39,14 +92,22 @@ class _ProfilepageState extends State<ProfilePage> {
       child: Scaffold(
         body: Responsive(
           mobile: ProfilePageMobile(
-              scrollController: _trackingScrollController, user: user!),
+            scrollController: _trackingScrollController,
+            user: user!,
+            posts: _posts,
+            isLoading: isLoading,
+          ),
           desktop: ProfilePageDesktop(
             scrollController: _trackingScrollController,
             user: user!,
+            posts: _posts,
+            isLoading: isLoading,
           ),
           tablet: ProfilePageMobile(
             scrollController: _trackingScrollController,
             user: user!,
+            posts: _posts,
+            isLoading: isLoading,
           ),
         ),
       ),
@@ -57,16 +118,19 @@ class _ProfilepageState extends State<ProfilePage> {
 class ProfilePageMobile extends StatelessWidget {
   final User user;
   final TrackingScrollController scrollController;
+  final List<Post> posts;
+  final bool isLoading;
 
   const ProfilePageMobile({
     super.key,
     required this.user,
     required this.scrollController,
+    required this.posts,
+    required this.isLoading,
   });
 
   @override
   Widget build(BuildContext context) {
-    final user = Provider.of<UserProvider>(context).user;
     return Scaffold(
       body: CustomScrollView(
         slivers: [
@@ -85,7 +149,7 @@ class ProfilePageMobile extends StatelessWidget {
               )
             ],
             flexibleSpace: FlexibleSpaceBar(
-              background: _TopPortion(user: user!),
+              background: _TopPortion(user: user),
             ),
           ),
           SliverToBoxAdapter(
@@ -128,31 +192,14 @@ class ProfilePageMobile extends StatelessWidget {
           SliverList(
             delegate: SliverChildBuilderDelegate(
               (context, index) {
-                return FutureBuilder<List<Post>>(
-                  future: fetchUserPosts(user),
-                  builder: (context, snapshot) {
-                    if (snapshot.connectionState == ConnectionState.waiting) {
-                      return const Center(child: CircularProgressIndicator());
-                    } else if (snapshot.hasError) {
-                      return const Center(child: Text("Error loading posts"));
-                    } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                      return const Center(child: Text("No posts available"));
-                    }
-
-                    final posts = snapshot.data!;
-                    return ListView.builder(
-                      physics: const NeverScrollableScrollPhysics(),
-                      shrinkWrap: true,
-                      itemCount: posts.length,
-                      itemBuilder: (context, index) {
-                        final post = posts[index];
-                        return PostContainer(post: post);
-                      },
-                    );
-                  },
-                );
+                if (isLoading) {
+                  return const Center(child: CircularProgressIndicator());
+                } else if (posts.isEmpty) {
+                  return const Center(child: Text("No posts available"));
+                }
+                return PostContainer(post: posts[index]);
               },
-              childCount: 1,
+              childCount: posts.length,
             ),
           ),
         ],
@@ -164,16 +211,19 @@ class ProfilePageMobile extends StatelessWidget {
 class ProfilePageDesktop extends StatelessWidget {
   final User user;
   final TrackingScrollController scrollController;
+  final List<Post> posts;
+  final bool isLoading;
 
   const ProfilePageDesktop({
     Key? key,
     required this.user,
     required this.scrollController,
+    required this.posts,
+    required this.isLoading,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    final user = Provider.of<UserProvider>(context).user;
     return Scaffold(
       body: CustomScrollView(
         slivers: [
@@ -192,7 +242,7 @@ class ProfilePageDesktop extends StatelessWidget {
               )
             ],
             flexibleSpace: FlexibleSpaceBar(
-              background: _TopPortion(user: user!),
+              background: _TopPortion(user: user),
             ),
           ),
           SliverToBoxAdapter(
@@ -232,50 +282,20 @@ class ProfilePageDesktop extends StatelessWidget {
               ),
             ),
           ),
-          SliverToBoxAdapter(
-              child: Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Column(
-              children: [
-                postContainer(user),
-              ],
+          SliverList(
+            delegate: SliverChildBuilderDelegate(
+              (context, index) {
+                if (isLoading) {
+                  return const Center(child: CircularProgressIndicator());
+                } else if (posts.isEmpty) {
+                  return const Center(child: Text("No posts available"));
+                }
+                return PostContainer(post: posts[index]);
+              },
+              childCount: posts.length,
             ),
-          )),
+          ),
         ],
-      ),
-    );
-  }
-}
-
-class postContainer extends StatelessWidget {
-  final User user;
-  const postContainer(this.user, {super.key});
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      constraints: const BoxConstraints(maxWidth: 600),
-      child: FutureBuilder<List<Post>>(
-        future: fetchUserPosts(user),
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(child: CircularProgressIndicator());
-          } else if (snapshot.hasError) {
-            return const Center(child: Text("Error loading posts"));
-          } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-            return const Center(child: Text("No posts available"));
-          }
-
-          final posts = snapshot.data!;
-          return ListView.builder(
-            physics: const NeverScrollableScrollPhysics(),
-            shrinkWrap: true,
-            itemCount: posts.length,
-            itemBuilder: (context, index) {
-              final post = posts[index];
-              return PostContainer(post: post);
-            },
-          );
-        },
       ),
     );
   }
@@ -411,43 +431,4 @@ class _TopPortion extends StatelessWidget {
       ],
     );
   }
-}
-
-Future<List<Post>> fetchUserPosts(User currentUser) async {
-  // Replace with your actual database fetch logic
-  await Future.delayed(const Duration(seconds: 2)); // Simulate network delay
-  return [
-    const Post(
-      user: User(
-        id: '2',
-        name: 'David Brooks',
-        email: 'david@example.com',
-        imageUrl:
-            'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=634&q=80',
-        books: [],
-        likedBooks: [],
-        requests: [],
-        followedUsers: [],
-      ),
-      caption: "Post 1",
-      timeAgo: "5m",
-      imageUrl: 'https://images.unsplash.com/photo-1525253086316-d0c936c814f8',
-      likes: 120,
-      comments: 20,
-      shares: 10,
-    ),
-    // const Post(
-    //   user: User(
-    //     name: 'John Doe',
-    //     imageUrl:
-    //         'https://images.unsplash.com/photo-1517841905240-472988babdf9?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=634&q=80',
-    //   ),
-    //   caption: "Post 2",
-    //   timeAgo: "10m",
-    //   imageUrl: 'https://images.unsplash.com/photo-1525253086316-d0c936c814f8',
-    //   likes: 150,
-    //   comments: 30,
-    //   shares: 15,
-    // ),
-  ];
 }
