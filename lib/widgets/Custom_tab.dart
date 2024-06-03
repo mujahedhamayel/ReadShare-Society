@@ -4,7 +4,7 @@ class CustomTab extends StatelessWidget {
   final int selected;
   final Function callback;
   CustomTab(this.selected, this.callback, {super.key});
-  final tabs = ['Free Books', 'Audio Books'];
+  final tabs = ['Free Books', 'PDF Books'];
   @override
   Widget build(BuildContext context) {
     final bool isSmallScreen = MediaQuery.of(context).size.width < 600;

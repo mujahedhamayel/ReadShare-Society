@@ -5,6 +5,7 @@ import '/models/models.dart';
 
 class ProfileAvatar extends StatelessWidget {
   final User user;
+
   final bool isActive;
   final bool hasBorder;
   final VoidCallback onTap;
@@ -29,7 +30,8 @@ class ProfileAvatar extends StatelessWidget {
             child: CircleAvatar(
               radius: hasBorder ? 17.0 : 20.0,
               backgroundColor: Colors.grey[200],
-              backgroundImage: CachedNetworkImageProvider(user.imageUrl ?? 'https://defaultimageurl.com/default.jpg'),
+              backgroundImage: CachedNetworkImageProvider(
+                  user.imageUrl ?? 'https://defaultimageurl.com/default.jpg'),
             ),
           ),
         ],

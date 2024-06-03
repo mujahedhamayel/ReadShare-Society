@@ -88,7 +88,7 @@ class _BookScreenDesktop extends StatelessWidget {
                         scrollController,
                         onTabIndexChanged,
                       )
-                    : AudioBookGridViewDesktop(
+                    : PdfBookGridViewDesktop(
                         tabIndex,
                         scrollController,
                         onTabIndexChanged,
@@ -164,7 +164,7 @@ class _BookScreenMobile extends StatelessWidget {
                       scrollController,
                       onTabIndexChanged,
                     )
-                  : AudioBookGridView(
+                  : PdfBookGridViewDesktop(
                       tabIndex,
                       scrollController,
                       onTabIndexChanged,

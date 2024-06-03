@@ -1,9 +1,14 @@
+import 'dart:io';
+
 import 'package:facebook/providers/user_provider.dart';
 import 'package:facebook/utils/auth_token.dart';
 import 'package:facebook/widgets/responsive.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:facebook/models/user_model.dart';
 import 'package:facebook/widgets/post_container.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
 import '../config/palette.dart';
 import '../models/post_model.dart';
@@ -20,9 +25,8 @@ import 'package:material_design_icons_flutter/material_design_icons_flutter.dart
 import 'package:http/http.dart' as http;
 
 class ProfilePage extends StatefulWidget {
-  const ProfilePage({
-    super.key,
-  });
+  final User? user;
+  const ProfilePage({super.key, this.user});
 
   @override
   _ProfilepageState createState() => _ProfilepageState();
@@ -34,11 +38,17 @@ class _ProfilepageState extends State<ProfilePage> {
 
   List<Post> _posts = [];
   bool isLoading = true;
+  bool isFollowing = false;
+  int followerCount = 0;
 
   @override
   void initState() {
     super.initState();
     _fetchPosts();
+    _checkIfFollowing();
+    if (widget.user != null) {
+      followerCount = widget.user!.followersCounts ?? 0;
+    }
   }
 
   @override
@@ -49,17 +59,22 @@ class _ProfilepageState extends State<ProfilePage> {
 
   Future<void> _fetchPosts() async {
     String? token = AuthToken().getToken;
+    String url = 'http://$ip:$port/api/posts/';
+    if (widget.user == null) {
+      url += 'me';
+    } else {
+      url += 'user/${widget.user!.id}';
+    }
 
     try {
       final response = await http.get(
-        Uri.parse('http://$ip:$port/api/posts/me'),
+        Uri.parse(url),
         headers: ApiUtil.headers(token),
       );
       print('Response: ${response.body}');
       if (response.statusCode == 200) {
         final List<dynamic> data = jsonDecode(response.body)['posts'];
 
-        // Add a check to see if data is null
         if (data == null) {
           print('No posts found');
           setState(() {
@@ -72,7 +87,7 @@ class _ProfilepageState extends State<ProfilePage> {
         setState(() {
           _posts = data.map((json) => Post.fromJson(json)).toList();
           print('Loaded ${_posts.length} posts');
-          isLoading = false; // Set loading to false
+          isLoading = false;
         });
       } else {
         print('Failed to load posts: ${response.statusCode}');
@@ -84,9 +99,58 @@ class _ProfilepageState extends State<ProfilePage> {
     }
   }
 
+  Future<void> _checkIfFollowing() async {
+    String? token = AuthToken().getToken;
+    String url = 'http://$ip:$port/api/users/${widget.user!.id}/is-following';
+
+    try {
+      final response = await http.get(
+        Uri.parse(url),
+        headers: ApiUtil.headers(token),
+      );
+
+      if (response.statusCode == 200) {
+        setState(() {
+          isFollowing = jsonDecode(response.body)['isFollowing'];
+        });
+      } else {
+        print('Failed to check following status: ${response.statusCode}');
+      }
+    } catch (e) {
+      print('Error checking following status: $e');
+    }
+  }
+
+  Future<void> _followUser() async {
+    String? token = AuthToken().getToken;
+    String url = 'http://$ip:$port/api/users/${widget.user!.id}/follow';
+
+    try {
+      final response = await http.post(
+        Uri.parse(url),
+        headers: ApiUtil.headers(token),
+      );
+
+      if (response.statusCode == 200) {
+        setState(() {
+          isFollowing = !isFollowing;
+          followerCount += isFollowing ? 1 : -1;
+        });
+      } else {
+        print('Failed to follow/unfollow user: ${response.statusCode}');
+      }
+    } catch (e) {
+      print('Error following/unfollowing user: $e');
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    final user = Provider.of<UserProvider>(context).user;
+    final providerUser = Provider.of<UserProvider>(context).user;
+    final user = widget.user ?? providerUser;
+    if (user != null && user.followersCounts != null) {
+      followerCount = user.followersCounts!;
+    }
     return GestureDetector(
       onTap: () => FocusScope.of(context).unfocus(),
       child: Scaffold(
@@ -96,18 +160,27 @@ class _ProfilepageState extends State<ProfilePage> {
             user: user!,
             posts: _posts,
             isLoading: isLoading,
+            isFollowing: isFollowing,
+            followerCount: followerCount,
+            onFollowPressed: _followUser,
           ),
           desktop: ProfilePageDesktop(
             scrollController: _trackingScrollController,
-            user: user!,
+            user: user,
             posts: _posts,
             isLoading: isLoading,
+            isFollowing: isFollowing,
+            followerCount: followerCount,
+            onFollowPressed: _followUser,
           ),
           tablet: ProfilePageMobile(
             scrollController: _trackingScrollController,
             user: user!,
             posts: _posts,
             isLoading: isLoading,
+            isFollowing: isFollowing,
+            followerCount: followerCount,
+            onFollowPressed: _followUser,
           ),
         ),
       ),
@@ -120,6 +193,9 @@ class ProfilePageMobile extends StatelessWidget {
   final TrackingScrollController scrollController;
   final List<Post> posts;
   final bool isLoading;
+  final bool isFollowing;
+  final int followerCount;
+  final VoidCallback onFollowPressed;
 
   const ProfilePageMobile({
     super.key,
@@ -127,6 +203,9 @@ class ProfilePageMobile extends StatelessWidget {
     required this.scrollController,
     required this.posts,
     required this.isLoading,
+    required this.isFollowing,
+    required this.followerCount,
+    required this.onFollowPressed,
   });
 
   @override
@@ -162,11 +241,12 @@ class ProfilePageMobile extends StatelessWidget {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       FloatingActionButton.extended(
-                        onPressed: () {},
+                        onPressed: onFollowPressed,
                         heroTag: 'follow',
                         elevation: 0,
-                        label: const Text("Follow"),
-                        icon: const Icon(Icons.person_add_alt_1),
+                        label: Text(isFollowing ? 'Following' : 'Follow'),
+                        icon: Icon(
+                            isFollowing ? Icons.check : Icons.person_add_alt_1),
                       ),
                       const SizedBox(width: 16.0),
                       FloatingActionButton.extended(
@@ -180,9 +260,9 @@ class ProfilePageMobile extends StatelessWidget {
                   ),
                   const SizedBox(height: 16),
                   _ProfileInfoRow(
-                    postCount: user.postCounts,
-                    followerCount: user.followersCounts,
-                    followingCount: user.followingCounts,
+                    postCount: user.postCounts ?? 0,
+                    followerCount: followerCount,
+                    followingCount: user.followingCounts ?? 0,
                   ),
                   const SizedBox(height: 16),
                 ],
@@ -213,6 +293,9 @@ class ProfilePageDesktop extends StatelessWidget {
   final TrackingScrollController scrollController;
   final List<Post> posts;
   final bool isLoading;
+  final bool isFollowing;
+  final int followerCount;
+  final VoidCallback onFollowPressed;
 
   const ProfilePageDesktop({
     Key? key,
@@ -220,6 +303,9 @@ class ProfilePageDesktop extends StatelessWidget {
     required this.scrollController,
     required this.posts,
     required this.isLoading,
+    required this.isFollowing,
+    required this.followerCount,
+    required this.onFollowPressed,
   }) : super(key: key);
 
   @override
@@ -255,11 +341,12 @@ class ProfilePageDesktop extends StatelessWidget {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       FloatingActionButton.extended(
-                        onPressed: () {},
+                        onPressed: onFollowPressed,
                         heroTag: 'follow',
                         elevation: 0,
-                        label: const Text("Follow"),
-                        icon: const Icon(Icons.person_add_alt_1),
+                        label: Text(isFollowing ? 'Following' : 'Follow'),
+                        icon: Icon(
+                            isFollowing ? Icons.check : Icons.person_add_alt_1),
                       ),
                       const SizedBox(width: 16.0),
                       FloatingActionButton.extended(
@@ -273,9 +360,9 @@ class ProfilePageDesktop extends StatelessWidget {
                   ),
                   const SizedBox(height: 16),
                   _ProfileInfoRow(
-                    postCount: user.postCounts,
-                    followerCount: user.followersCounts,
-                    followingCount: user.followingCounts,
+                    postCount: user.postCounts ?? 0,
+                    followerCount: followerCount,
+                    followingCount: user.followingCounts ?? 0,
                   ),
                   const SizedBox(height: 16),
                 ],
@@ -368,13 +455,98 @@ class ProfileInfoItem {
   const ProfileInfoItem(this.title, this.value);
 }
 
-class _TopPortion extends StatelessWidget {
+class _TopPortion extends StatefulWidget {
   final User user;
 
   const _TopPortion({
     super.key,
     required this.user,
   });
+
+  @override
+  __TopPortionState createState() => __TopPortionState();
+}
+
+class __TopPortionState extends State<_TopPortion> {
+  late String imageUrl;
+
+  @override
+  void initState() {
+    super.initState();
+    imageUrl = widget.user.imageUrl!;
+  }
+
+  Future<void> _changeProfilePhoto(BuildContext context) async {
+    final picker = ImagePicker();
+    final pickedFile = await picker.pickImage(source: ImageSource.gallery);
+
+    if (pickedFile != null) {
+      try {
+        // Show a loading indicator while the image is being uploaded
+        showDialog(
+          context: context,
+          barrierDismissible: false,
+          builder: (context) => Center(child: CircularProgressIndicator()),
+        );
+
+        // Initialize Firebase
+        await Firebase.initializeApp();
+
+        // Upload the image to Firebase Storage
+        final storageRef = FirebaseStorage.instance
+            .ref()
+            .child('profile_photos/${widget.user.id}.jpg');
+        await storageRef.putFile(File(pickedFile.path));
+
+        // Get the download URL
+        final downloadUrl = await storageRef.getDownloadURL();
+
+        // Update the user's profile photo URL in the backend
+        await _updateUserProfilePhoto(downloadUrl);
+
+        // Close the loading indicator
+        Navigator.of(context).pop();
+
+        // Update the state with the new image URL
+        setState(() {
+          imageUrl = downloadUrl;
+        });
+
+        // Show success message
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Profile photo updated successfully!')),
+        );
+      } catch (e) {
+        // Close the loading indicator
+        Navigator.of(context).pop();
+
+        // Show error message
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Failed to update profile photo: $e')),
+        );
+      }
+    }
+  }
+
+  Future<void> _updateUserProfilePhoto(String downloadUrl) async {
+    // Make a request to your backend to update the user's profile photo URL
+    String? token = AuthToken().getToken;
+    String url = 'http://$ip:$port/api/users/${widget.user.id}/update-photo';
+
+    try {
+      final response = await http.put(
+        Uri.parse(url),
+        headers: ApiUtil.headers(token),
+        body: jsonEncode({'imageUrl': downloadUrl}),
+      );
+
+      if (response.statusCode != 200) {
+        throw Exception('Failed to update profile photo');
+      }
+    } catch (e) {
+      throw Exception('Error updating profile photo: $e');
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -410,8 +582,15 @@ class _TopPortion extends StatelessWidget {
                         shape: BoxShape.circle,
                         image: DecorationImage(
                           fit: BoxFit.cover,
-                          image: NetworkImage(user.imageUrl!),
+                          image: NetworkImage(imageUrl),
                         ),
+                      ),
+                    ),
+                    Align(
+                      alignment: Alignment.bottomRight,
+                      child: IconButton(
+                        icon: Icon(Icons.camera_alt, color: Colors.white),
+                        onPressed: () => _changeProfilePhoto(context),
                       ),
                     ),
                   ],
@@ -419,7 +598,7 @@ class _TopPortion extends StatelessWidget {
               ),
               const SizedBox(height: 8),
               Text(
-                user.name,
+                widget.user.name,
                 style: Theme.of(context)
                     .textTheme
                     .titleLarge

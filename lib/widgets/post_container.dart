@@ -38,7 +38,7 @@ class PostContainer extends StatelessWidget {
                 children: [
                   _PostHeader(post: post),
                   const SizedBox(height: 4.0),
-                  Text(post.caption ),
+                  Text(post.caption),
                   if (post.imageUrl != null && post.imageUrl!.isNotEmpty)
                     Padding(
                       padding: const EdgeInsets.symmetric(vertical: 8.0),
@@ -78,7 +78,7 @@ class _PostHeader extends StatelessWidget {
             Navigator.push(
               context,
               MaterialPageRoute(
-                builder: (context) => ProfilePage(),
+                builder: (context) => ProfilePage(user: post.user),
               ),
             );
           },

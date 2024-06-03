@@ -20,4 +20,17 @@ class BookService {
       throw Exception('Failed to load books');
     }
   }
+
+  Future<List<Book>> fetchPDFBooks() async {
+    List<Book> books = await fetchBooks();
+    
+    return books.where((book) => book.type == 'pdf').toList();
+  }
+
+  Future<List<Book>> fetchPhysicalBooks() async {
+    List<Book> books = await fetchBooks();
+    // List bookPhysical = books.where((book) => book.type == 'physical').toList(); 
+    //  print('Physical books: $bookPhysical');
+    return books.where((book) => book.type == 'physical').toList();
+  }
 }

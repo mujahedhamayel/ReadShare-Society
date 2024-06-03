@@ -5,7 +5,7 @@ import '../data/detail.dart';
 class BookItem extends StatelessWidget {
   final Book book;
   const BookItem({required this.book, super.key});
-  final num bookHeight = 220.0;
+  final num bookHeight = 235.0;
 
   @override
   Widget build(BuildContext context) {
@@ -23,6 +23,7 @@ class BookItem extends StatelessWidget {
           image: DecorationImage(
             image: NetworkImage(book.imgUrl), // Use NetworkImage for URL
             fit: BoxFit.cover,
+            
           ),
           borderRadius: BorderRadius.circular(16),
         ),

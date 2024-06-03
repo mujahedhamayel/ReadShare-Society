@@ -23,7 +23,7 @@ class _BookGridViewState extends State<BookGridView> {
   @override
   void initState() {
     super.initState();
-    _bookList = BookService().fetchBooks();
+    _bookList = BookService().fetchPhysicalBooks();
   }
 
   @override
@@ -82,7 +82,121 @@ class _BookGridViewDesktopState extends State<BookGridViewDesktop> {
   @override
   void initState() {
     super.initState();
-    _bookList = BookService().fetchBooks();
+    _bookList = BookService().fetchPhysicalBooks();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return FutureBuilder<List<Book>>(
+      future: _bookList,
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return Center(child: CircularProgressIndicator());
+        } else if (snapshot.hasError) {
+          return Center(child: Text('Error: ${snapshot.error}'));
+        } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+          return Center(child: Text('No books available'));
+        } else {
+          return ListView(
+            controller: widget.scrollController,
+            children: [
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 20),
+                child: MasonryGridView.count(
+                  shrinkWrap: true,
+                  physics: const ScrollPhysics(),
+                  crossAxisSpacing: 10,
+                  mainAxisSpacing: 10,
+                  crossAxisCount: 2,
+                  itemCount: snapshot.data!.length,
+                  itemBuilder: (_, index) =>
+                      BookItem(book: snapshot.data![index]),
+                ),
+              ),
+            ],
+          );
+        }
+      },
+    );
+  }
+}
+
+class PdfBookGridViewDesktop extends StatefulWidget {
+  final int selected;
+  final TrackingScrollController scrollController;
+  final Function callback;
+
+  PdfBookGridViewDesktop(this.selected, this.scrollController, this.callback,
+      {super.key});
+
+  @override
+  _PdfBookGridViewDesktopState createState() => _PdfBookGridViewDesktopState();
+}
+
+class _PdfBookGridViewDesktopState extends State<PdfBookGridViewDesktop> {
+  late Future<List<Book>> _bookList;
+
+  @override
+  void initState() {
+    super.initState();
+    _bookList = BookService().fetchPDFBooks();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return FutureBuilder<List<Book>>(
+      future: _bookList,
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return Center(child: CircularProgressIndicator());
+        } else if (snapshot.hasError) {
+          return Center(child: Text('Error: ${snapshot.error}'));
+        } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+          return Center(child: Text('No books available'));
+        } else {
+          return ListView(
+            controller: widget.scrollController,
+            children: [
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 20),
+                child: MasonryGridView.count(
+                  shrinkWrap: true,
+                  physics: const ScrollPhysics(),
+                  crossAxisSpacing: 10,
+                  mainAxisSpacing: 10,
+                  crossAxisCount: 2,
+                  itemCount: snapshot.data!.length,
+                  itemBuilder: (_, index) =>
+                      BookItem(book: snapshot.data![index]),
+                ),
+              ),
+            ],
+          );
+        }
+      },
+    );
+  }
+}
+
+class PdfBookGridView extends StatefulWidget {
+  final int selected;
+  final TrackingScrollController scrollController;
+  final Function callback;
+
+  PdfBookGridView(this.selected, this.scrollController, this.callback,
+      {super.key});
+
+  @override
+  _PdfBookGridViewState createState() => _PdfBookGridViewState();
+}
+
+class _PdfBookGridViewState extends State<PdfBookGridView> {
+  late Future<List<Book>> _bookList;
+
+  @override
+  void initState() {
+    super.initState();
+    _bookList = BookService().fetchPDFBooks();
   }
 
   @override
@@ -107,7 +221,7 @@ class _BookGridViewDesktopState extends State<BookGridViewDesktop> {
                   physics: const ScrollPhysics(),
                   crossAxisSpacing: 16,
                   mainAxisSpacing: 16,
-                  crossAxisCount: 4,
+                  crossAxisCount: 2,
                   itemCount: snapshot.data!.length,
                   itemBuilder: (_, index) =>
                       BookItem(book: snapshot.data![index]),
@@ -117,70 +231,6 @@ class _BookGridViewDesktopState extends State<BookGridViewDesktop> {
           );
         }
       },
-    );
-  }
-}
-
-class AudioBookGridViewDesktop extends StatelessWidget {
-  final int selected;
-  final TrackingScrollController scrollController;
-  final Function callback;
-  AudioBookGridViewDesktop(this.selected, this.scrollController, this.callback,
-      {super.key});
-
-  final bookListAudio = Book.audioBooks();//here init state fetch pdf books
-
-  @override
-  Widget build(BuildContext context) {
-    return ListView(
-      // Use ListView or CustomScrollView
-      controller: scrollController,
-      children: [
-        Container(
-          padding: const EdgeInsets.symmetric(horizontal: 20),
-          child: MasonryGridView.count(
-            shrinkWrap: true,
-            physics: const ScrollPhysics(),
-            crossAxisSpacing: 16,
-            mainAxisSpacing: 16,
-            crossAxisCount: 4,
-            itemCount: bookListAudio.length,
-            itemBuilder: (_, index) => BookItem(book: bookListAudio[index]),
-          ),
-        ),
-      ],
-    );
-  }
-}
-
-class AudioBookGridView extends StatelessWidget {
-  final int selected;
-  final TrackingScrollController scrollController;
-  final Function callback;
-  AudioBookGridView(this.selected, this.scrollController, this.callback,
-      {super.key});
-
-  final bookListAudio = Book.audioBooks();
-
-  @override
-  Widget build(BuildContext context) {
-    return ListView(
-      // Use ListView or CustomScrollView
-      controller: scrollController,
-      children: [
-        Container(
-          padding: const EdgeInsets.symmetric(horizontal: 20),
-          child: MasonryGridView.count(
-            shrinkWrap: true,
-            physics: const ScrollPhysics(),
-            crossAxisSpacing: 16,
-            mainAxisSpacing: 16,
-            crossAxisCount: 2,
-            itemCount: bookListAudio.length,
-            itemBuilder: (_, index) => BookItem(book: bookListAudio[index]),
-          ),
-        ),
-      ],
     );
   }
 }

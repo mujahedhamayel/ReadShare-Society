@@ -8,6 +8,7 @@ class Post {
   final int likes;
   final int comments;
   final int shares;
+  final String? imageUrlUser; // Make imageUrl nullable
 
   const Post({
     required this.user,
@@ -17,11 +18,12 @@ class Post {
     required this.likes,
     required this.comments,
     required this.shares,
+    this.imageUrlUser, // Allow null values
   });
 
   factory Post.fromJson(Map<String, dynamic> json) {
     return Post(
-      user: User.fromJson(json['id'] ?? {}), // Handle null user
+      user: User.fromJson(json['user'] ?? {}), // Handle null user
       caption: json['description'] ?? '', // Provide a default value if null
       timeAgo: json['createDate'] ?? '', // Provide a default value if null
       imageUrl: json['imagepost'], // This can be null
@@ -29,6 +31,8 @@ class Post {
       comments: (json['comments'] as List).length, // Count the comments
       shares:
           0, // Assuming shares is not available in your JSON and default to 0
+
+      imageUrlUser: json['imageUrl'], // This can be null
     );
   }
 }
