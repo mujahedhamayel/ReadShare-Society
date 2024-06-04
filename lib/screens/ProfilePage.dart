@@ -163,6 +163,7 @@ class _ProfilepageState extends State<ProfilePage> {
             isFollowing: isFollowing,
             followerCount: followerCount,
             onFollowPressed: _followUser,
+            isProfileUser: widget.user == null,
           ),
           desktop: ProfilePageDesktop(
             scrollController: _trackingScrollController,
@@ -172,6 +173,7 @@ class _ProfilepageState extends State<ProfilePage> {
             isFollowing: isFollowing,
             followerCount: followerCount,
             onFollowPressed: _followUser,
+            isProfileUser: widget.user == null,
           ),
           tablet: ProfilePageMobile(
             scrollController: _trackingScrollController,
@@ -181,6 +183,7 @@ class _ProfilepageState extends State<ProfilePage> {
             isFollowing: isFollowing,
             followerCount: followerCount,
             onFollowPressed: _followUser,
+            isProfileUser: widget.user == null,
           ),
         ),
       ),
@@ -196,6 +199,7 @@ class ProfilePageMobile extends StatelessWidget {
   final bool isFollowing;
   final int followerCount;
   final VoidCallback onFollowPressed;
+  final bool isProfileUser;
 
   const ProfilePageMobile({
     super.key,
@@ -206,6 +210,7 @@ class ProfilePageMobile extends StatelessWidget {
     required this.isFollowing,
     required this.followerCount,
     required this.onFollowPressed,
+    required this.isProfileUser,
   });
 
   @override
@@ -228,7 +233,10 @@ class ProfilePageMobile extends StatelessWidget {
               )
             ],
             flexibleSpace: FlexibleSpaceBar(
-              background: _TopPortion(user: user),
+              background: _TopPortion(
+                user: user,
+                isProfileUser: isProfileUser,
+              ),
             ),
           ),
           SliverToBoxAdapter(
@@ -237,27 +245,30 @@ class ProfilePageMobile extends StatelessWidget {
               child: Column(
                 children: [
                   const SizedBox(height: 16),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      FloatingActionButton.extended(
-                        onPressed: onFollowPressed,
-                        heroTag: 'follow',
-                        elevation: 0,
-                        label: Text(isFollowing ? 'Following' : 'Follow'),
-                        icon: Icon(
-                            isFollowing ? Icons.check : Icons.person_add_alt_1),
-                      ),
-                      const SizedBox(width: 16.0),
-                      FloatingActionButton.extended(
-                        onPressed: () {},
-                        heroTag: 'message',
-                        elevation: 0,
-                        label: const Text("Message"),
-                        icon: const Icon(Icons.message_rounded),
-                      ),
-                    ],
-                  ),
+                  isProfileUser
+                      ? const SizedBox(height: 16)
+                      : Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            FloatingActionButton.extended(
+                              onPressed: onFollowPressed,
+                              heroTag: 'follow',
+                              elevation: 0,
+                              label: Text(isFollowing ? 'Following' : 'Follow'),
+                              icon: Icon(isFollowing
+                                  ? Icons.check
+                                  : Icons.person_add_alt_1),
+                            ),
+                            const SizedBox(width: 16.0),
+                            FloatingActionButton.extended(
+                              onPressed: () {},
+                              heroTag: 'message',
+                              elevation: 0,
+                              label: const Text("Message"),
+                              icon: const Icon(Icons.message_rounded),
+                            ),
+                          ],
+                        ),
                   const SizedBox(height: 16),
                   _ProfileInfoRow(
                     postCount: user.postCounts ?? 0,
@@ -286,9 +297,7 @@ class ProfilePageMobile extends StatelessWidget {
       ),
     );
   }
-}
-
-class ProfilePageDesktop extends StatelessWidget {
+}class ProfilePageDesktop extends StatelessWidget {
   final User user;
   final TrackingScrollController scrollController;
   final List<Post> posts;
@@ -296,6 +305,7 @@ class ProfilePageDesktop extends StatelessWidget {
   final bool isFollowing;
   final int followerCount;
   final VoidCallback onFollowPressed;
+  final bool isProfileUser;
 
   const ProfilePageDesktop({
     Key? key,
@@ -306,6 +316,7 @@ class ProfilePageDesktop extends StatelessWidget {
     required this.isFollowing,
     required this.followerCount,
     required this.onFollowPressed,
+    required this.isProfileUser,
   }) : super(key: key);
 
   @override
@@ -328,7 +339,10 @@ class ProfilePageDesktop extends StatelessWidget {
               )
             ],
             flexibleSpace: FlexibleSpaceBar(
-              background: _TopPortion(user: user),
+              background: _TopPortion(
+                user: user,
+                isProfileUser: isProfileUser,
+              ),
             ),
           ),
           SliverToBoxAdapter(
@@ -337,8 +351,10 @@ class ProfilePageDesktop extends StatelessWidget {
               child: Column(
                 children: [
                   const SizedBox(height: 16),
+                  
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
+                    
                     children: [
                       FloatingActionButton.extended(
                         onPressed: onFollowPressed,
@@ -457,10 +473,11 @@ class ProfileInfoItem {
 
 class _TopPortion extends StatefulWidget {
   final User user;
-
+  final bool isProfileUser;
   const _TopPortion({
     super.key,
     required this.user,
+    required this.isProfileUser,
   });
 
   @override
@@ -586,13 +603,17 @@ class __TopPortionState extends State<_TopPortion> {
                         ),
                       ),
                     ),
-                    Align(
-                      alignment: Alignment.bottomRight,
-                      child: IconButton(
-                        icon: Icon(Icons.camera_alt, color: Colors.white),
-                        onPressed: () => _changeProfilePhoto(context),
-                      ),
-                    ),
+                    // ignore: unnecessary_null_comparison
+                    widget.isProfileUser
+                        ? Align(
+                            alignment: Alignment.bottomRight,
+                            child: IconButton(
+                              icon: const Icon(Icons.camera_alt,
+                                  color: Colors.black),
+                              onPressed: () => _changeProfilePhoto(context),
+                            ),
+                          )
+                        : const SizedBox(height: 8),
                   ],
                 ),
               ),

@@ -1,3 +1,4 @@
+import 'package:facebook/screens/home_screen.dart';
 import 'package:facebook/utils/auth_token.dart';
 import 'package:facebook/providers/user_provider.dart';
 import 'package:facebook/screens/ProfilePage.dart';
@@ -20,10 +21,7 @@ import 'package:facebook/models/user_model.dart';
 import 'package:facebook/widgets/profile_avatar.dart';
 import '/config/palette.dart';
 
-
-
 class CreatePostContainer extends StatefulWidget {
-
   final User currentUser;
   const CreatePostContainer({
     super.key,
@@ -48,7 +46,8 @@ class _CreatePostContainerState extends State<CreatePostContainer> {
 
   Future<String> _uploadImage(File file) async {
     String fileName = path.basename(file.path);
-    Reference storageReference = FirebaseStorage.instance.ref().child('posts/$fileName');
+    Reference storageReference =
+        FirebaseStorage.instance.ref().child('posts/$fileName');
     UploadTask uploadTask = storageReference.putFile(file);
     await uploadTask.whenComplete(() => null);
     String returnURL = await storageReference.getDownloadURL();
@@ -61,6 +60,7 @@ class _CreatePostContainerState extends State<CreatePostContainer> {
       imageUrl = await _uploadImage(_imageFile!);
     }
     await _storePost(imageUrl);
+    HomeScreen.of(context)?.refreshPosts();
   }
 
   Future<void> _storePost(String? imageUrl) async {

@@ -17,7 +17,7 @@ class _favoritepageState extends State<favoritepage> {
   @override
   void initState() {
     super.initState();
-    _bookList = BookService().fetchBooks();
+    _bookList = BookService().fetchLikedBooks();
   }
 
   @override

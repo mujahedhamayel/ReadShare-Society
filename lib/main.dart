@@ -1,6 +1,12 @@
+import 'package:facebook/data/detail.dart';
+import 'package:facebook/models/book.dart';
+import 'package:facebook/models/post_model.dart';
+import 'package:facebook/models/user_model.dart';
 import 'package:facebook/providers/user_provider.dart';
+import 'package:facebook/screens/ProfilePage.dart';
 import 'package:facebook/screens/SignUpSecond.dart';
 import 'package:facebook/services/notification_service.dart';
+import 'package:facebook/widgets/CommentsPage.dart';
 
 import '/screens/screens.dart';
 import 'package:flutter/material.dart';
@@ -29,6 +35,9 @@ void main() async {
           '/signin': (context) => SignInPage(),
           '/nav_screen': (context) => NavScreen(),
           '/SignUpsecond': (context) => SignUpPage2(),
+          '/bookDetail': (context) => DetailPage(book: ModalRoute.of(context)?.settings.arguments as Book),
+        '/userProfile': (context) => ProfilePage(user: ModalRoute.of(context)?.settings.arguments as User),
+         '/commentsPage': (context) => CommentsPage(post: ModalRoute.of(context)?.settings.arguments as Post),
         },
       ),
     ),
