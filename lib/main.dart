@@ -34,10 +34,13 @@ void main() async {
           '/home': (context) => NavScreen(),
           '/signin': (context) => SignInPage(),
           '/nav_screen': (context) => NavScreen(),
-          '/SignUpsecond': (context) => SignUpPage2(),
-          '/bookDetail': (context) => DetailPage(book: ModalRoute.of(context)?.settings.arguments as Book),
-        '/userProfile': (context) => ProfilePage(user: ModalRoute.of(context)?.settings.arguments as User),
-         '/commentsPage': (context) => CommentsPage(post: ModalRoute.of(context)?.settings.arguments as Post),
+       //   '/SignUpsecond': (context) => SignUpPage2(),
+          '/bookDetail': (context) => DetailPage(
+              book: ModalRoute.of(context)?.settings.arguments as Book),
+          '/userProfile': (context) => ProfilePage(
+              user: ModalRoute.of(context)?.settings.arguments as User),
+          '/commentsPage': (context) => CommentsPage(
+              post: ModalRoute.of(context)?.settings.arguments as Post),
         },
       ),
     ),
