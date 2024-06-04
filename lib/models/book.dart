@@ -15,7 +15,6 @@ class Book {
     this.title,
     this.owner,
     this.updateDate,
-    
     this.imgUrl,
     this.author,
     this.location,

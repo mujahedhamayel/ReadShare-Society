@@ -1,5 +1,4 @@
 import 'package:facebook/providers/user_provider.dart';
-import 'package:facebook/screens/SignUpSecond.dart';
 import 'package:facebook/services/notification_service.dart';
 
 import '/screens/screens.dart';

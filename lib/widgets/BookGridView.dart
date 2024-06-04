@@ -62,8 +62,6 @@ class _BookGridViewState extends State<BookGridView> {
   }
 }
 
-// Similar updates can be made for the other grid view classes
-
 class BookGridViewDesktop extends StatefulWidget {
   final int selected;
   final TrackingScrollController scrollController;
@@ -83,63 +81,6 @@ class _BookGridViewDesktopState extends State<BookGridViewDesktop> {
   void initState() {
     super.initState();
     _bookList = BookService().fetchPhysicalBooks();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return FutureBuilder<List<Book>>(
-      future: _bookList,
-      builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.waiting) {
-          return Center(child: CircularProgressIndicator());
-        } else if (snapshot.hasError) {
-          return Center(child: Text('Error: ${snapshot.error}'));
-        } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-          return Center(child: Text('No books available'));
-        } else {
-          return ListView(
-            controller: widget.scrollController,
-            children: [
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 20),
-                child: MasonryGridView.count(
-                  shrinkWrap: true,
-                  physics: const ScrollPhysics(),
-                  crossAxisSpacing: 10,
-                  mainAxisSpacing: 10,
-                  crossAxisCount: 2,
-                  itemCount: snapshot.data!.length,
-                  itemBuilder: (_, index) =>
-                      BookItem(book: snapshot.data![index]),
-                ),
-              ),
-            ],
-          );
-        }
-      },
-    );
-  }
-}
-
-class PdfBookGridViewDesktop extends StatefulWidget {
-  final int selected;
-  final TrackingScrollController scrollController;
-  final Function callback;
-
-  PdfBookGridViewDesktop(this.selected, this.scrollController, this.callback,
-      {super.key});
-
-  @override
-  _PdfBookGridViewDesktopState createState() => _PdfBookGridViewDesktopState();
-}
-
-class _PdfBookGridViewDesktopState extends State<PdfBookGridViewDesktop> {
-  late Future<List<Book>> _bookList;
-
-  @override
-  void initState() {
-    super.initState();
-    _bookList = BookService().fetchPDFBooks();
   }
 
   @override
@@ -221,6 +162,65 @@ class _PdfBookGridViewState extends State<PdfBookGridView> {
                   physics: const ScrollPhysics(),
                   crossAxisSpacing: 16,
                   mainAxisSpacing: 16,
+                  crossAxisCount: 2,
+                  itemCount: snapshot.data!.length,
+                  itemBuilder: (_, index) =>
+                      BookItem(book: snapshot.data![index]),
+                ),
+              ),
+            ],
+          );
+        }
+      },
+    );
+  }
+}
+
+// Similar updates can be made for the other grid view classes
+
+class PdfBookGridViewDesktop extends StatefulWidget {
+  final int selected;
+  final TrackingScrollController scrollController;
+  final Function callback;
+
+  PdfBookGridViewDesktop(this.selected, this.scrollController, this.callback,
+      {super.key});
+
+  @override
+  _PdfBookGridViewDesktopState createState() => _PdfBookGridViewDesktopState();
+}
+
+class _PdfBookGridViewDesktopState extends State<PdfBookGridViewDesktop> {
+  late Future<List<Book>> _bookList;
+
+  @override
+  void initState() {
+    super.initState();
+    _bookList = BookService().fetchPDFBooks();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return FutureBuilder<List<Book>>(
+      future: _bookList,
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return Center(child: CircularProgressIndicator());
+        } else if (snapshot.hasError) {
+          return Center(child: Text('Error: ${snapshot.error}'));
+        } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+          return Center(child: Text('No books available'));
+        } else {
+          return ListView(
+            controller: widget.scrollController,
+            children: [
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 20),
+                child: MasonryGridView.count(
+                  shrinkWrap: true,
+                  physics: const ScrollPhysics(),
+                  crossAxisSpacing: 10,
+                  mainAxisSpacing: 10,
                   crossAxisCount: 2,
                   itemCount: snapshot.data!.length,
                   itemBuilder: (_, index) =>

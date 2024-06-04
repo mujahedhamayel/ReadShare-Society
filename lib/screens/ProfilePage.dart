@@ -473,7 +473,8 @@ class __TopPortionState extends State<_TopPortion> {
   @override
   void initState() {
     super.initState();
-    imageUrl = widget.user.imageUrl!;
+    imageUrl = widget.user.imageUrl ??
+        'https://via.placeholder.com/150'; // Provide a default placeholder image URL
   }
 
   Future<void> _changeProfilePhoto(BuildContext context) async {
@@ -486,7 +487,8 @@ class __TopPortionState extends State<_TopPortion> {
         showDialog(
           context: context,
           barrierDismissible: false,
-          builder: (context) => Center(child: CircularProgressIndicator()),
+          builder: (context) =>
+              const Center(child: CircularProgressIndicator()),
         );
 
         // Initialize Firebase
@@ -514,7 +516,7 @@ class __TopPortionState extends State<_TopPortion> {
 
         // Show success message
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Profile photo updated successfully!')),
+          const SnackBar(content: Text('Profile photo updated successfully!')),
         );
       } catch (e) {
         // Close the loading indicator
@@ -589,7 +591,7 @@ class __TopPortionState extends State<_TopPortion> {
                     Align(
                       alignment: Alignment.bottomRight,
                       child: IconButton(
-                        icon: Icon(Icons.camera_alt, color: Colors.white),
+                        icon: const Icon(Icons.camera_alt, color: Colors.white),
                         onPressed: () => _changeProfilePhoto(context),
                       ),
                     ),

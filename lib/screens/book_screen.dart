@@ -164,7 +164,7 @@ class _BookScreenMobile extends StatelessWidget {
                       scrollController,
                       onTabIndexChanged,
                     )
-                  : PdfBookGridViewDesktop(
+                  : PdfBookGridView(
                       tabIndex,
                       scrollController,
                       onTabIndexChanged,

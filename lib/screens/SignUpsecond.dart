@@ -118,18 +118,6 @@ class __FormContentState extends State<_FormContent> {
                   ),
                 ),
                 const SizedBox(height: 16),
-                TextFormField(
-                  controller: _addressController,
-                  decoration: const InputDecoration(
-                    labelText: 'Address',
-                    hintText: 'Enter your address',
-                    prefixIcon: Icon(Icons.home, color: Colors.black),
-                    border: OutlineInputBorder(),
-                    labelStyle: TextStyle(color: Colors.black),
-                    hintStyle: TextStyle(color: Colors.black),
-                  ),
-                ),
-                const SizedBox(height: 16),
                 DropdownButtonFormField<String>(
                   value: _gender,
                   decoration: const InputDecoration(
