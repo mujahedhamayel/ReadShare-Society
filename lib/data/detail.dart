@@ -100,9 +100,16 @@ class BookDetail extends StatelessWidget {
   }
 }
 
-class BookCover extends StatelessWidget {
+class BookCover extends StatefulWidget {
   final Book book;
   const BookCover({super.key, required this.book});
+
+  @override
+  _BookCoverState createState() => _BookCoverState();
+}
+
+class _BookCoverState extends State<BookCover> {
+  bool isBookmarked = false;
 
   @override
   Widget build(BuildContext context) {
@@ -132,7 +139,7 @@ class BookCover extends StatelessWidget {
                   color: Colors.black,
                   image: DecorationImage(
                     fit: BoxFit.fill,
-                    image: NetworkImage(book.imgUrl),
+                    image: NetworkImage(widget.book.imgUrl),
                   ),
                 ),
               ),
@@ -141,19 +148,23 @@ class BookCover extends StatelessWidget {
           Positioned(
             left: 300,
             bottom: 20,
-            child: Container(
-              padding: const EdgeInsets.all(8),
-              decoration: BoxDecoration(
+            child: GestureDetector(
+              onTap: () {
+                setState(() {
+                  isBookmarked = !isBookmarked;
+                });
+              },
+              child: Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(10),
-                  color: Palette.REDcolor),
-              child: const Row(
-                children: [
-                  Icon(
-                    Icons.bookmark_border,
-                    color: Colors.white,
-                    size: 25,
-                  ),
-                ],
+                  color: Palette.REDcolor,
+                ),
+                child: Icon(
+                  isBookmarked ? Icons.bookmark : Icons.bookmark_border,
+                  color: Colors.white,
+                  size: 25,
+                ),
               ),
             ),
           ),
