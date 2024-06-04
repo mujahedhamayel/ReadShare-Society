@@ -1,18 +1,54 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:facebook/screens/ProfilePage.dart';
+import 'package:facebook/widgets/CommentsPage.dart';
 import 'package:flutter/material.dart';
 import '/config/palette.dart';
 import '/models/models.dart';
 import '/widgets/widgets.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 
-class PostContainer extends StatelessWidget {
+class PostContainer extends StatefulWidget {
   final Post post;
 
   const PostContainer({
     super.key,
     required this.post,
   });
+
+  @override
+  _PostContainerState createState() => _PostContainerState();
+}
+
+class _PostContainerState extends State<PostContainer> {
+  late bool isLiked;
+  late int likeCount;
+
+  @override
+  void initState() {
+    super.initState();
+    isLiked = false;
+    likeCount = widget.post.likes;
+  }
+
+  void _toggleLike() {
+    setState(() {
+      isLiked = !isLiked;
+      if (isLiked) {
+        likeCount++;
+      } else {
+        likeCount--;
+      }
+    });
+  }
+
+  void _navigateToComments() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => CommentsPage(post: widget.post),
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -36,13 +72,15 @@ class PostContainer extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  _PostHeader(post: post),
+                  _PostHeader(post: widget.post),
                   const SizedBox(height: 4.0),
-                  Text(post.caption),
-                  if (post.imageUrl != null && post.imageUrl!.isNotEmpty)
+                  Text(widget.post.caption),
+                  if (widget.post.imageUrl != null &&
+                      widget.post.imageUrl!.isNotEmpty)
                     Padding(
                       padding: const EdgeInsets.symmetric(vertical: 8.0),
-                      child: CachedNetworkImage(imageUrl: post.imageUrl!),
+                      child:
+                          CachedNetworkImage(imageUrl: widget.post.imageUrl!),
                     )
                   else
                     const SizedBox.shrink(),
@@ -51,7 +89,13 @@ class PostContainer extends StatelessWidget {
             ),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 12.0),
-              child: _PostStats(post: post),
+              child: _PostStats(
+                post: widget.post,
+                isLiked: isLiked,
+                likeCount: likeCount,
+                onLikePressed: _toggleLike,
+                onCommentPressed: _navigateToComments,
+              ),
             ),
           ],
         ),
@@ -124,9 +168,17 @@ class _PostHeader extends StatelessWidget {
 
 class _PostStats extends StatelessWidget {
   final Post post;
+  final bool isLiked;
+  final int likeCount;
+  final VoidCallback onLikePressed;
+  final VoidCallback onCommentPressed;
 
   const _PostStats({
     required this.post,
+    required this.isLiked,
+    required this.likeCount,
+    required this.onLikePressed,
+    required this.onCommentPressed,
   });
 
   @override
@@ -150,7 +202,7 @@ class _PostStats extends StatelessWidget {
             const SizedBox(width: 4.0),
             Expanded(
               child: Text(
-                '${post.likes}',
+                '$likeCount',
                 style: TextStyle(
                   color: Colors.grey[600],
                 ),
@@ -163,12 +215,6 @@ class _PostStats extends StatelessWidget {
               ),
             ),
             const SizedBox(width: 8.0),
-            Text(
-              '${post.shares} Shares',
-              style: TextStyle(
-                color: Colors.grey[600],
-              ),
-            )
           ],
         ),
         const Divider(),
@@ -176,12 +222,12 @@ class _PostStats extends StatelessWidget {
           children: [
             _PostButton(
               icon: Icon(
-                Icons.favorite_border_outlined,
-                color: Colors.grey[600],
+                isLiked ? Icons.favorite : Icons.favorite_border_outlined,
+                color: isLiked ? Palette.REDcolor : Colors.grey[600],
                 size: 20.0,
               ),
               label: 'Like',
-              onTap: () => print('Like'),
+              onTap: onLikePressed,
             ),
             _PostButton(
               icon: Icon(
@@ -190,17 +236,8 @@ class _PostStats extends StatelessWidget {
                 size: 20.0,
               ),
               label: 'Comment',
-              onTap: () => print('Comment'),
+              onTap: onCommentPressed,
             ),
-            _PostButton(
-              icon: Icon(
-                MdiIcons.shareOutline,
-                color: Colors.grey[600],
-                size: 25.0,
-              ),
-              label: 'Share',
-              onTap: () => print('Share'),
-            )
           ],
         ),
       ],
@@ -211,7 +248,7 @@ class _PostStats extends StatelessWidget {
 class _PostButton extends StatelessWidget {
   final Icon icon;
   final String label;
-  final VoidCallback onTap; // Change the type to VoidCallback
+  final VoidCallback onTap;
 
   const _PostButton({
     required this.icon,
@@ -225,7 +262,7 @@ class _PostButton extends StatelessWidget {
       child: Material(
         color: Colors.white,
         child: InkWell(
-          onTap: onTap, // Pass onTap directly
+          onTap: onTap,
           child: Container(
             padding: const EdgeInsets.symmetric(horizontal: 12.0),
             height: 25.0,

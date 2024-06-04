@@ -48,30 +48,48 @@ class _SearchPageState extends State<SearchPage> {
           onPressed: () => Navigator.of(context).pop(),
           icon: const Icon(Icons.arrow_back_ios_new_outlined),
         ),
-        title: Expanded(
-          child: Container(
-            height: 45,
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(150.0),
-              color: Colors.grey[200],
-            ),
-            padding: const EdgeInsets.symmetric(horizontal: 10.0),
-            child: TextField(
-              controller: _searchController,
-              focusNode: _focusNode,
-              decoration: InputDecoration(
-                hintText: 'Search ',
-                border: InputBorder.none,
-                suffixIcon: IconButton(
-                  icon: const Icon(Icons.close),
-                  onPressed: () {
-                    _searchController.clear();
-                  },
+        title: Row(
+          children: [
+            Expanded(
+              child: Container(
+                height: 45,
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(150.0),
+                  color: Colors.grey[200],
+                ),
+                padding: const EdgeInsets.symmetric(horizontal: 10.0),
+                child: TextField(
+                  controller: _searchController,
+                  focusNode: _focusNode,
+                  decoration: InputDecoration(
+                    hintText: 'Search ',
+                    border: InputBorder.none,
+                    suffixIcon: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        IconButton(
+                          icon: const Icon(Icons.search),
+                          onPressed: () {
+                            _performSearch(_searchController.text);
+                          },
+                        ),
+                        IconButton(
+                          icon: const Icon(Icons.close),
+                          onPressed: () {
+                            _searchController.clear();
+                            setState(() {
+                              _searchResults.clear();
+                            });
+                          },
+                        ),
+                      ],
+                    ),
+                  ),
+                  onChanged: _performSearch,
                 ),
               ),
-              onChanged: _performSearch,
             ),
-          ),
+          ],
         ),
       ),
       body: ListView.builder(

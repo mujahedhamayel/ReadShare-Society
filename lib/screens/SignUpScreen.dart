@@ -230,57 +230,6 @@ class __FormContentState extends State<_FormContent> {
                   ),
                 ),
                 const SizedBox(height: 16),
-                const Center(child: Text("Or")),
-                const SizedBox(height: 16),
-                Container(
-                  height: 45,
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(25),
-                    border: Border.all(
-                      color: const Color.fromRGBO(226, 124, 126, 0.978),
-                    ),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.white.withOpacity(0.5),
-                        spreadRadius: 1,
-                        blurRadius: 1,
-                        offset:
-                            const Offset(0, 1), // changes position of shadow
-                      ),
-                    ],
-                  ),
-                  child: TextButton(
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => const NavScreen()),
-                      );
-                    },
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Container(
-                          height: 30.0,
-                          width: 30.0,
-                          decoration: const BoxDecoration(
-                            image: DecorationImage(
-                                image: AssetImage('assets/images/google.jpg'),
-                                fit: BoxFit.cover),
-                            shape: BoxShape.circle,
-                          ),
-                        ),
-                        const SizedBox(width: 18),
-                        const Text(
-                          "Sign In with Google",
-                          style: TextStyle(
-                              fontSize: 16,
-                              color: Color.fromRGBO(226, 124, 126, 0.978)),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
                 const SizedBox(height: 16),
                 const SizedBox(height: 16),
                 Row(
@@ -329,7 +278,7 @@ class __FormContentState extends State<_FormContent> {
       final body = jsonDecode(response.body);
       final backendToken = body['token'];
       AuthToken().setToken(backendToken);
-      Navigator.pushReplacementNamed(context, '/nav_screen');
+      Navigator.pushReplacementNamed(context, '/SignUpsecond');
     } else {
       // If the server returns an error response, show a Snackbar with the error
       ScaffoldMessenger.of(context).showSnackBar(

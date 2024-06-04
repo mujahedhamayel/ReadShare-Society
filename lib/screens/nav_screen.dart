@@ -1,3 +1,4 @@
+import 'package:facebook/screens/favoritePage.dart';
 import 'package:flutter/material.dart';
 import '/data/data.dart';
 import '/screens/screens.dart';
@@ -13,8 +14,8 @@ class NavScreen extends StatefulWidget {
 class _NavScreenState extends State<NavScreen> {
   final List<Widget> _screens = [
     const HomeScreen(),
-    const BooksContent(), // Replace Scaffold with BooksContent
-    const Scaffold(), // Placeholder for other screens
+    const BooksContent(),
+    const favoritepage(),
     const Scaffold(), // Placeholder for other screens
     const Scaffold(), // Placeholder for other screens
     const Scaffold(), // Placeholder for other screens

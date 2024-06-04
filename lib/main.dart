@@ -1,4 +1,5 @@
 import 'package:facebook/providers/user_provider.dart';
+import 'package:facebook/screens/SignUpSecond.dart';
 import 'package:facebook/services/notification_service.dart';
 
 import '/screens/screens.dart';
@@ -27,6 +28,7 @@ void main() async {
           '/home': (context) => NavScreen(),
           '/signin': (context) => SignInPage(),
           '/nav_screen': (context) => NavScreen(),
+          '/SignUpsecond': (context) => SignUpPage2(),
         },
       ),
     ),
