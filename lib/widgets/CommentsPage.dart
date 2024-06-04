@@ -17,7 +17,6 @@ class CommentsPage extends StatefulWidget {
   _CommentsPageState createState() => _CommentsPageState();
 }
 
-////// هون رح تعدل معلومات الشخص الي علق
 class _CommentsPageState extends State<CommentsPage> {
   final List<Comment> _comments = [];
   final TextEditingController _commentController = TextEditingController();
@@ -52,6 +51,10 @@ class _CommentsPageState extends State<CommentsPage> {
     return Scaffold(
       appBar: AppBar(
         title: Text('Comments'),
+        leading: IconButton(
+          onPressed: () => Navigator.of(context).pop(),
+          icon: const Icon(Icons.arrow_back_ios_new_outlined),
+        ),
       ),
       body: Column(
         children: [
