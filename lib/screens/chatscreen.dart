@@ -26,12 +26,13 @@ class UserListPage extends StatelessWidget {
         ),
       ),
       body: ListView.builder(
+        padding: const EdgeInsets.all(20), // Add padding to the entire list
         itemCount: userList.length,
         itemBuilder: (context, index) {
           final user = userList[index];
           return Padding(
             padding: const EdgeInsets.symmetric(
-                vertical: 20), // Add vertical padding here
+                vertical: 16), // Add vertical padding here
             child: UserCardChat(user: user), // Use UserCardChat here
           ); // Use UserCardChat here
         },
@@ -110,7 +111,9 @@ class _ChatscreentState extends State<Chatscreen> {
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             MessagesStream(
-                user: widget.user), // Pass the user to MessagesStream
+              messages: _messages,
+              user: widget.user, // Pass the messages list to MessagesStream
+            ),
             Container(
               decoration: const BoxDecoration(
                 color: Colors.white,
@@ -163,7 +166,8 @@ class _ChatscreentState extends State<Chatscreen> {
                             setState(() {
                               _messages.add(MessageBubble(
                                 sender: 'You',
-                                text: messageText,
+                                text:
+                                    messageText, // Display the entered message
                                 isMe: true,
                               ));
                             });
@@ -185,30 +189,43 @@ class _ChatscreentState extends State<Chatscreen> {
 
 class MessagesStream extends StatelessWidget {
   final User user;
-  const MessagesStream({Key? key, required this.user}) : super(key: key);
+  final List<MessageBubble> messages;
+  const MessagesStream({Key? key, required this.user, required this.messages})
+      : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return Expanded(
       child: Container(
         color: Colors.white,
-        child: ListView(
+        child: /* messages.isEmpty
+            ? Center(
+                child: Text(
+                  "Start the conversation!",
+                  style: TextStyle(fontSize: 16.0, color: Colors.grey),
+                ),
+              )
+            : */
+            ListView.builder(
           padding: const EdgeInsets.symmetric(
             horizontal: 16.0,
             vertical: 10.0,
           ),
-          children: [
-            MessageBubble(
-              sender: user.name,
-              text: 'Hello!',
-              isMe: false,
-            ),
-            MessageBubble(
-              sender: 'You',
-              text: 'Hi there!',
-              isMe: true,
-            ),
-          ],
+          itemCount: messages.length + 1, // Add 1 for default message
+          itemBuilder: (context, index) {
+            if (index == 0) {
+              // Render default message
+              return MessageBubble(
+                sender: user.name,
+                text: "Hello!",
+                isMe: false,
+              );
+            } else {
+              // Render actual messages
+              final message = messages[index - 1];
+              return message;
+            }
+          },
         ),
       ),
     );
