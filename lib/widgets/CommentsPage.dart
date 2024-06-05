@@ -1,3 +1,4 @@
+import 'package:facebook/config/palette.dart';
 import 'package:facebook/models/comment_model.dart';
 import 'package:facebook/screens/ProfilePage.dart';
 import 'package:facebook/widgets/profile_avatar.dart';
@@ -122,9 +123,16 @@ class _CommentsPageState extends State<CommentsPage> {
                     ),
                   ),
                 ),
-                IconButton(
-                  icon: Icon(Icons.send),
+                RawMaterialButton(
+                  padding: const EdgeInsets.all(12.0),
+                  fillColor: Palette.REDcolor, // Changed color to red
+                  elevation: 0.0,
+                  shape: const CircleBorder(),
                   onPressed: _addComment,
+                  child: const Icon(
+                    Icons.send,
+                    color: Colors.white,
+                  ),
                 ),
               ],
             ),

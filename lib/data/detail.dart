@@ -324,9 +324,16 @@ class _BookReviewState extends State<BookReview> {
                     ),
                   ),
                 ),
-                IconButton(
-                  icon: Icon(Icons.send),
+                RawMaterialButton(
+                  padding: const EdgeInsets.all(12.0),
+                  fillColor: Palette.REDcolor, // Changed color to red
+                  elevation: 0.0,
+                  shape: const CircleBorder(),
                   onPressed: _submitReview,
+                  child: const Icon(
+                    Icons.send,
+                    color: Colors.white,
+                  ),
                 ),
               ],
             ),
