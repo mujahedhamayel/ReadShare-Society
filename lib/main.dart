@@ -2,9 +2,10 @@ import 'package:facebook/data/detail.dart';
 import 'package:facebook/models/book.dart';
 import 'package:facebook/models/post_model.dart';
 import 'package:facebook/models/user_model.dart';
+import 'package:facebook/providers/book_provider.dart';
 import 'package:facebook/providers/user_provider.dart';
 import 'package:facebook/screens/ProfilePage.dart';
-import 'package:facebook/screens/SignUpSecond.dart';
+
 import 'package:facebook/services/notification_service.dart';
 import 'package:facebook/widgets/CommentsPage.dart';
 
@@ -27,6 +28,7 @@ void main() async {
     MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (_) => UserProvider()),
+        ChangeNotifierProvider(create: (_) => BookProvider()),
       ],
       child: MaterialApp(
         home: WelcomePage(),
@@ -34,7 +36,7 @@ void main() async {
           '/home': (context) => NavScreen(),
           '/signin': (context) => SignInPage(),
           '/nav_screen': (context) => NavScreen(),
-       //   '/SignUpsecond': (context) => SignUpPage2(),
+          '/SignUpsecond': (context) => SignUpPage2(),
           '/bookDetail': (context) => DetailPage(
               book: ModalRoute.of(context)?.settings.arguments as Book),
           '/userProfile': (context) => ProfilePage(

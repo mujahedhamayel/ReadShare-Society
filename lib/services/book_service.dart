@@ -47,6 +47,35 @@ class BookService {
       throw Exception('Failed to load liked books');
     }
   }
+
+  // Add the likeBook method
+  Future<void> likeBook(String bookId) async {
+    String token = AuthToken().getToken;
+    final url = '$apiUrl/$bookId/like';
+
+    final response = await http.post(
+      Uri.parse(url),
+      headers: ApiUtil.headers(token),
+    );
+
+    if (response.statusCode != 200) {
+      throw Exception('Failed to like the book');
+    }
+  }
+
+   Future<void> addReview(String bookId, Review review) async {
+    String token = AuthToken().getToken;
+    final response = await http.post(
+      Uri.parse('$apiUrl/$bookId/reviews'),
+      headers: ApiUtil.headers(token),
+      body: jsonEncode(review.toJson()),
+    );
+
+    if (response.statusCode != 201) {
+      throw Exception('Failed to add review');
+    }
+  }
+
 }
 
 

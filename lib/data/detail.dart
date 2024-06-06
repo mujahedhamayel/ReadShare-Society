@@ -1,9 +1,18 @@
+import 'dart:convert';
+
 import 'package:facebook/config/palette.dart';
+import 'package:facebook/constants.dart';
+import 'package:facebook/providers/book_provider.dart';
+import 'package:facebook/providers/user_provider.dart';
 import 'package:facebook/screens/ProfilePage.dart';
 import 'package:facebook/services/book_service.dart';
+import 'package:facebook/utils/api_util.dart';
+import 'package:facebook/utils/auth_token.dart';
 import 'package:intl/intl.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import '../models/models.dart';
+import 'package:http/http.dart' as http;
 
 class DetailPage extends StatelessWidget {
   final Book book;
@@ -51,19 +60,15 @@ class BookDetail extends StatelessWidget {
             children: [
               GestureDetector(
                 ////////// هاد الفنكشن الي بستدعي صفحة الناشر ////////////////// هون رح تعدل عليه لانه بستدعي غلط
-                onTap: () {
+                onTap: () async {
+                  // Fetch the owner's details from the backend or use what you have
+                  User owner =
+                      await fetchUserDetails(book.owner); // Fetch owner details
+
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (context) => ProfilePage(
-                          user: User(
-                              id: book.owner,
-                              name: book.owner,
-                              email: '',
-                              books: [],
-                              likedBooks: [],
-                              requests: [],
-                              followedUsers: [])), // Assuming you have the user's ID and name
+                      builder: (context) => ProfilePage(user: owner),
                     ),
                   );
                 },
@@ -112,7 +117,19 @@ class _BookCoverState extends State<BookCover> {
   bool isBookmarked = false;
 
   @override
+  void initState() {
+    super.initState();
+
+    final providerUser = Provider.of<UserProvider>(context, listen: false).user;
+    final userId = providerUser!.id; // Obtain the current user's ID
+    isBookmarked = widget.book.likes.contains(userId);
+  }
+
+  @override
   Widget build(BuildContext context) {
+    final bookProvider = Provider.of<BookProvider>(context, listen: false);
+    //final providerUser = Provider.of<UserProvider>(context).user;
+    //final userId = providerUser!.id ;
     return Container(
       margin: const EdgeInsets.symmetric(vertical: 10),
       padding: const EdgeInsets.only(left: 20),
@@ -149,10 +166,20 @@ class _BookCoverState extends State<BookCover> {
             left: 300,
             bottom: 20,
             child: GestureDetector(
-              onTap: () {
-                setState(() {
-                  isBookmarked = !isBookmarked;
-                });
+              onTap: () async {
+                try {
+                  await BookService().likeBook(widget.book.id);
+                  setState(() {
+                    isBookmarked = !isBookmarked;
+                    if (isBookmarked) {
+                      bookProvider.likeBook(widget.book);
+                    } else {
+                      bookProvider.unlikeBook(widget.book.id);
+                    }
+                  });
+                } catch (e) {
+                  print('Failed to like/unlike the book: $e');
+                }
               },
               child: Container(
                 padding: const EdgeInsets.all(8),
@@ -224,12 +251,13 @@ class BookReview extends StatefulWidget {
 class _BookReviewState extends State<BookReview> {
   late double userRating;
   TextEditingController _reviewController = TextEditingController();
-  List<String> _submittedReviews = [];
+  List<Review> _submittedReviews = [];
 
   @override
   void initState() {
     super.initState();
     userRating = widget.book.rate.toDouble();
+    _submittedReviews = widget.book.review;
   }
 
   void _handleRatingUpdate(double newRating) {
@@ -238,28 +266,27 @@ class _BookReviewState extends State<BookReview> {
     });
   }
 
-  void _submitReview() {
+  Future<void> _submitReview() async {
     if (_reviewController.text.isNotEmpty) {
-      // Replace 'Current User' with the actual current user object
-      const currentUser = User(
-        name: 'Current User', // Replace with actual user name
-        imageUrl: 'path_to_current_user_image',
-        id: '',
-        email: '',
-        books: [],
-        likedBooks: [],
-        requests: [],
-        followedUsers: [], // Replace with actual image URL
-      );
+      final userProvider = Provider.of<UserProvider>(context, listen: false);
+      final currentUser = userProvider.user!;
 
-      setState(() {
-        _submittedReviews.add(Review(
+      try {
+        final newReview = Review(
           username: currentUser.name,
           text: _reviewController.text,
           date: DateTime.now(),
-        ) as String);
-        _reviewController.clear();
-      });
+        );
+
+        await BookService().addReview(widget.book.id, newReview);
+
+        setState(() {
+          _submittedReviews.add(newReview);
+          _reviewController.clear();
+        });
+      } catch (e) {
+        print('Failed to add review: $e');
+      }
     }
   }
 
@@ -291,8 +318,7 @@ class _BookReviewState extends State<BookReview> {
             ),
           ),
           const SizedBox(height: 15),
-          if (widget
-              .book.review.isNotEmpty) // Check if review list is not empty
+          if (_submittedReviews.isNotEmpty)
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -304,9 +330,11 @@ class _BookReviewState extends State<BookReview> {
                   ),
                 ),
                 SizedBox(height: 10),
-                for (Review review
-                    in widget.book.review) // Iterate over reviews
-                  Text(review.text),
+                for (Review review in _submittedReviews)
+                  Padding(
+                    padding: const EdgeInsets.only(bottom: 10),
+                    child: Text(review.text),
+                  ),
                 SizedBox(height: 20),
               ],
             ),
@@ -316,6 +344,7 @@ class _BookReviewState extends State<BookReview> {
               children: [
                 Expanded(
                   child: TextField(
+                    controller: _reviewController,
                     decoration: InputDecoration(
                       hintText: 'Add a Review...',
                       border: OutlineInputBorder(
@@ -352,5 +381,22 @@ class _BookReviewState extends State<BookReview> {
         );
       }),
     );
+  }
+}
+
+Future<User> fetchUserDetails(String name) async {
+  final String apiUrl =
+      'http://$ip:$port/api/users/name/$name'; // Update this to your actual API endpoint
+  String token = AuthToken().getToken;
+  final response = await http.get(
+    Uri.parse(apiUrl),
+    headers: ApiUtil.headers(token),
+  );
+
+  if (response.statusCode == 200) {
+    final data = jsonDecode(response.body);
+    return User.fromJson(data);
+  } else {
+    throw Exception('Failed to load user');
   }
 }

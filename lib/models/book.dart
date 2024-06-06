@@ -8,6 +8,8 @@ class Book {
   String? location;
   num rate;
   List<Review> review;
+  String id;
+  List<String> likes;
   // num height;
 
   Book(
@@ -20,6 +22,9 @@ class Book {
     this.location,
     this.rate,
     this.review,
+    this.id,
+    this.likes,
+    
     // this.height,
   );
 
@@ -27,6 +32,11 @@ class Book {
   factory Book.fromJson(Map<String, dynamic> json) {
     var reviewList = (json['reviews'] as List)
         .map((reviewJson) => Review.fromJson(reviewJson))
+        .toList();
+
+
+    var likesList = (json['likes'] as List<dynamic>)
+        .map((like) => like as String)
         .toList();
 
     return Book(
@@ -39,6 +49,8 @@ class Book {
       json['location'],
       4.7, //rate
       reviewList,
+      json['_id'],
+      likesList,  
     );
   }
 
@@ -52,6 +64,9 @@ class Book {
       'image': imgUrl,
       'author': author,
       'location': location,
+      '_id':id,
+      'likes': likes,  
+
     };
   }
 
