@@ -3,6 +3,7 @@ import 'package:facebook/models/book.dart';
 import 'package:facebook/models/post_model.dart';
 import 'package:facebook/models/user_model.dart';
 import 'package:facebook/providers/book_provider.dart';
+import 'package:facebook/providers/followed_user_provider.dart';
 import 'package:facebook/providers/user_provider.dart';
 import 'package:facebook/screens/ProfilePage.dart';
 
@@ -29,6 +30,7 @@ void main() async {
       providers: [
         ChangeNotifierProvider(create: (_) => UserProvider()),
         ChangeNotifierProvider(create: (_) => BookProvider()),
+         ChangeNotifierProvider(create: (_) => FollowedUsersProvider()),
       ],
       child: MaterialApp(
         home: WelcomePage(),

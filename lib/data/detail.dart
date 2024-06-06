@@ -6,6 +6,7 @@ import 'package:facebook/providers/book_provider.dart';
 import 'package:facebook/providers/user_provider.dart';
 import 'package:facebook/screens/ProfilePage.dart';
 import 'package:facebook/services/book_service.dart';
+import 'package:facebook/services/user_service.dart';
 import 'package:facebook/utils/api_util.dart';
 import 'package:facebook/utils/auth_token.dart';
 import 'package:intl/intl.dart';
@@ -39,6 +40,7 @@ class BookDetail extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    UserService userService = UserService();
     return Container(
       padding: const EdgeInsets.all(20),
       child: Column(
@@ -62,8 +64,8 @@ class BookDetail extends StatelessWidget {
                 ////////// هاد الفنكشن الي بستدعي صفحة الناشر ////////////////// هون رح تعدل عليه لانه بستدعي غلط
                 onTap: () async {
                   // Fetch the owner's details from the backend or use what you have
-                  User owner =
-                      await fetchUserDetails(book.owner); // Fetch owner details
+                  User owner = await userService
+                      .fetchUserDetails(book.owner); // Fetch owner details
 
                   Navigator.push(
                     context,
@@ -388,22 +390,5 @@ class _BookReviewState extends State<BookReview> {
         );
       }),
     );
-  }
-}
-
-Future<User> fetchUserDetails(String name) async {
-  final String apiUrl =
-      'http://$ip:$port/api/users/name/$name'; // Update this to your actual API endpoint
-  String token = AuthToken().getToken;
-  final response = await http.get(
-    Uri.parse(apiUrl),
-    headers: ApiUtil.headers(token),
-  );
-
-  if (response.statusCode == 200) {
-    final data = jsonDecode(response.body);
-    return User.fromJson(data);
-  } else {
-    throw Exception('Failed to load user');
   }
 }

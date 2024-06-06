@@ -3,7 +3,7 @@ export 'nav_screen.dart';
 export 'SignInPage.dart';
 export 'ResetPassScreen.dart';
 export 'book_screen.dart';
-export 'chatscreen.dart';
+export 'chatscreenfetch.dart';
 export 'favoritePage.dart';
 export 'ProfilePage.dart';
 export 'personal.dart';

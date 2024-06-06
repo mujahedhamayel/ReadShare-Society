@@ -1,88 +1,48 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:facebook/providers/user_provider.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import '../config/palette.dart';
 import '../models/user_model.dart';
-import '../widgets/user_card.dart';
-
-class UserListPage extends StatelessWidget {
-  const UserListPage({Key? key}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Colors.white,
-        automaticallyImplyLeading: false,
-        title: const Text(
-          'Chat',
-          style: TextStyle(
-            color: Palette.REDcolor,
-            fontSize: 28.0,
-            fontWeight: FontWeight.bold,
-            letterSpacing: -1.2,
-          ),
-        ),
-        iconTheme: const IconThemeData(
-          color: Colors.black,
-        ),
-      ),
-      body: ListView.builder(
-        padding: const EdgeInsets.all(20), // Add padding to the entire list
-        itemCount: userList.length,
-        itemBuilder: (context, index) {
-          final user = userList[index];
-          return Padding(
-            padding: const EdgeInsets.symmetric(
-                vertical: 16), // Add vertical padding here
-            child: UserCardChat(user: user), // Use UserCardChat here
-          ); // Use UserCardChat here
-        },
-      ),
-    );
-  }
-}
-
-final List<User> userList = [
-  const User(
-      name: 'John',
-      id: '1',
-      email: '',
-      books: [],
-      likedBooks: [],
-      requests: [],
-      followedUsers: []),
-  const User(
-      name: 'Bob',
-      id: '2',
-      email: '',
-      books: [],
-      likedBooks: [],
-      requests: [],
-      followedUsers: []),
-  const User(
-      name: 'Mays',
-      id: '3',
-      email: '',
-      books: [],
-      likedBooks: [],
-      requests: [],
-      followedUsers: []),
-  // Add more users as needed
-];
 
 class Chatscreen extends StatefulWidget {
   final User user;
-  const Chatscreen({super.key, required this.user});
+  const Chatscreen({Key? key, required this.user}) : super(key: key);
 
   @override
-  _ChatscreentState createState() => _ChatscreentState();
+  _ChatscreenState createState() => _ChatscreenState();
 }
 
-class _ChatscreentState extends State<Chatscreen> {
+class _ChatscreenState extends State<Chatscreen> {
   final TextEditingController _messageController = TextEditingController();
-  final List<MessageBubble> _messages = [];
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  void _sendMessage(loggedInUserId) async {
+    if (_messageController.text.isNotEmpty) {
+      await _firestore
+          .collection('chats')
+          .doc(getChatId(loggedInUserId, widget.user.id))
+          .collection('messages')
+          .add({
+        'text': _messageController.text,
+        'senderId': loggedInUserId, // Replace with logged in user ID
+        'receiverId': widget.user.id,
+        'timestamp': FieldValue.serverTimestamp(),
+      });
+      _messageController.clear();
+    }
+  }
+
+  String getChatId(String userId1, String userId2) {
+    // Ensure the IDs are always concatenated in the same order
+    return userId1.hashCode <= userId2.hashCode
+        ? '${userId1}_$userId2'
+        : '${userId2}_$userId1';
+  }
 
   @override
   Widget build(BuildContext context) {
+    final providerUser = Provider.of<UserProvider>(context, listen: false).user;
+
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
@@ -110,16 +70,49 @@ class _ChatscreentState extends State<Chatscreen> {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            MessagesStream(
-              messages: _messages,
-              user: widget.user, // Pass the messages list to MessagesStream
+            Expanded(
+              child: StreamBuilder<QuerySnapshot>(
+                stream: _firestore
+                    .collection('chats')
+                    .doc(getChatId(providerUser!.id, widget.user.id))
+                    .collection('messages')
+                    .orderBy('timestamp')
+                    .snapshots(),
+                builder: (context, snapshot) {
+                  if (!snapshot.hasData) {
+                    return const Center(child: CircularProgressIndicator());
+                  }
+                  final messages = snapshot.data!.docs;
+                  List<MessageBubble> messageBubbles = [];
+                  for (var message in messages) {
+                    final messageText = message['text'];
+                    final messageSender = message['senderId'];
+                    final currentUser =
+                        providerUser!.id; // Replace with logged in user ID
+
+                    final messageBubble = MessageBubble(
+                      sender: providerUser.name,
+                      text: messageText,
+                      isMe: currentUser == messageSender,
+                    );
+                    messageBubbles.add(messageBubble);
+                  }
+                  return ListView(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 16.0,
+                      vertical: 10.0,
+                    ),
+                    children: messageBubbles,
+                  );
+                },
+              ),
             ),
             Container(
               decoration: const BoxDecoration(
                 color: Colors.white,
                 border: Border(
                   top: BorderSide(
-                    color: Palette.REDcolor, // Changed color to red
+                    color: Palette.REDcolor,
                     width: 1.5,
                   ),
                 ),
@@ -153,7 +146,7 @@ class _ChatscreentState extends State<Chatscreen> {
                       ),
                       child: RawMaterialButton(
                         padding: const EdgeInsets.all(12.0),
-                        fillColor: Palette.REDcolor, // Changed color to red
+                        fillColor: Palette.REDcolor,
                         elevation: 0.0,
                         shape: const CircleBorder(),
                         child: const Icon(
@@ -161,18 +154,7 @@ class _ChatscreentState extends State<Chatscreen> {
                           color: Colors.white,
                         ),
                         onPressed: () {
-                          final messageText = _messageController.text.trim();
-                          if (messageText.isNotEmpty) {
-                            setState(() {
-                              _messages.add(MessageBubble(
-                                sender: 'You',
-                                text:
-                                    messageText, // Display the entered message
-                                isMe: true,
-                              ));
-                            });
-                            _messageController.clear();
-                          }
+                          _sendMessage(providerUser!.id);
                         },
                       ),
                     ),
@@ -181,51 +163,6 @@ class _ChatscreentState extends State<Chatscreen> {
               ),
             ),
           ],
-        ),
-      ),
-    );
-  }
-}
-
-class MessagesStream extends StatelessWidget {
-  final User user;
-  final List<MessageBubble> messages;
-  const MessagesStream({Key? key, required this.user, required this.messages})
-      : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return Expanded(
-      child: Container(
-        color: Colors.white,
-        child: /* messages.isEmpty
-            ? Center(
-                child: Text(
-                  "Start the conversation!",
-                  style: TextStyle(fontSize: 16.0, color: Colors.grey),
-                ),
-              )
-            : */
-            ListView.builder(
-          padding: const EdgeInsets.symmetric(
-            horizontal: 16.0,
-            vertical: 10.0,
-          ),
-          itemCount: messages.length + 1, // Add 1 for default message
-          itemBuilder: (context, index) {
-            if (index == 0) {
-              // Render default message
-              return MessageBubble(
-                sender: user.name,
-                text: "Hello!",
-                isMe: false,
-              );
-            } else {
-              // Render actual messages
-              final message = messages[index - 1];
-              return message;
-            }
-          },
         ),
       ),
     );
