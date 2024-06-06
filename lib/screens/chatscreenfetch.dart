@@ -1,9 +1,13 @@
-import 'package:facebook/screens/chatscreen.dart';
+import 'package:facebook/providers/followed_user_provider.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import '../config/palette.dart';
 import '../models/user_model.dart';
+import '../providers/followed_user_provider.dart';
 import '../services/user_service.dart';
 import '../widgets/user_card.dart';
+import 'chatscreen.dart';
+
 class UserListPage extends StatefulWidget {
   const UserListPage({Key? key}) : super(key: key);
 
@@ -12,14 +16,14 @@ class UserListPage extends StatefulWidget {
 }
 
 class _UserListPageState extends State<UserListPage> {
-  late Future<List<User>> _followedUserListFuture;
   late Future<List<User>> _allUserListFuture;
   late Future<List<User>> _chattedUserListFuture;
   TextEditingController _searchController = TextEditingController();
   List<User> _allUsers = [];
   List<User> _filteredUsers = [];
-  List<User> _followedUsers = [];
   List<User> _chattedUsers = [];
+  List<User> _searchResults = [];
+  bool _isSearching = false;
 
   @override
   void initState() {
@@ -36,18 +40,16 @@ class _UserListPageState extends State<UserListPage> {
   }
 
   void _fetchData() {
-    _followedUserListFuture = UserService().fetchFollowedUsers();
-    _followedUserListFuture.then((users) {
-      setState(() {
-        _followedUsers = users;
-        _filteredUsers = users;
-      });
-    });
+    final followedUsersProvider =
+        Provider.of<FollowedUsersProvider>(context, listen: false);
+
+    followedUsersProvider.fetchFollowedUsers();
 
     _allUserListFuture = UserService().fetchAllUsers();
     _allUserListFuture.then((users) {
       setState(() {
         _allUsers = users;
+        _updateFilteredUsers(); // Update filtered users initially
       });
     });
 
@@ -55,42 +57,69 @@ class _UserListPageState extends State<UserListPage> {
     _chattedUserListFuture.then((users) {
       setState(() {
         _chattedUsers = users;
-        _filteredUsers.addAll(users);
+        _updateFilteredUsers(); // Update filtered users with chatted users
       });
     });
   }
 
   void _onSearchChanged() {
-    filterUsers();
-  }
-
-  void filterUsers() {
-    List<User> _users = [];
-    _users.addAll(_allUsers);
     if (_searchController.text.isNotEmpty) {
-      _users.retainWhere((user) {
-        String searchTerm = _searchController.text.toLowerCase();
-        String userName = user.name.toLowerCase();
-        return userName.contains(searchTerm);
+      setState(() {
+        _isSearching = true;
+        _filterSearchResults();
       });
     } else {
-      _users = _followedUsers;
-       _users.addAll(_chattedUsers);
+      setState(() {
+        _isSearching = false;
+      });
     }
+  }
+
+  void _filterSearchResults() {
+    List<User> searchResults = _allUsers.where((user) {
+      String searchTerm = _searchController.text.toLowerCase();
+      String userName = user.name.toLowerCase();
+      return userName.contains(searchTerm);
+    }).toList();
+
+    // Remove duplicates
+    searchResults = searchResults.toSet().toList();
+
     setState(() {
-      _filteredUsers = _users;
+      _searchResults = searchResults;
     });
   }
 
+  void _updateFilteredUsers() {
+  final followedUsersProvider = Provider.of<FollowedUsersProvider>(context, listen: false);
+
+  // Create a map to remove duplicates using user.id as the key
+  Map<String, User> userMap = {};
+
+  // Add followed users to the map
+  for (var user in followedUsersProvider.followedUsers) {
+    userMap[user.id] = user;
+  }
+
+  // Add chatted users to the map
+  for (var user in _chattedUsers) {
+    userMap[user.id] = user;
+  }
+
+  // Convert the map values to a list to get unique users
+  setState(() {
+    _filteredUsers = userMap.values.toList();
+  });
+}
   void _addUserToFollowed(User user) async {
     try {
       await UserService().addChattedUser(user.id);
+      final followedUsersProvider =
+          Provider.of<FollowedUsersProvider>(context, listen: false);
+      followedUsersProvider.addFollowedUser(user);
       setState(() {
-        if (!_followedUsers.contains(user)) {
-          _followedUsers.add(user);
-          _chattedUsers.remove(user);
-          _filteredUsers.remove(user);
-        }
+        _chattedUsers.remove(user);
+        _updateFilteredUsers(); // Update filtered users after modifying the lists
       });
     } catch (error) {
       // Handle the error, e.g., show a notification
@@ -136,31 +165,24 @@ class _UserListPageState extends State<UserListPage> {
             ),
           ),
           Expanded(
-            child: FutureBuilder<List<User>>(
-              future: _followedUserListFuture,
-              builder: (context, snapshot) {
-                if (snapshot.connectionState == ConnectionState.waiting) {
-                  return const Center(child: CircularProgressIndicator());
-                } else if (snapshot.hasError) {
-                  return Center(child: Text('Error: ${snapshot.error}'));
-                } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                  return const Center(child: Text('No followed users found.'));
-                } else {
-                  return ListView.builder(
-                    padding: const EdgeInsets.all(20),
-                    itemCount: _filteredUsers.length,
-                    itemBuilder: (context, index) {
-                      final user = _filteredUsers[index];
-                      return Padding(
-                        padding: const EdgeInsets.symmetric(vertical: 16),
-                        child: UserCardChat(
-                          user: user,
-                          onStartChat: _addUserToFollowed,
-                        ),
-                      );
-                    },
-                  );
-                }
+            child: Consumer<FollowedUsersProvider>(
+              builder: (context, followedUsersProvider, _) {
+                List<User> usersToDisplay =
+                    _isSearching ? _searchResults : _filteredUsers;
+                return ListView.builder(
+                  padding: const EdgeInsets.all(20),
+                  itemCount: usersToDisplay.length,
+                  itemBuilder: (context, index) {
+                    final user = usersToDisplay[index];
+                    return Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 16),
+                      child: UserCardChat(
+                        user: user,
+                        onStartChat: _addUserToFollowed,
+                      ),
+                    );
+                  },
+                );
               },
             ),
           ),
@@ -205,7 +227,9 @@ class UserCardChat extends StatelessWidget {
         child: Row(
           children: [
             CircleAvatar(
-              backgroundImage: NetworkImage(user.imageUrl!),
+              backgroundImage: user.imageUrl != null
+                  ? NetworkImage(user.imageUrl!)
+                  : AssetImage('assets/default_avatar.png'), // Default avatar
               radius: 30,
             ),
             const SizedBox(width: 16),
@@ -220,13 +244,6 @@ class UserCardChat extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(height: 4),
-                // Text(
-                //   user.email,
-                //   style: const TextStyle(
-                //     fontSize: 14,
-                //     color: Colors.grey,
-                //   ),
-                // ),
               ],
             ),
           ],
