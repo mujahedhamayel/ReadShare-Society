@@ -15,7 +15,7 @@ class _NavScreenState extends State<NavScreen> {
     const HomeScreen(),
     const BooksContent(),
     const FavoritePage(),
-    const Chatscreen(),
+    const UserListPage(),
     const Scaffold(), // Placeholder for other screens
   ];
   final List<IconData> _icons = const [
