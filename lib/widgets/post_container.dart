@@ -1,11 +1,17 @@
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:facebook/constants.dart';
+import 'package:facebook/providers/user_provider.dart';
 import 'package:facebook/screens/ProfilePage.dart';
+import 'package:facebook/utils/api_util.dart';
+import 'package:facebook/utils/auth_token.dart';
 import 'package:facebook/widgets/CommentsPage.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import '/config/palette.dart';
 import '/models/models.dart';
 import '/widgets/widgets.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
+import 'package:http/http.dart' as http;
 
 class PostContainer extends StatefulWidget {
   final Post post;
@@ -26,19 +32,57 @@ class _PostContainerState extends State<PostContainer> {
   @override
   void initState() {
     super.initState();
-    isLiked = false;
     likeCount = widget.post.likes;
+    // Check if the current user has liked the post
+    final currentUser = Provider.of<UserProvider>(context, listen: false).user;
+    isLiked = widget.post.likedBy.contains(currentUser?.id);
   }
 
-  void _toggleLike() {
+  Future<void> likePost(String postId) async {
+    String token = AuthToken().getToken;
+    final String baseUrl = 'http://$ip:$port/api/posts';
+
+    final response = await http.post(
+      Uri.parse('$baseUrl/$postId/like'),
+      headers: ApiUtil.headers(token),
+    );
+
+    if (response.statusCode != 200) {
+      throw Exception('Failed to like the post');
+    }
+  }
+
+ void _toggleLike() async {
+    final currentUser = Provider.of<UserProvider>(context, listen: false).user;
+    if (currentUser == null) return;
+
     setState(() {
       isLiked = !isLiked;
       if (isLiked) {
         likeCount++;
+        widget.post.likedBy.add(currentUser.id);
       } else {
         likeCount--;
+        widget.post.likedBy.remove(currentUser.id);
       }
     });
+
+    try {
+      await likePost(widget.post.id!);
+    } catch (e) {
+      // Revert the state if the API call fails
+      setState(() {
+        isLiked = !isLiked;
+        if (isLiked) {
+          likeCount++;
+          widget.post.likedBy.add(currentUser.id);
+        } else {
+          likeCount--;
+          widget.post.likedBy.remove(currentUser.id);
+        }
+      });
+      print('Failed to like/unlike the post: $e');
+    }
   }
 
   void _navigateToComments() {
@@ -181,7 +225,7 @@ class _PostStats extends StatelessWidget {
     required this.onCommentPressed,
   });
 
-  @override
+ @override
   Widget build(BuildContext context) {
     return Column(
       children: [
@@ -244,7 +288,6 @@ class _PostStats extends StatelessWidget {
     );
   }
 }
-
 class _PostButton extends StatelessWidget {
   final Icon icon;
   final String label;

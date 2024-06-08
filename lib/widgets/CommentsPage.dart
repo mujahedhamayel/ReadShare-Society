@@ -1,18 +1,27 @@
+import 'dart:convert';
+
 import 'package:facebook/config/palette.dart';
+import 'package:facebook/constants.dart';
 import 'package:facebook/models/comment_model.dart';
+import 'package:facebook/providers/user_provider.dart';
 import 'package:facebook/screens/ProfilePage.dart';
+import 'package:facebook/utils/api_util.dart';
+import 'package:facebook/utils/auth_token.dart';
 import 'package:facebook/widgets/profile_avatar.dart';
 import 'package:flutter/material.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:intl/intl.dart';
+import 'package:provider/provider.dart';
 import '/models/models.dart';
+import 'package:http/http.dart' as http;
 
 class CommentsPage extends StatefulWidget {
   final Post post;
 
   const CommentsPage({
-    super.key,
+    Key? key,
     required this.post,
-  });
+  }) : super(key: key);
 
   @override
   _CommentsPageState createState() => _CommentsPageState();
@@ -22,30 +31,91 @@ class _CommentsPageState extends State<CommentsPage> {
   final List<Comment> _comments = [];
   final TextEditingController _commentController = TextEditingController();
 
-  void _addComment() {
-    if (_commentController.text.isNotEmpty) {
-      // Replace 'Current User' with the actual current user object
-      const currentUser = User(
-        name: 'Current User', // Replace with actual user name
-        imageUrl: 'path_to_current_user_image',
-        id: '',
-        email: '',
-        books: [],
-        likedBooks: [],
-        requests: [],
-        followedUsers: [], // Replace with actual image URL
-      );
+  final String baseUrl = 'http://$ip:$port/api';
 
+  @override
+  void initState() {
+    super.initState();
+    _fetchComments();
+  }
+
+  Future<void> _fetchComments() async {
+    String token = AuthToken().getToken;
+    final response = await http.get(
+      Uri.parse('$baseUrl/posts/${widget.post.id}/comments'),
+      headers: ApiUtil.headers(token),
+    );
+
+    if (response.statusCode == 200) {
+      final List<dynamic> commentData = json.decode(response.body);
       setState(() {
-        _comments.add(Comment(
-          user: currentUser,
-          text: _commentController.text,
-          timeAgo: 'Just now',
-        ));
-        _commentController.clear();
+        _comments
+            .addAll(commentData.map((data) => Comment.fromJson(data)).toList());
       });
+    } else {
+      print('Failed to load comments');
     }
   }
+
+  Future<void> _addComment() async {
+    String token = AuthToken().getToken;
+
+    final providerUser = Provider.of<UserProvider>(context, listen: false).user;
+
+    if (_commentController.text.isNotEmpty && providerUser != null) {
+      // Create a new comment object
+      final newComment = Comment(
+        user: providerUser,
+        text: _commentController.text,
+        timeAgo: 'Just now',
+        likes: [],
+        id: 'temporary_id', // Use a temporary ID for optimistic update
+      );
+
+      // Optimistically add the comment to the list
+      setState(() {
+        _comments.add(newComment);
+        _commentController.clear();
+      });
+
+      // Perform the network request
+      final response = await http.post(
+        Uri.parse('$baseUrl/posts/${widget.post.id}/comment'),
+        headers: ApiUtil.headers(token),
+        body: json.encode({'text': newComment.text}),
+      );
+
+      if (response.statusCode == 201) {
+        final Comment addedComment =
+            Comment.fromJson(json.decode(response.body));
+        setState(() {
+          // Replace the temporary comment with the actual comment from the server
+          _comments[_comments.indexOf(newComment)] = addedComment;
+        });
+      } else {
+        // If the request fails, remove the optimistic comment and show an error
+        setState(() {
+          _comments.remove(newComment);
+        });
+        print('Failed to add comment');
+      }
+    }
+  }
+  String formatDate(String date) {
+    final DateTime dateTime = DateTime.parse(date);
+    return DateFormat('yyyy-MM-dd HH:mm').format(dateTime);
+  }
+
+  //     setState(() {
+  //       _comments.add(Comment(
+  //         user: currentUser,
+  //         text: _commentController.text,
+  //         timeAgo: 'Just now',
+  //       ));
+  //       _commentController.clear();
+  //     });
+  //   }
+  // }
 
   @override
   Widget build(BuildContext context) {
@@ -80,7 +150,7 @@ class _CommentsPageState extends State<CommentsPage> {
                     ),
                   ListView.builder(
                     shrinkWrap: true,
-                    physics: NeverScrollableScrollPhysics(),
+                    physics: const NeverScrollableScrollPhysics(),
                     itemCount: _comments.length,
                     itemBuilder: (context, index) {
                       final comment = _comments[index];
@@ -100,7 +170,12 @@ class _CommentsPageState extends State<CommentsPage> {
                         ),
                         title: Text(comment.user.name),
                         subtitle: Text(comment.text),
-                        trailing: Text(comment.timeAgo),
+                         trailing: Text(formatDate(comment.timeAgo)),
+                        onTap: () {
+                          setState(() {
+                            _commentController.text = comment.text;
+                          });
+                        },
                       );
                     },
                   ),

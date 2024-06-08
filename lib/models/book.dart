@@ -24,7 +24,7 @@ class Book {
     this.review,
     this.id,
     this.likes,
-    
+
     // this.height,
   );
 
@@ -34,15 +34,13 @@ class Book {
         .map((reviewJson) => Review.fromJson(reviewJson))
         .toList();
 
-
-    var likesList = (json['likes'] as List<dynamic>)
-        .map((like) => like as String)
-        .toList();
+    var likesList =
+        (json['likes'] as List<dynamic>).map((like) => like as String).toList();
 
     return Book(
       json['type'],
       json['title'],
-      json['owner'],
+      json['owner'] ?? {},   //user: User.fromJson(json['user'] ?? {}), // Handle null user
       DateTime.parse(json['updatedAt']),
       json['image'],
       json['author'],
@@ -50,7 +48,7 @@ class Book {
       4.7, //rate
       reviewList,
       json['_id'],
-      likesList,  
+      likesList,
     );
   }
 
@@ -64,9 +62,8 @@ class Book {
       'image': imgUrl,
       'author': author,
       'location': location,
-      '_id':id,
-      'likes': likes,  
-
+      '_id': id,
+      'likes': likes,
     };
   }
 

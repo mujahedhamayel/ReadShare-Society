@@ -1,5 +1,7 @@
+import 'package:facebook/providers/book_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
+import 'package:provider/provider.dart';
 import '../models/book.dart';
 import '../models/book_item.dart';
 
@@ -23,20 +25,17 @@ class _BookGridViewState extends State<BookGridView> {
   @override
   void initState() {
     super.initState();
-    _bookList = BookService().fetchPhysicalBooks();
+    final bookProvider = Provider.of<BookProvider>(context, listen: false);
+    bookProvider
+        .fetchPhysicalBooks(); // Fetch physical books when the widget is initialized
   }
 
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder<List<Book>>(
-      future: _bookList,
-      builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.waiting) {
+    return Consumer<BookProvider>(
+      builder: (context, bookProvider, child) {
+        if (bookProvider.physicalBooks.isEmpty) {
           return Center(child: CircularProgressIndicator());
-        } else if (snapshot.hasError) {
-          return Center(child: Text('Error: ${snapshot.error}'));
-        } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-          return Center(child: Text('No books available'));
         } else {
           return ListView(
             controller: widget.scrollController,
@@ -49,9 +48,9 @@ class _BookGridViewState extends State<BookGridView> {
                   crossAxisSpacing: 16,
                   mainAxisSpacing: 16,
                   crossAxisCount: 2,
-                  itemCount: snapshot.data!.length,
+                  itemCount: bookProvider.physicalBooks.length,
                   itemBuilder: (_, index) =>
-                      BookItem(book: snapshot.data![index]),
+                      BookItem(book: bookProvider.physicalBooks[index]),
                 ),
               ),
             ],
@@ -80,20 +79,16 @@ class _BookGridViewDesktopState extends State<BookGridViewDesktop> {
   @override
   void initState() {
     super.initState();
-    _bookList = BookService().fetchPhysicalBooks();
+    final bookProvider = Provider.of<BookProvider>(context, listen: false);
+    bookProvider.fetchPhysicalBooks();
   }
 
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder<List<Book>>(
-      future: _bookList,
-      builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.waiting) {
+    return Consumer<BookProvider>(
+      builder: (context, bookProvider, child) {
+        if (bookProvider.physicalBooks.isEmpty) {
           return Center(child: CircularProgressIndicator());
-        } else if (snapshot.hasError) {
-          return Center(child: Text('Error: ${snapshot.error}'));
-        } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-          return Center(child: Text('No books available'));
         } else {
           return ListView(
             controller: widget.scrollController,
@@ -106,9 +101,9 @@ class _BookGridViewDesktopState extends State<BookGridViewDesktop> {
                   crossAxisSpacing: 10,
                   mainAxisSpacing: 10,
                   crossAxisCount: 2,
-                  itemCount: snapshot.data!.length,
+                  itemCount: bookProvider.physicalBooks.length,
                   itemBuilder: (_, index) =>
-                      BookItem(book: snapshot.data![index]),
+                      BookItem(book: bookProvider.physicalBooks[index]),
                 ),
               ),
             ],
@@ -137,20 +132,17 @@ class _PdfBookGridViewState extends State<PdfBookGridView> {
   @override
   void initState() {
     super.initState();
-    _bookList = BookService().fetchPDFBooks();
+
+    final bookProvider = Provider.of<BookProvider>(context, listen: false);
+    bookProvider.fetchPDFBooks();
   }
 
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder<List<Book>>(
-      future: _bookList,
-      builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.waiting) {
+    return Consumer<BookProvider>(
+      builder: (context, bookProvider, child) {
+        if (bookProvider.pdfBooks.isEmpty) {
           return Center(child: CircularProgressIndicator());
-        } else if (snapshot.hasError) {
-          return Center(child: Text('Error: ${snapshot.error}'));
-        } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-          return Center(child: Text('No books available'));
         } else {
           return ListView(
             controller: widget.scrollController,
@@ -163,10 +155,9 @@ class _PdfBookGridViewState extends State<PdfBookGridView> {
                   crossAxisSpacing: 16,
                   mainAxisSpacing: 16,
                   crossAxisCount: 2,
-                  itemCount: snapshot.data!.length,
-                  itemBuilder: (_, index) =>
-                      BookItem(book: snapshot.data![index]),
-                ),
+                 itemCount: bookProvider.pdfBooks.length,
+                  itemBuilder: (_, index) => BookItem(book: bookProvider.pdfBooks[index]),
+               ),
               ),
             ],
           );
@@ -196,20 +187,16 @@ class _PdfBookGridViewDesktopState extends State<PdfBookGridViewDesktop> {
   @override
   void initState() {
     super.initState();
-    _bookList = BookService().fetchPDFBooks();
+   final bookProvider = Provider.of<BookProvider>(context, listen: false);
+    bookProvider.fetchPDFBooks();
   }
 
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder<List<Book>>(
-      future: _bookList,
-      builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.waiting) {
+   return Consumer<BookProvider>(
+      builder: (context, bookProvider, child) {
+        if (bookProvider.pdfBooks.isEmpty) {
           return Center(child: CircularProgressIndicator());
-        } else if (snapshot.hasError) {
-          return Center(child: Text('Error: ${snapshot.error}'));
-        } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-          return Center(child: Text('No books available'));
         } else {
           return ListView(
             controller: widget.scrollController,
@@ -222,9 +209,8 @@ class _PdfBookGridViewDesktopState extends State<PdfBookGridViewDesktop> {
                   crossAxisSpacing: 10,
                   mainAxisSpacing: 10,
                   crossAxisCount: 2,
-                  itemCount: snapshot.data!.length,
-                  itemBuilder: (_, index) =>
-                      BookItem(book: snapshot.data![index]),
+                   itemCount: bookProvider.pdfBooks.length,
+                  itemBuilder: (_, index) => BookItem(book: bookProvider.pdfBooks[index]),
                 ),
               ),
             ],

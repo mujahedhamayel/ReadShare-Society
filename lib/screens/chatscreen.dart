@@ -27,6 +27,8 @@ class _ChatscreenState extends State<Chatscreen> {
         'senderId': loggedInUserId, // Replace with logged in user ID
         'receiverId': widget.user.id,
         'timestamp': FieldValue.serverTimestamp(),
+      }).then((_) {
+        // #TODO:send message notificatopn
       });
       _messageController.clear();
     }

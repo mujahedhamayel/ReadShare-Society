@@ -124,7 +124,9 @@ class _BookCoverState extends State<BookCover> {
 
     final providerUser = Provider.of<UserProvider>(context, listen: false).user;
     final userId = providerUser!.id; // Obtain the current user's ID
-    isBookmarked = widget.book.likes.contains(userId);
+    //isBookmarked = widget.book.likes.contains(userId);
+    final bookProvider = Provider.of<BookProvider>(context, listen: false);
+    isBookmarked = bookProvider.isBookLiked(widget.book, userId);
   }
 
   @override
