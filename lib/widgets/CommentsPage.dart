@@ -67,7 +67,7 @@ class _CommentsPageState extends State<CommentsPage> {
       final newComment = Comment(
         user: providerUser,
         text: _commentController.text,
-        timeAgo: 'Just now',
+        timeAgo: formatDate(DateTime.now().toIso8601String()),
         likes: [],
         id: 'temporary_id', // Use a temporary ID for optimistic update
       );
@@ -101,6 +101,7 @@ class _CommentsPageState extends State<CommentsPage> {
       }
     }
   }
+
   String formatDate(String date) {
     final DateTime dateTime = DateTime.parse(date);
     return DateFormat('yyyy-MM-dd HH:mm').format(dateTime);
@@ -170,7 +171,7 @@ class _CommentsPageState extends State<CommentsPage> {
                         ),
                         title: Text(comment.user.name),
                         subtitle: Text(comment.text),
-                         trailing: Text(formatDate(comment.timeAgo)),
+                        trailing: Text(formatDate(comment.timeAgo)),
                         onTap: () {
                           setState(() {
                             _commentController.text = comment.text;
