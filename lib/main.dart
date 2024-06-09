@@ -38,7 +38,7 @@ void main() async {
           '/home': (context) => NavScreen(),
           '/signin': (context) => SignInPage(),
           '/nav_screen': (context) => NavScreen(),
-          '/SignUpsecond': (context) => SignUpPage2(),
+          //'/SignUpsecond': (context) => SignUpAdditionalPage(),
           '/bookDetail': (context) => DetailPage(
               book: ModalRoute.of(context)?.settings.arguments as Book),
           '/userProfile': (context) => ProfilePage(

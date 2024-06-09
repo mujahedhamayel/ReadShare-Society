@@ -1,9 +1,14 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:facebook/constants.dart';
 import 'package:facebook/providers/user_provider.dart';
+import 'package:facebook/utils/api_util.dart';
+import 'package:facebook/utils/auth_token.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../config/palette.dart';
 import '../models/user_model.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 
 class Chatscreen extends StatefulWidget {
   final User user;
@@ -27,9 +32,24 @@ class _ChatscreenState extends State<Chatscreen> {
         'senderId': loggedInUserId, // Replace with logged in user ID
         'receiverId': widget.user.id,
         'timestamp': FieldValue.serverTimestamp(),
-      }).then((_) {
+      }).then((_) async {
         // #TODO:send message notificatopn
-      });
+        final String apiUrl = 'http://$ip:$port/api/notification';
+         String token = AuthToken().getToken;
+
+    final url = '$apiUrl/chat/${widget.user.id}/${_messageController.text}';
+
+    final response = await  http.post(
+      Uri.parse(url),
+      headers: ApiUtil.headers(token),
+    );
+
+    if (response.statusCode != 200) {
+      throw Exception('message  notification not sent');
+    }
+
+
+      });//here
       _messageController.clear();
     }
   }

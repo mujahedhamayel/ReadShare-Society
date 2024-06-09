@@ -1,13 +1,9 @@
-import 'package:facebook/utils/auth_token.dart';
+import 'package:facebook/screens/SignUpsecond.dart';
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
-import 'dart:convert'; // For jsonEncode
-import 'package:uuid/uuid.dart'; // For uuid generation if needed
-import 'package:facebook/constants.dart';
-import '/screens/screens.dart';
+//import '/screens/sign_up_additional.dart'; // Import the second page
 
-class SignUpPage extends StatelessWidget {
-  const SignUpPage({super.key});
+class SignUpBasicPage extends StatelessWidget {
+  const SignUpBasicPage({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -23,7 +19,7 @@ class SignUpPage extends StatelessWidget {
                         child: Column(
                           mainAxisSize: MainAxisSize.min,
                           children: [
-                            _FormContent(),
+                            _BasicFormContent(),
                           ],
                         ),
                       )
@@ -34,7 +30,7 @@ class SignUpPage extends StatelessWidget {
                           child: const Row(
                             children: [
                               Expanded(
-                                child: Center(child: _FormContent()),
+                                child: Center(child: _BasicFormContent()),
                               ),
                             ],
                           ),
@@ -49,22 +45,19 @@ class SignUpPage extends StatelessWidget {
   }
 }
 
-class _FormContent extends StatefulWidget {
-  const _FormContent();
+class _BasicFormContent extends StatefulWidget {
+  const _BasicFormContent();
 
   @override
-  State<_FormContent> createState() => __FormContentState();
+  State<_BasicFormContent> createState() => __BasicFormContentState();
 }
 
-class __FormContentState extends State<_FormContent> {
-  bool _isPasswordVisible = false;
-
+class __BasicFormContentState extends State<_BasicFormContent> {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   final TextEditingController _userNameController = TextEditingController();
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
-  final TextEditingController _confirmPasswordController =
-      TextEditingController();
+  final TextEditingController _confirmPasswordController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -139,27 +132,14 @@ class __FormContentState extends State<_FormContent> {
                     }
                     return null;
                   },
-                  obscureText: !_isPasswordVisible,
-                  decoration: InputDecoration(
+                  obscureText: true,
+                  decoration: const InputDecoration(
                     labelText: 'Password',
                     hintText: 'Enter your password',
-                    prefixIcon: const Icon(Icons.lock_outline_rounded,
-                        color: Colors.black),
-                    border: const OutlineInputBorder(),
-                    suffixIcon: IconButton(
-                      icon: Icon(
-                          _isPasswordVisible
-                              ? Icons.visibility_off
-                              : Icons.visibility,
-                          color: Colors.black),
-                      onPressed: () {
-                        setState(() {
-                          _isPasswordVisible = !_isPasswordVisible;
-                        });
-                      },
-                    ),
-                    labelStyle: const TextStyle(color: Colors.black),
-                    hintStyle: const TextStyle(color: Colors.black),
+                    prefixIcon: Icon(Icons.lock_outline_rounded, color: Colors.black),
+                    border: OutlineInputBorder(),
+                    labelStyle: TextStyle(color: Colors.black),
+                    hintStyle: TextStyle(color: Colors.black),
                   ),
                   style: const TextStyle(color: Colors.black),
                 ),
@@ -175,31 +155,17 @@ class __FormContentState extends State<_FormContent> {
                     }
                     return null;
                   },
-                  obscureText: !_isPasswordVisible,
-                  decoration: InputDecoration(
+                  obscureText: true,
+                  decoration: const InputDecoration(
                     labelText: 'Confirm Password',
                     hintText: 'Confirm your password',
-                    prefixIcon: const Icon(Icons.lock_outline_rounded,
-                        color: Colors.black),
-                    border: const OutlineInputBorder(),
-                    suffixIcon: IconButton(
-                      icon: Icon(
-                          _isPasswordVisible
-                              ? Icons.visibility_off
-                              : Icons.visibility,
-                          color: Colors.black),
-                      onPressed: () {
-                        setState(() {
-                          _isPasswordVisible = !_isPasswordVisible;
-                        });
-                      },
-                    ),
-                    labelStyle: const TextStyle(color: Colors.black),
-                    hintStyle: const TextStyle(color: Colors.black),
+                    prefixIcon: Icon(Icons.lock_outline_rounded, color: Colors.black),
+                    border: OutlineInputBorder(),
+                    labelStyle: TextStyle(color: Colors.black),
+                    hintStyle: TextStyle(color: Colors.black),
                   ),
                   style: const TextStyle(color: Colors.black),
                 ),
-                const SizedBox(height: 16),
                 const SizedBox(height: 16),
                 SizedBox(
                   width: double.infinity,
@@ -213,13 +179,22 @@ class __FormContentState extends State<_FormContent> {
                     ),
                     onPressed: () {
                       if (_formKey.currentState!.validate()) {
-                        _signUp(context);
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => SignUpAdditionalPage(
+                              userName: _userNameController.text,
+                              email: _emailController.text,
+                              password: _passwordController.text,
+                            ),
+                          ),
+                        );
                       }
                     },
                     child: const Padding(
                       padding: EdgeInsets.all(10.0),
                       child: Text(
-                        'Sign up',
+                        'Next',
                         style: TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.bold,
@@ -229,28 +204,6 @@ class __FormContentState extends State<_FormContent> {
                     ),
                   ),
                 ),
-                const SizedBox(height: 16),
-                const SizedBox(height: 16),
-                const SizedBox(height: 16),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: <Widget>[
-                    const Text("Already have an account?"),
-                    TextButton(
-                        onPressed: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => const SignInPage()),
-                          );
-                        },
-                        child: const Text(
-                          "Login",
-                          style: TextStyle(
-                              color: Color.fromRGBO(226, 124, 126, 0.978)),
-                        ))
-                  ],
-                )
               ],
             ),
           ),
@@ -258,56 +211,4 @@ class __FormContentState extends State<_FormContent> {
       ),
     );
   }
-
-  void _signUp(BuildContext context) async {
-    final url = Uri.parse('http://$ip:$port/api/users/signup');
-    final response = await http.post(
-      url,
-      headers: <String, String>{
-        'Content-Type': 'application/json; charset=UTF-8',
-      },
-      body: jsonEncode(<String, String>{
-        'name': _userNameController.text,
-        'email': _emailController.text,
-        'password': _passwordController.text,
-      }),
-    );
-
-    if (response.statusCode == 200) {
-      // Successful signup, navigate to Home screen
-      final body = jsonDecode(response.body);
-      final backendToken = body['token'];
-      AuthToken().setToken(backendToken);
-      Navigator.pushReplacementNamed(context, '/SignUpsecond');
-    } else {
-      // If the server returns an error response, show a Snackbar with the error
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Failed to sign up: ${response.body}')),
-      );
-    }
-  }
 }
-
-// class SignInPage extends StatelessWidget {
-//   const SignInPage({super.key});
-
-//   @override
-//   Widget build(BuildContext context) {
-//     return Scaffold(
-//       appBar: AppBar(title: const Text('Sign In')),
-//       body: Center(child: const Text('Sign In Page')),
-//     );
-//   }
-// }
-
-// class NavScreen extends StatelessWidget {
-//   const NavScreen({super.key});
-
-//   @override
-//   Widget build(BuildContext context) {
-//     return Scaffold(
-//       appBar: AppBar(title: const Text('Home')),
-//       body: Center(child: const Text('Home Page')),
-//     );
-//   }
-// }

@@ -272,7 +272,7 @@ class __FormContentState extends State<_FormContent> {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                            builder: (context) => const SignUpPage()),
+                            builder: (context) => const SignUpBasicPage()),
                       );
                     },
                     child: const Text(
