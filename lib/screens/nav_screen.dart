@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '/data/data.dart';
 import '/screens/screens.dart';
 import '/widgets/widgets.dart';
+import '/screens/menu_page.dart';
 
 class NavScreen extends StatefulWidget {
   const NavScreen({super.key});
@@ -49,16 +50,31 @@ class _NavScreenState extends State<NavScreen> {
           children: _screens,
         ),
         bottomNavigationBar: !Responsive.isDesktop(context)
-            ? Container(
-                padding: const EdgeInsets.only(bottom: 0.0),
-                color: Colors.white,
-                child: CustomTabBar(
-                  icons: _icons,
-                  selectedIndex: _selectedIndex,
-                  onTap: (index) => setState(() => _selectedIndex = index),
+            ? Builder(
+                builder: (context) => BottomNavigationBar(
+                  currentIndex: _selectedIndex,
+                  onTap: (index) {
+                    if (index == _icons.length - 1) {
+                      Scaffold.of(context).openEndDrawer();
+                    } else {
+                      setState(() {
+                        _selectedIndex = index;
+                      });
+                    }
+                  },
+                  backgroundColor: Colors.grey[800], // Set background color
+                  selectedItemColor: const Color.fromARGB(255, 176, 101, 101), // Set selected item color
+                  unselectedItemColor: Colors.grey[400], // Set unselected item color
+                  items: _icons.map((icon) {
+                    return BottomNavigationBarItem(
+                      icon: Icon(icon),
+                      label: '',
+                    );
+                  }).toList(),
                 ),
               )
             : const SizedBox.shrink(),
+        endDrawer: const MenuPage(),
       ),
     );
   }

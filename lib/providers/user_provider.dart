@@ -15,4 +15,8 @@ class UserProvider with ChangeNotifier {
     _user = null;
     notifyListeners();
   }
+  void logout() {
+    _user = null;
+    notifyListeners();
+  }
 }

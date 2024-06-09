@@ -26,13 +26,16 @@ class PostContainer extends StatefulWidget {
 }
 
 class _PostContainerState extends State<PostContainer> {
+  
   late bool isLiked;
   late int likeCount;
+    late int commentCount;
 
   @override
   void initState() {
     super.initState();
     likeCount = widget.post.likes;
+     commentCount = widget.post.comments;
     // Check if the current user has liked the post
     final currentUser = Provider.of<UserProvider>(context, listen: false).user;
     isLiked = widget.post.likedBy.contains(currentUser?.id);
@@ -85,15 +88,20 @@ class _PostContainerState extends State<PostContainer> {
     }
   }
 
-  void _navigateToComments() {
-    Navigator.push(
+   void _navigateToComments() async {
+    final updatedComments = await Navigator.push(
       context,
       MaterialPageRoute(
         builder: (context) => CommentsPage(post: widget.post),
       ),
     );
-  }
 
+    if (updatedComments != null) {
+      setState(() {
+        commentCount = updatedComments;
+      });
+    }
+  }
   @override
   Widget build(BuildContext context) {
     final bool isDesktop = Responsive.isDesktop(context);
@@ -137,6 +145,8 @@ class _PostContainerState extends State<PostContainer> {
                 post: widget.post,
                 isLiked: isLiked,
                 likeCount: likeCount,
+                commentCount: commentCount,
+
                 onLikePressed: _toggleLike,
                 onCommentPressed: _navigateToComments,
               ),
@@ -214,6 +224,8 @@ class _PostStats extends StatelessWidget {
   final Post post;
   final bool isLiked;
   final int likeCount;
+    final int commentCount;
+
   final VoidCallback onLikePressed;
   final VoidCallback onCommentPressed;
 
@@ -221,6 +233,7 @@ class _PostStats extends StatelessWidget {
     required this.post,
     required this.isLiked,
     required this.likeCount,
+    required this.commentCount,
     required this.onLikePressed,
     required this.onCommentPressed,
   });
@@ -253,7 +266,7 @@ class _PostStats extends StatelessWidget {
               ),
             ),
             Text(
-              '${post.comments} Comments',
+              '$commentCount Comments',
               style: TextStyle(
                 color: Colors.grey[600],
               ),

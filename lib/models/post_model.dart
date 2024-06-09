@@ -6,13 +6,13 @@ class Post {
   final String timeAgo;
   final String? imageUrl; // Make imageUrl nullable
   final int likes;
-  final int comments;
+   int comments;
   final int shares;
   final String? imageUrlUser; // Make imageUrl nullable
   final String? id;
   final List<String> likedBy;
 
-  const Post({
+   Post({
     required this.user,
     required this.caption,
     required this.timeAgo,

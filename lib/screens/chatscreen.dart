@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:facebook/constants.dart';
+import 'package:facebook/providers/followed_user_provider.dart';
 import 'package:facebook/providers/user_provider.dart';
 import 'package:facebook/utils/api_util.dart';
 import 'package:facebook/utils/auth_token.dart';
@@ -35,21 +36,27 @@ class _ChatscreenState extends State<Chatscreen> {
       }).then((_) async {
         // #TODO:send message notificatopn
         final String apiUrl = 'http://$ip:$port/api/notification';
-         String token = AuthToken().getToken;
+        String token = AuthToken().getToken;
 
-    final url = '$apiUrl/chat/${widget.user.id}/${_messageController.text}';
+        final url = '$apiUrl/chat/${widget.user.id}/${_messageController.text}';
 
-    final response = await  http.post(
-      Uri.parse(url),
-      headers: ApiUtil.headers(token),
-    );
+        final response = await http.post(
+          Uri.parse(url),
+          headers: ApiUtil.headers(token),
+        );
 
-    if (response.statusCode != 200) {
-      throw Exception('message  notification not sent');
-    }
+        if (response.statusCode != 200) {
+          throw Exception('message  notification not sent');
+        }
 
-
-      });//here
+        // Add user to followed list if not already followed
+        final followedUsersProvider =
+            Provider.of<FollowedUsersProvider>(context, listen: false);
+        if (!followedUsersProvider.followedUsers
+            .any((user) => user.id == widget.user.id)) {
+          followedUsersProvider.addFollowedUser(widget.user);
+        }
+      }); //here
       _messageController.clear();
     }
   }

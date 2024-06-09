@@ -14,4 +14,9 @@ class AuthToken {
   }
 
   String get getToken => token;
+
+   // Add clearToken method
+  void clearToken() {
+    token = ''; // Clear the token
+  }
 }

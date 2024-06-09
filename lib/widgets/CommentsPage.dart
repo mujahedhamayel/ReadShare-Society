@@ -75,6 +75,8 @@ class _CommentsPageState extends State<CommentsPage> {
       // Optimistically add the comment to the list
       setState(() {
         _comments.add(newComment);
+          widget.post.comments++;
+
         _commentController.clear();
       });
 
@@ -96,9 +98,12 @@ class _CommentsPageState extends State<CommentsPage> {
         // If the request fails, remove the optimistic comment and show an error
         setState(() {
           _comments.remove(newComment);
+          widget.post.comments--;
+
         });
         print('Failed to add comment');
       }
+       Navigator.pop(context, widget.post.comments);
     }
   }
 

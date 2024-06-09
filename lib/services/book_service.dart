@@ -76,6 +76,20 @@ class BookService {
     }
   }
 
+  // New method to fetch books created by the logged-in user
+  Future<List<Book>> fetchUserBooks() async {
+    String token = AuthToken().getToken;
+    final userBooksUrl = '$apiUrl/user/books';
+    final response = await http.get(Uri.parse(userBooksUrl), headers: ApiUtil.headers(token));
+
+    if (response.statusCode == 200) {
+      List<dynamic> json = jsonDecode(response.body);
+      return json.map((book) => Book.fromJson(book)).toList();
+    } else {
+      throw Exception('Failed to load user books');
+    }
+  }
+
 }
 
 

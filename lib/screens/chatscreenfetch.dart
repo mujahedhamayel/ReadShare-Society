@@ -38,7 +38,7 @@ class _UserListPageState extends State<UserListPage> {
     _searchController.dispose();
     super.dispose();
   }
-
+  
   void _fetchData() {
     final followedUsersProvider =
         Provider.of<FollowedUsersProvider>(context, listen: false);
@@ -125,7 +125,11 @@ class _UserListPageState extends State<UserListPage> {
       // Handle the error, e.g., show a notification
       print('Error adding user to followed list: $error');
     }
+    
   }
+
+    
+  
 
   @override
   Widget build(BuildContext context) {
