@@ -11,6 +11,8 @@ class Book {
   String id;
   List<String> likes;
   String? pdfLink;
+  double? userRating;
+  
 
   // num height;
 
@@ -27,6 +29,7 @@ class Book {
     this.id,
     this.likes,
      this.pdfLink,
+     this.userRating,
 
     // this.height,
   );
@@ -48,11 +51,12 @@ class Book {
       json['image'],
       json['author'],
       json['location'],
-      4.7, //rate
+      json['rate'] ?? 0.0,
       reviewList,
       json['_id'],
       likesList,
       json['pdfLink'],
+      json['userRating']?.toDouble(),
     );
   }
 
@@ -66,9 +70,11 @@ class Book {
       'image': imgUrl,
       'author': author,
       'location': location,
+      'rate': rate,
       '_id': id,
       'likes': likes,
       'pdfLink': pdfLink,
+      'userRating': userRating,
     };
   }
 

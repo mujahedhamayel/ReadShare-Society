@@ -270,26 +270,26 @@ class BookPdfLink extends StatelessWidget {
     );
   }
 
-  Future<void> _launchURL(BuildContext context, String url) async {
-    final uri = Uri.parse(url);
-    print('Parsed URL: $uri');
+  // Future<void> _launchURL(BuildContext context, String url) async {
+  //   final uri = Uri.parse(url);
+  //   print('Parsed URL: $uri');
 
-    final canLaunchResult = await canLaunchUrl(uri);
-    print('Can launch URL: $canLaunchResult');
+  //   final canLaunchResult = await canLaunchUrl(uri);
+  //   print('Can launch URL: $canLaunchResult');
 
-    if (canLaunchResult) {
-      await launchUrl(uri, mode: LaunchMode.externalApplication);
-    } else {
-      print('Could not launch URL');
-      _showErrorSnackBar(context, 'Could not launch $url');
-    }
-  }
+  //   if (canLaunchResult) {
+  //     await launchUrl(uri, mode: LaunchMode.externalApplication);
+  //   } else {
+  //     print('Could not launch URL');
+  //     _showErrorSnackBar(context, 'Could not launch $url');
+  //   }
+  // }
 
-  void _showErrorSnackBar(BuildContext context, String message) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(message)),
-    );
-  }
+  // void _showErrorSnackBar(BuildContext context, String message) {
+  //   ScaffoldMessenger.of(context).showSnackBar(
+  //     SnackBar(content: Text(message)),
+  //   );
+  // }
 }
 
 class BookReview extends StatefulWidget {
@@ -302,20 +302,52 @@ class BookReview extends StatefulWidget {
 
 class _BookReviewState extends State<BookReview> {
   late double userRating;
+  late double averageRating;
+  bool isLoading = true;
+
   TextEditingController _reviewController = TextEditingController();
   List<Review> _submittedReviews = [];
 
   @override
   void initState() {
     super.initState();
-    userRating = widget.book.rate.toDouble();
+    //userRating = widget.book.userRating?.toDouble() ?? 0.0;
+    averageRating = widget.book.rate.toDouble();
     _submittedReviews = widget.book.review;
+    _loadUserRating();
   }
 
-  void _handleRatingUpdate(double newRating) {
+  Future<void> _loadUserRating() async {
+    try {
+      final rating = await BookService().getUserRating(widget.book.id);
+      setState(() {
+        userRating = rating ?? 0.0;
+        isLoading = false; // Update the loading state
+      });
+    } catch (e) {
+      print('Failed to load user rating: $e');
+      setState(() {
+        userRating = 0.0;
+        isLoading = false; // Update the loading state
+      });
+    }
+  }
+
+  void _handleRatingUpdate(double newRating) async {
     setState(() {
       userRating = newRating;
     });
+    try {
+      await BookService().rateBook(widget.book.id, newRating);
+      // Optionally, fetch the updated book details to get the new average rating
+      final updatedBook = await BookService().getBookById(widget.book.id);
+      setState(() {
+        averageRating = updatedBook.rate.toDouble();
+        userRating = updatedBook.userRating ?? 0.0;
+      });
+    } catch (e) {
+      print('Failed to update rating: $e');
+    }
   }
 
   Future<void> _submitReview() async {
@@ -342,88 +374,96 @@ class _BookReviewState extends State<BookReview> {
     }
   }
 
-  @override
+ @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(20),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              Text(
-                '${widget.book.author}',
-                style: const TextStyle(
-                  fontSize: 26,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              const SizedBox(width: 10),
-              _buildInteractiveStarRating(userRating),
-            ],
-          ),
-          const SizedBox(height: 10),
-          Text(
-            '${widget.book.rate} The Ratings of Book',
-            style: const TextStyle(
-              color: Colors.grey,
-            ),
-          ),
-          const SizedBox(height: 15),
-          if (_submittedReviews.isNotEmpty)
-            Column(
+    return isLoading
+        ? Center(child: CircularProgressIndicator())  // Show loading indicator while fetching user rating
+        : Container(
+            padding: const EdgeInsets.all(20),
+            child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
-                  'Reviews:',
-                  style: const TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                SizedBox(height: 10),
-                for (Review review in _submittedReviews)
-                  Padding(
-                    padding: const EdgeInsets.only(bottom: 10),
-                    child: Text(review.text),
-                  ),
-                SizedBox(height: 20),
-              ],
-            ),
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Row(
-              children: [
-                Expanded(
-                  child: TextField(
-                    controller: _reviewController,
-                    decoration: InputDecoration(
-                      hintText: 'Add a Review...',
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(20.0),
+                Row(
+                  children: [
+                    Text(
+                      widget.book.author,
+                      style: const TextStyle(
+                        fontSize: 26,
+                        fontWeight: FontWeight.bold,
                       ),
                     ),
+                    const SizedBox(width: 10),
+                    _buildInteractiveStarRating(userRating),
+                  ],
+                ),
+                const SizedBox(height: 10),
+                Text(
+                  'Your Rating: ${userRating.toStringAsFixed(1)}',
+                  style: const TextStyle(
+                    color: Colors.grey,
                   ),
                 ),
-                RawMaterialButton(
-                  padding: const EdgeInsets.all(12.0),
-                  fillColor: Palette.REDcolor, // Changed color to red
-                  elevation: 0.0,
-                  shape: const CircleBorder(),
-                  onPressed: _submitReview,
-                  child: const Icon(
-                    Icons.send,
-                    color: Colors.white,
+                const SizedBox(height: 10),
+                Text(
+                  'Average Rating: ${averageRating.toStringAsFixed(1)}',
+                  style: const TextStyle(
+                    color: Colors.grey,
+                  ),
+                ),
+                const SizedBox(height: 15),
+                if (_submittedReviews.isNotEmpty)
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Text(
+                        'Reviews:',
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      const SizedBox(height: 10),
+                      for (Review review in _submittedReviews)
+                        Padding(
+                          padding: const EdgeInsets.only(bottom: 10),
+                          child: Text(review.text),
+                        ),
+                      const SizedBox(height: 20),
+                    ],
+                  ),
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Row(
+                    children: [
+                      Expanded(
+                        child: TextField(
+                          controller: _reviewController,
+                          decoration: InputDecoration(
+                            hintText: 'Add a Review...',
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(20.0),
+                            ),
+                          ),
+                        ),
+                      ),
+                      RawMaterialButton(
+                        padding: const EdgeInsets.all(12.0),
+                        fillColor: Palette.REDcolor, // Changed color to red
+                        elevation: 0.0,
+                        shape: const CircleBorder(),
+                        onPressed: _submitReview,
+                        child: const Icon(
+                          Icons.send,
+                          color: Colors.white,
+                        ),
+                      ),
+                    ],
                   ),
                 ),
               ],
             ),
-          ),
-        ],
-      ),
-    );
+          );
   }
-
   Widget _buildInteractiveStarRating(double score) {
     return Row(
       mainAxisSize: MainAxisSize.min,

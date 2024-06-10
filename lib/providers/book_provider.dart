@@ -10,7 +10,7 @@ class BookProvider with ChangeNotifier {
 
   List<Book> _likedBooks = [];
     List<Book> _userBooks = [];
-
+  Map<String, Book> _bookCache = {}; 
 
   List<Book> get books => _books;
 
@@ -18,7 +18,7 @@ class BookProvider with ChangeNotifier {
   List<Book> get physicalBooks => _physicalBooks;
   List<Book> get pdfBooks => _pdfBooks;
     List<Book> get userBooks => _userBooks;
-
+  
 
   void setBooks(List<Book> books) {
     _books = books;
@@ -58,4 +58,22 @@ class BookProvider with ChangeNotifier {
     _userBooks = await BookService().fetchUserBooks();
     notifyListeners();
   }
+Future<Book> fetchBookById(String bookId) async {
+    if (_bookCache.containsKey(bookId)) {
+      return _bookCache[bookId]!;
+    } else {
+      Book book = await BookService().getBookById(bookId);
+      _bookCache[bookId] = book;
+      notifyListeners();
+      return book;
+    }
+  }
+
+  Future<void> rateBook(String bookId, double score) async {
+    await BookService().rateBook(bookId, score);
+    Book updatedBook = await fetchBookById(bookId);
+    _bookCache[bookId] = updatedBook;
+    notifyListeners();
+  }
+
 }

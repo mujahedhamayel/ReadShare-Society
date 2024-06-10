@@ -90,6 +90,54 @@ class BookService {
     }
   }
 
+   Future<Book> getBookById(String bookId) async {
+    String token = AuthToken().getToken;
+    final url = '$apiUrl/$bookId';
+    final response = await http.get(
+      Uri.parse(url),
+      headers: ApiUtil.headers(token),
+    );
+
+    if (response.statusCode != 200) {
+      throw Exception('Failed to load book');
+    }
+
+    final bookJson = jsonDecode(response.body);
+    return Book.fromJson(bookJson);
+  }
+
+  // New method to rate a book
+  Future<void> rateBook(String bookId, double score) async {
+    String token = AuthToken().getToken;
+    final url = '$apiUrl/$bookId/rate';
+
+    final response = await http.post(
+      Uri.parse(url),
+      headers: ApiUtil.headers(token),
+      body: jsonEncode({'score': score}),
+    );
+
+    if (response.statusCode != 200) {
+      throw Exception('Failed to rate the book');
+    }
+  }
+
+   Future<double?> getUserRating(String bookId) async {
+    String token =  AuthToken().getToken;
+    final url = '$apiUrl/$bookId/user-rating';
+    final response = await http.get(
+      Uri.parse(url),
+      headers: ApiUtil.headers(token),
+    );
+
+    if (response.statusCode != 200) {
+      throw Exception('Failed to load user rating');
+    }
+
+    final responseJson = jsonDecode(response.body);
+    return responseJson['userRating']?.toDouble();
+  }
+
 }
 
 
