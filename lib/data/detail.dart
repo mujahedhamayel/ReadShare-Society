@@ -10,8 +10,11 @@ import 'package:facebook/services/user_service.dart';
 import 'package:facebook/utils/api_util.dart';
 import 'package:facebook/utils/auth_token.dart';
 import 'package:facebook/widgets/PDF_viewer.dart';
+import 'package:geolocator/geolocator.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:intl/intl.dart';
 import 'package:flutter/material.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../models/models.dart';
@@ -29,7 +32,6 @@ class DetailPage extends StatelessWidget {
             children: [
               BookDetail(book: book),
               BookCover(book: book),
-              if (book.type == 'pdf') BookPdfLink(book: book),
               BookReview(book: book)
             ],
           ),
@@ -127,7 +129,6 @@ class _BookCoverState extends State<BookCover> {
 
     final providerUser = Provider.of<UserProvider>(context, listen: false).user;
     final userId = providerUser!.id; // Obtain the current user's ID
-    //isBookmarked = widget.book.likes.contains(userId);
     final bookProvider = Provider.of<BookProvider>(context, listen: false);
     isBookmarked = bookProvider.isBookLiked(widget.book, userId);
   }
@@ -135,8 +136,6 @@ class _BookCoverState extends State<BookCover> {
   @override
   Widget build(BuildContext context) {
     final bookProvider = Provider.of<BookProvider>(context, listen: false);
-    //final providerUser = Provider.of<UserProvider>(context).user;
-    //final userId = providerUser!.id ;
     return Container(
       margin: const EdgeInsets.symmetric(vertical: 10),
       padding: const EdgeInsets.only(left: 20),
@@ -205,31 +204,292 @@ class _BookCoverState extends State<BookCover> {
           Positioned(
             left: 350,
             bottom: 20,
-            child: Container(
-              padding: const EdgeInsets.all(8),
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(10),
-                color: const Color.fromARGB(255, 60, 27, 110),
-              ),
-              child: const Row(
-                children: [
-                  Icon(
-                    Icons.book,
-                    color: Colors.white,
-                    size: 25,
-                  ),
-                  Text(
-                    'Request the book',
-                    style: TextStyle(color: Colors.white),
+            child: widget.book.type == 'pdf'
+                ? GestureDetector(
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) =>
+                              PdfViewerPage(pdfUrl: widget.book.pdfLink!),
+                        ),
+                      );
+                    },
+                    child: Container(
+                      padding: const EdgeInsets.all(8),
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(10),
+                        color: const Color.fromARGB(255, 60, 27, 110),
+                      ),
+                      child: const Row(
+                        children: [
+                          Icon(
+                            Icons.book,
+                            color: Colors.white,
+                            size: 25,
+                          ),
+                          Text(
+                            'Read Book',
+                            style: TextStyle(color: Colors.white),
+                          )
+                        ],
+                      ),
+                    ),
                   )
-                ],
-              ),
-            ),
-          )
+                : Positioned(
+                    left: 350,
+                    bottom: 20,
+                    child: GestureDetector(
+                      onTap: () => _showRequestDialog(context),
+                      child: Container(
+                        padding: const EdgeInsets.all(8),
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(10),
+                          color: const Color.fromARGB(255, 60, 27, 110),
+                        ),
+                        child: const Row(
+                          children: [
+                            Icon(
+                              Icons.book,
+                              color: Colors.white,
+                              size: 25,
+                            ),
+                            SizedBox(width: 5),
+                            Text(
+                              'Request the book',
+                              style: TextStyle(color: Colors.white),
+                            )
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+          ),
         ],
       ),
     );
   }
+}
+
+void _showRequestDialog(BuildContext context) {
+  LatLng? _selectedLocation;
+  final TextEditingController addressController = TextEditingController();
+  showDialog(
+    context: context,
+    builder: (BuildContext context) {
+      return StatefulBuilder(
+        builder: (BuildContext context, StateSetter setState) {
+          return AlertDialog(
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(15),
+            ),
+            title: const Text('Request the book'),
+            content: Container(
+              width: 450, // Set the width
+              height: 450, // Set the height
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const Text('The prise of Book',
+                      style:
+                          TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+                  SizedBox(
+                    width: double.infinity,
+                    height: 200,
+                    child: GoogleMap(
+                      onMapCreated: (GoogleMapController controller) async {
+                        LatLng currentLocation = await _getCurrentLocation();
+                        controller.animateCamera(
+                            CameraUpdate.newLatLng(currentLocation));
+                      },
+                      initialCameraPosition: const CameraPosition(
+                        target: LatLng(0, 0), // Default location (initial load)
+                        zoom: 12,
+                      ),
+                      onTap: (location) {
+                        setState(() {
+                          _selectedLocation = location;
+                          addressController.text =
+                              'Lat: ${location.latitude}, Lon: ${location.longitude}';
+                        });
+                      },
+                      markers: _selectedLocation != null
+                          ? {
+                              Marker(
+                                markerId: MarkerId('selected-location'),
+                                position: _selectedLocation!,
+                              ),
+                            }
+                          : {},
+                    ),
+                  ),
+                  const Text('Choose an option below:',
+                      style:
+                          TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+                  const SizedBox(height: 20),
+                  ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.blue,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                    ),
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                      // Navigate to chat page
+                      // Navigator.push(context, MaterialPageRoute(builder: (context) => ChatPage()));
+                    },
+                    child: const Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(Icons.chat, color: Colors.white),
+                        SizedBox(width: 10),
+                        Text('Go to chat with Owner',
+                            style: TextStyle(
+                                color: Colors.white,
+                                fontWeight: FontWeight.bold)),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 10),
+                  ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.green,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                    ),
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                      _showCompleteRequestDialog(context);
+                    },
+                    child: const Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(Icons.check_circle, color: Colors.white),
+                        SizedBox(width: 10),
+                        Text('Confirm Request',
+                            style: TextStyle(
+                                color: Colors.white,
+                                fontWeight: FontWeight.bold)),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          );
+        },
+      );
+    },
+  );
+}
+
+void _showCompleteRequestDialog(BuildContext context) {
+  final TextEditingController addressController = TextEditingController();
+  final TextEditingController detailsController = TextEditingController();
+  LatLng? _selectedLocation;
+
+  showDialog(
+    context: context,
+    builder: (BuildContext context) {
+      return StatefulBuilder(
+        builder: (BuildContext context, StateSetter setState) {
+          return AlertDialog(
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(15),
+            ),
+            title: const Text('Complete the Request'),
+            content: Container(
+              width: 450, // Set the width
+              height: 500, // Set the height
+              child: SingleChildScrollView(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    const Text('Enter additional details:'),
+                    const SizedBox(height: 20),
+                    TextField(
+                      controller: detailsController,
+                      decoration: const InputDecoration(
+                        border: OutlineInputBorder(),
+                        labelText: 'Phone Number',
+                      ),
+                    ),
+                    const SizedBox(height: 20),
+                    TextField(
+                      controller: addressController,
+                      decoration: const InputDecoration(
+                        border: OutlineInputBorder(),
+                        labelText: 'Address Manual (Optional)',
+                      ),
+                    ),
+                    const SizedBox(height: 10),
+                    Container(
+                      width: double.infinity,
+                      height: 200,
+                      child: GoogleMap(
+                        onMapCreated: (GoogleMapController controller) async {
+                          LatLng currentLocation = await _getCurrentLocation();
+                          controller.animateCamera(
+                              CameraUpdate.newLatLng(currentLocation));
+                        },
+                        initialCameraPosition: const CameraPosition(
+                          target:
+                              LatLng(0, 0), // Default location (initial load)
+                          zoom: 12,
+                        ),
+                        onTap: (location) {
+                          setState(() {
+                            _selectedLocation = location;
+                            addressController.text =
+                                'Lat: ${location.latitude}, Lon: ${location.longitude}';
+                          });
+                        },
+                        markers: _selectedLocation != null
+                            ? {
+                                Marker(
+                                  markerId: MarkerId('selected-location'),
+                                  position: _selectedLocation!,
+                                ),
+                              }
+                            : {},
+                      ),
+                    ),
+                    const SizedBox(height: 20),
+                    ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Palette.REDcolor,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                      ),
+                      onPressed: () {
+                        Navigator.of(context).pop();
+                        print('Request details: ${detailsController.text}');
+                        print('Request address: ${addressController.text}');
+                      },
+                      child: const Text(
+                        'Submit',
+                        style: TextStyle(
+                            color: Colors.white, fontWeight: FontWeight.bold),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          );
+        },
+      );
+    },
+  );
+}
+
+Future<LatLng> _getCurrentLocation() async {
+  Position position = await Geolocator.getCurrentPosition(
+      desiredAccuracy: LocationAccuracy.high);
+  return LatLng(position.latitude, position.longitude);
 }
 
 AppBar _buildAppBar(BuildContext context) {

@@ -43,7 +43,7 @@ class _FavoritePageState extends State<FavoritePage> {
       ),
       body: Center(
         child: Container(
-          constraints: const BoxConstraints(maxWidth: 400),
+          constraints: const BoxConstraints(maxWidth: 600),
           child: bookProvider.likedBooks.isEmpty
               ? const Text('No books available')
               : ListView.builder(

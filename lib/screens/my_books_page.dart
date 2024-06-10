@@ -17,7 +17,8 @@ class _MyBooksPageState extends State<MyBooksPage> {
   void initState() {
     super.initState();
     final bookProvider = Provider.of<BookProvider>(context, listen: false);
-    bookProvider.fetchUserBooks(); // Fetch all books when the widget is initialized
+    bookProvider
+        .fetchUserBooks(); // Fetch all books when the widget is initialized
   }
 
   @override
@@ -25,6 +26,10 @@ class _MyBooksPageState extends State<MyBooksPage> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('My Books'),
+        leading: IconButton(
+          onPressed: () => Navigator.of(context).pop(),
+          icon: const Icon(Icons.arrow_back_ios_new_outlined),
+        ),
       ),
       body: Consumer<BookProvider>(
         builder: (context, bookProvider, child) {
@@ -38,7 +43,8 @@ class _MyBooksPageState extends State<MyBooksPage> {
                 mainAxisSpacing: 16,
                 crossAxisCount: 2,
                 itemCount: bookProvider.userBooks.length,
-                itemBuilder: (_, index) => BookItem(book: bookProvider.userBooks[index]),
+                itemBuilder: (_, index) =>
+                    BookItem(book: bookProvider.userBooks[index]),
               ),
             );
           }

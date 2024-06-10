@@ -16,7 +16,7 @@ class MenuPage extends StatelessWidget {
       child: ListView(
         padding: EdgeInsets.zero,
         children: <Widget>[
-         const DrawerHeader(
+          const DrawerHeader(
             decoration: BoxDecoration(
               color: Palette.REDcolor,
             ),
@@ -29,8 +29,8 @@ class MenuPage extends StatelessWidget {
             ),
           ),
           ListTile(
-            leading: Icon(Icons.account_circle),
-            title: Text('Profile Page'),
+            leading: const Icon(Icons.account_circle),
+            title: const Text('Profile Page'),
             onTap: () {
               Navigator.push(
                 context,
@@ -39,8 +39,8 @@ class MenuPage extends StatelessWidget {
             },
           ),
           ListTile(
-            leading: Icon(Icons.library_books),
-            title: Text('My Books'),
+            leading: const Icon(Icons.library_books),
+            title: const Text('My Books'),
             onTap: () {
               Navigator.push(
                 context,
@@ -48,9 +48,26 @@ class MenuPage extends StatelessWidget {
               );
             },
           ),
-         ListTile(
-            leading: Icon(Icons.exit_to_app),
-            title: Text('Logout'),
+          ListTile(
+            leading: const Icon((Icons.shopping_bag)),
+            title: const Text('My Requests'),
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const MyBooksPage()),
+              );
+            },
+          ),
+          ListTile(
+            leading: const Icon(Icons.settings),
+            title: const Text('Settings'),
+            onTap: () {
+              _logout(context);
+            },
+          ),
+          ListTile(
+            leading: const Icon(Icons.exit_to_app),
+            title: const Text('Logout'),
             onTap: () {
               _logout(context);
             },
@@ -59,11 +76,12 @@ class MenuPage extends StatelessWidget {
       ),
     );
   }
+
   void _logout(BuildContext context) {
     // Clear user session/token
     AuthToken().clearToken();
     Provider.of<UserProvider>(context, listen: false).logout();
-    
+
     // Navigate back to the sign-in page
     Navigator.pushAndRemoveUntil(
       context,
