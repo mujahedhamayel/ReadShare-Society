@@ -10,6 +10,8 @@ class Book {
   List<Review> review;
   String id;
   List<String> likes;
+  String? pdfLink;
+
   // num height;
 
   Book(
@@ -24,6 +26,7 @@ class Book {
     this.review,
     this.id,
     this.likes,
+     this.pdfLink,
 
     // this.height,
   );
@@ -49,6 +52,7 @@ class Book {
       reviewList,
       json['_id'],
       likesList,
+      json['pdfLink'],
     );
   }
 
@@ -64,6 +68,7 @@ class Book {
       'location': location,
       '_id': id,
       'likes': likes,
+      'pdfLink': pdfLink,
     };
   }
 

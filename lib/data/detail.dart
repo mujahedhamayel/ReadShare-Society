@@ -9,9 +9,11 @@ import 'package:facebook/services/book_service.dart';
 import 'package:facebook/services/user_service.dart';
 import 'package:facebook/utils/api_util.dart';
 import 'package:facebook/utils/auth_token.dart';
+import 'package:facebook/widgets/PDF_viewer.dart';
 import 'package:intl/intl.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:url_launcher/url_launcher.dart';
 import '../models/models.dart';
 import 'package:http/http.dart' as http;
 
@@ -27,6 +29,7 @@ class DetailPage extends StatelessWidget {
             children: [
               BookDetail(book: book),
               BookCover(book: book),
+              if (book.type == 'pdf') BookPdfLink(book: book),
               BookReview(book: book)
             ],
           ),
@@ -242,6 +245,51 @@ AppBar _buildAppBar(BuildContext context) {
       )
     ],
   );
+}
+
+class BookPdfLink extends StatelessWidget {
+  final Book book;
+  const BookPdfLink({required this.book, super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.all(20),
+      child: ElevatedButton(
+        onPressed: () async {
+          // Navigate to the PDF Viewer Page
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => PdfViewerPage(pdfUrl: book.pdfLink!),
+            ),
+          );
+        },
+        child: const Text('Read Book'),
+      ),
+    );
+  }
+
+  Future<void> _launchURL(BuildContext context, String url) async {
+    final uri = Uri.parse(url);
+    print('Parsed URL: $uri');
+
+    final canLaunchResult = await canLaunchUrl(uri);
+    print('Can launch URL: $canLaunchResult');
+
+    if (canLaunchResult) {
+      await launchUrl(uri, mode: LaunchMode.externalApplication);
+    } else {
+      print('Could not launch URL');
+      _showErrorSnackBar(context, 'Could not launch $url');
+    }
+  }
+
+  void _showErrorSnackBar(BuildContext context, String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(message)),
+    );
+  }
 }
 
 class BookReview extends StatefulWidget {

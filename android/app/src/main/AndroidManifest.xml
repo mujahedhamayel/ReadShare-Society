@@ -1,5 +1,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.example.bookv_app">
+
+    <!-- Add this line -->
+    <uses-permission android:name="android.permission.INTERNET"/>
    <application
         android:label="bookv_app"
         android:name="${applicationName}"
