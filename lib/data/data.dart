@@ -10,6 +10,7 @@ const User currentUser = User(
   likedBooks: [],
   requests: [],
   followedUsers: [],
+  //mobileNumber: '',
 );
 
 final List<User> onlineUsers = [
@@ -22,6 +23,8 @@ final List<User> onlineUsers = [
     likedBooks: [],
     requests: [],
     followedUsers: [],
+     // mobileNumber: '',
+
   ),
   const User(
     id: '3',
@@ -32,6 +35,8 @@ final List<User> onlineUsers = [
     likedBooks: [],
     requests: [],
     followedUsers: [],
+     // mobileNumber: '',
+
   ),
   const User(
     id: '4',
@@ -42,6 +47,8 @@ final List<User> onlineUsers = [
     likedBooks: [],
     requests: [],
     followedUsers: [],
+      //mobileNumber: '',
+
   ),
   const User(
     id: '5',
@@ -52,6 +59,8 @@ final List<User> onlineUsers = [
     likedBooks: [],
     requests: [],
     followedUsers: [],
+      //mobileNumber: '',
+
   ),
   const User(
     id: '6',
@@ -62,6 +71,8 @@ final List<User> onlineUsers = [
     likedBooks: [],
     requests: [],
     followedUsers: [],
+     // mobileNumber: '',
+
   ),
   const User(
     id: '7',
@@ -72,6 +83,8 @@ final List<User> onlineUsers = [
     likedBooks: [],
     requests: [],
     followedUsers: [],
+     // mobileNumber: '',
+
   ),
   const User(
     id: '8',
@@ -82,6 +95,8 @@ final List<User> onlineUsers = [
     likedBooks: [],
     requests: [],
     followedUsers: [],
+     // mobileNumber: '',
+
   ),
   const User(
     id: '9',
@@ -92,6 +107,8 @@ final List<User> onlineUsers = [
     likedBooks: [],
     requests: [],
     followedUsers: [],
+     // mobileNumber: '',
+
   ),
   const User(
     id: '10',
@@ -102,6 +119,8 @@ final List<User> onlineUsers = [
     likedBooks: [],
     requests: [],
     followedUsers: [],
+     // mobileNumber: '',
+
   ),
   const User(
     id: '11',
@@ -112,6 +131,8 @@ final List<User> onlineUsers = [
     likedBooks: [],
     requests: [],
     followedUsers: [],
+     // mobileNumber: '',
+
   ),
 ];
 

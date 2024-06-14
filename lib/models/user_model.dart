@@ -1,3 +1,5 @@
+import 'package:latlong2/latlong.dart';
+
 class User {
   final String id;
   final String name;
@@ -12,23 +14,36 @@ class User {
   final int? booksCounts;
   final int? followersCounts;
   final int? followingCounts;
+  final LatLng? location;
+  //final String mobileNumber;
 
-  const User(
-      {required this.id,
-      required this.name,
-      required this.email,
-      this.birthday,
-      required this.books,
-      required this.likedBooks,
-      required this.requests,
-      required this.followedUsers,
-      this.imageUrl,
-      this.booksCounts,
-      this.postCounts,
-      this.followersCounts,
-      this.followingCounts});
+
+  const User({
+    required this.id,
+    required this.name,
+    required this.email,
+    this.birthday,
+    required this.books,
+    required this.likedBooks,
+    required this.requests,
+    required this.followedUsers,
+    this.imageUrl,
+    this.booksCounts,
+    this.postCounts,
+    this.followersCounts,
+    this.followingCounts,
+    this.location,
+    //required this.mobileNumber,
+  });
 
   factory User.fromJson(Map<String, dynamic> json) {
+    LatLng? parseLocation(Map<String, dynamic>? locationJson) {
+      if (locationJson == null) {
+        return null;
+      }
+      return LatLng(locationJson['latitude'], locationJson['longitude']);
+    }
+
     return User(
       id: json['_id'],
       name: json['name'],
@@ -43,6 +58,8 @@ class User {
       postCounts: json['postCount'],
       followersCounts: json['followersCount'],
       followingCounts: json['followingCount'],
+      location: parseLocation(json['location']),
+      //mobileNumber: json['mobileNumber'],
     );
   }
 }

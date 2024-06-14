@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:facebook/providers/followed_user_provider.dart';
 import 'package:facebook/providers/user_provider.dart';
 import 'package:facebook/utils/auth_token.dart';
 import 'package:facebook/widgets/responsive.dart';
@@ -134,8 +135,21 @@ class _ProfilepageState extends State<ProfilePage> {
       if (response.statusCode == 200) {
         setState(() {
           isFollowing = !isFollowing;
-          followerCount += isFollowing ? 1 : -1;
+          followerCount += isFollowing
+              ? 1
+              : followerCount == 0
+                  ? 0
+                  : -1;
         });
+        final followedUsersProvider =
+            Provider.of<FollowedUsersProvider>(context, listen: false);
+        var body = jsonDecode(response.body);
+        print(body);
+        if (body["message"].toString() == "User unfollowed successfully") {
+          followedUsersProvider.removeFollowedUser(widget.user!);
+        } else {
+          followedUsersProvider.addFollowedUser(widget.user!);
+        }
       } else {
         print('Failed to follow/unfollow user: ${response.statusCode}');
       }
@@ -297,7 +311,9 @@ class ProfilePageMobile extends StatelessWidget {
       ),
     );
   }
-}class ProfilePageDesktop extends StatelessWidget {
+}
+
+class ProfilePageDesktop extends StatelessWidget {
   final User user;
   final TrackingScrollController scrollController;
   final List<Post> posts;
@@ -351,10 +367,8 @@ class ProfilePageMobile extends StatelessWidget {
               child: Column(
                 children: [
                   const SizedBox(height: 16),
-                  
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
-                    
                     children: [
                       FloatingActionButton.extended(
                         onPressed: onFollowPressed,

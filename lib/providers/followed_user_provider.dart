@@ -23,7 +23,11 @@ class FollowedUsersProvider with ChangeNotifier {
   }
 
   void removeFollowedUser(User user) {
-    _followedUsers.remove(user);
-    notifyListeners();
+    User? listUser =
+        _followedUsers.firstWhere((element) => element.id == user.id);
+    if (listUser.id == user.id) {
+      _followedUsers.remove(listUser);
+      notifyListeners();
+    }
   }
 }

@@ -38,7 +38,7 @@ class _UserListPageState extends State<UserListPage> {
     _searchController.dispose();
     super.dispose();
   }
-  
+
   void _fetchData() {
     final followedUsersProvider =
         Provider.of<FollowedUsersProvider>(context, listen: false);
@@ -47,17 +47,21 @@ class _UserListPageState extends State<UserListPage> {
 
     _allUserListFuture = UserService().fetchAllUsers();
     _allUserListFuture.then((users) {
-      setState(() {
-        _allUsers = users;
-        _updateFilteredUsers(); // Update filtered users initially
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        setState(() {
+          _allUsers = users;
+          _updateFilteredUsers();
+        });
       });
     });
 
     _chattedUserListFuture = UserService().fetchChattedUsers();
     _chattedUserListFuture.then((users) {
-      setState(() {
-        _chattedUsers = users;
-        _updateFilteredUsers(); // Update filtered users with chatted users
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        setState(() {
+          _chattedUsers = users;
+          _updateFilteredUsers();
+        });
       });
     });
   }
@@ -91,45 +95,50 @@ class _UserListPageState extends State<UserListPage> {
   }
 
   void _updateFilteredUsers() {
-  final followedUsersProvider = Provider.of<FollowedUsersProvider>(context, listen: false);
+    final followedUsersProvider =
+        Provider.of<FollowedUsersProvider>(context, listen: false);
 
-  // Create a map to remove duplicates using user.id as the key
-  Map<String, User> userMap = {};
+    // Create a map to remove duplicates using user.id as the key
+    Map<String, User> userMap = {};
 
-  // Add followed users to the map
-  for (var user in followedUsersProvider.followedUsers) {
-    userMap[user.id] = user;
+    // Add followed users to the map
+    for (var user in followedUsersProvider.followedUsers) {
+      userMap[user.id] = user;
+    }
+
+    // Add chatted users to the map
+    for (var user in _chattedUsers) {
+      userMap[user.id] = user;
+    }
+
+    // Convert the map values to a list to get unique users
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      setState(() {
+        _filteredUsers = userMap.values.toList();
+      });
+    });
   }
 
-  // Add chatted users to the map
-  for (var user in _chattedUsers) {
-    userMap[user.id] = user;
-  }
-
-  // Convert the map values to a list to get unique users
-  setState(() {
-    _filteredUsers = userMap.values.toList();
-  });
-}
   void _addUserToFollowed(User user) async {
     try {
+      print('Adding user ${user.name} to chatted users...');
       await UserService().addChattedUser(user.id);
+      print('User ${user.name} added to chatted users in the database.');
+
       final followedUsersProvider =
           Provider.of<FollowedUsersProvider>(context, listen: false);
       followedUsersProvider.addFollowedUser(user);
-      setState(() {
-        _chattedUsers.remove(user);
-        _updateFilteredUsers(); // Update filtered users after modifying the lists
+
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        setState(() {
+          _chattedUsers.remove(user);
+          _updateFilteredUsers();
+        });
       });
     } catch (error) {
-      // Handle the error, e.g., show a notification
       print('Error adding user to followed list: $error');
     }
-    
   }
-
-    
-  
 
   @override
   Widget build(BuildContext context) {
@@ -171,6 +180,7 @@ class _UserListPageState extends State<UserListPage> {
           Expanded(
             child: Consumer<FollowedUsersProvider>(
               builder: (context, followedUsersProvider, _) {
+                _updateFilteredUsers();
                 List<User> usersToDisplay =
                     _isSearching ? _searchResults : _filteredUsers;
                 return ListView.builder(
@@ -211,7 +221,7 @@ class UserCardChat extends StatelessWidget {
         Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (context) => Chatscreen(user: user),
+            builder: (context) => Chatscreen(user: user, defaultMessage: ""),
           ),
         );
       },

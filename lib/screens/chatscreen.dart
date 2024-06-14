@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:facebook/constants.dart';
 import 'package:facebook/providers/followed_user_provider.dart';
 import 'package:facebook/providers/user_provider.dart';
+import 'package:facebook/services/user_service.dart';
 import 'package:facebook/utils/api_util.dart';
 import 'package:facebook/utils/auth_token.dart';
 import 'package:flutter/material.dart';
@@ -13,7 +14,10 @@ import 'dart:convert';
 
 class Chatscreen extends StatefulWidget {
   final User user;
-  const Chatscreen({Key? key, required this.user}) : super(key: key);
+  final String defaultMessage; // Add this line
+
+  const Chatscreen({Key? key, required this.user, required this.defaultMessage})
+      : super(key: key); // Update the constructor
 
   @override
   _ChatscreenState createState() => _ChatscreenState();
@@ -22,16 +26,25 @@ class Chatscreen extends StatefulWidget {
 class _ChatscreenState extends State<Chatscreen> {
   final TextEditingController _messageController = TextEditingController();
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
-  void _sendMessage(loggedInUserId) async {
+
+  @override
+  void initState() {
+    super.initState();
+    _messageController.text = widget.defaultMessage; // Set the default message
+  }
+
+  void _sendMessage(User loggedInUser) async {
     if (_messageController.text.isNotEmpty) {
       await _firestore
           .collection('chats')
-          .doc(getChatId(loggedInUserId, widget.user.id))
+          .doc(getChatId(loggedInUser.id, widget.user.id))
           .collection('messages')
           .add({
         'text': _messageController.text,
-        'senderId': loggedInUserId, // Replace with logged in user ID
+        'senderId': loggedInUser.id, // Replace with logged in user ID
         'receiverId': widget.user.id,
+        'senderName': loggedInUser.name, // Replace with logged in user ID
+        'receiverName': widget.user.name,
         'timestamp': FieldValue.serverTimestamp(),
       }).then((_) async {
         // #TODO:send message notificatopn
@@ -48,7 +61,9 @@ class _ChatscreenState extends State<Chatscreen> {
         if (response.statusCode != 200) {
           throw Exception('message  notification not sent');
         }
-
+        if (widget.defaultMessage != '') {
+          await UserService().addChattedUser(widget.user.id);
+        } // cahtgpt do it here
         // Add user to followed list if not already followed
         final followedUsersProvider =
             Provider.of<FollowedUsersProvider>(context, listen: false);
@@ -111,22 +126,22 @@ class _ChatscreenState extends State<Chatscreen> {
                   if (!snapshot.hasData) {
                     return const Center(child: CircularProgressIndicator());
                   }
-                  final messages = snapshot.data!.docs;
+                  final messages = snapshot.data!.docs.reversed;
                   List<MessageBubble> messageBubbles = [];
                   for (var message in messages) {
                     final messageText = message['text'];
-                    final messageSender = message['senderId'];
-                    final currentUser =
-                        providerUser!.id; // Replace with logged in user ID
+                    final messageSenderName = message['senderName'];
+                    final messageSenderId = message['senderId'];
 
                     final messageBubble = MessageBubble(
-                      sender: providerUser.name,
+                      sender: messageSenderName,
                       text: messageText,
-                      isMe: currentUser == messageSender,
+                      isMe: providerUser.id == messageSenderId,
                     );
                     messageBubbles.add(messageBubble);
                   }
                   return ListView(
+                    reverse: true,
                     padding: const EdgeInsets.symmetric(
                       horizontal: 16.0,
                       vertical: 10.0,
@@ -183,7 +198,7 @@ class _ChatscreenState extends State<Chatscreen> {
                           color: Colors.white,
                         ),
                         onPressed: () {
-                          _sendMessage(providerUser!.id);
+                          _sendMessage(providerUser);
                         },
                       ),
                     ),

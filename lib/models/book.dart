@@ -1,3 +1,5 @@
+import 'package:facebook/models/request_model.dart';
+
 class Book {
   String type;
   String title;
@@ -12,6 +14,8 @@ class Book {
   List<String> likes;
   String? pdfLink;
   double? userRating;
+  num price;
+  //List<Request> requests;
   
 
   // num height;
@@ -30,7 +34,8 @@ class Book {
     this.likes,
      this.pdfLink,
      this.userRating,
-
+     this.price,
+//this.requests,
     // this.height,
   );
 
@@ -42,6 +47,11 @@ class Book {
 
     var likesList =
         (json['likes'] as List<dynamic>).map((like) => like as String).toList();
+
+        // var requestList = (json['requests'] as List?)
+        // ?.map((requestJson) => Request.fromJson(requestJson))
+        // .toList() ?? [];
+
 
     return Book(
       json['type'],
@@ -57,6 +67,8 @@ class Book {
       likesList,
       json['pdfLink'],
       json['userRating']?.toDouble(),
+      json['price'],
+      //requestList,
     );
   }
 
@@ -75,6 +87,8 @@ class Book {
       'likes': likes,
       'pdfLink': pdfLink,
       'userRating': userRating,
+      'price': price,
+      //'requests': requests.map((r) => r.toJson()).toList(),
     };
   }
 

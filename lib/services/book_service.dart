@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:facebook/constants.dart';
+import 'package:facebook/models/request_model.dart';
 import 'package:facebook/utils/api_util.dart';
 import 'package:facebook/utils/auth_token.dart';
 import 'package:http/http.dart' as http;
@@ -136,6 +137,62 @@ class BookService {
 
     final responseJson = jsonDecode(response.body);
     return responseJson['userRating']?.toDouble();
+  }
+
+
+  Future<void> requestBook(String bookId) async {
+    String token = AuthToken().getToken;
+    final response = await http.post(
+      Uri.parse('$apiUrl/$bookId/request'),
+      headers: ApiUtil.headers(token),
+    );
+
+    if (response.statusCode != 200) {
+      final responseJson = jsonDecode(response.body);
+      throw Exception(responseJson['message'] ?? 'Failed to request the book');
+    }
+  }
+Future<List<Request>> fetchBookRequests(String bookId) async {
+    String token = AuthToken().getToken;
+    final response = await http.get(
+      Uri.parse('$apiUrl/$bookId/requests'),
+      headers: ApiUtil.headers(token),
+    );
+
+    if (response.statusCode == 200) {
+      List<dynamic> json = jsonDecode(response.body);
+      return json.map((request) => Request.fromJson(request)).toList();
+    } else {
+      throw Exception('Failed to load requests');
+    }
+  }
+
+  Future<void> acceptRequest(String bookId, String requestId) async {
+    String token = AuthToken().getToken;
+    final response = await http.post(
+      Uri.parse('$apiUrl/$bookId/requests/$requestId/accept'),
+      headers: ApiUtil.headers(token),
+    );
+
+    if (response.statusCode != 200) {
+      throw Exception('Failed to accept request');
+    }
+  }
+
+ Future<List<Book>> fetchUserBookRequests() async {
+    String token = AuthToken().getToken;
+    final url = '$apiUrl/user/book-requests';
+    final response = await http.get(
+      Uri.parse(url),
+      headers: ApiUtil.headers(token),
+    );
+
+    if (response.statusCode == 200) {
+      List<dynamic> json = jsonDecode(response.body);
+      return json.map((book) => Book.fromJson(book)).toList();
+    } else {
+      throw Exception('Failed to load user book requests');
+    }
   }
 
 }

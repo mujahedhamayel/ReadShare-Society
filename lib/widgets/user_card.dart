@@ -61,7 +61,7 @@ class UserCardChat extends StatelessWidget {
         Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (context) => Chatscreen(user: user),
+            builder: (context) => Chatscreen(user: user,defaultMessage: "",),
           ),
         );
       },

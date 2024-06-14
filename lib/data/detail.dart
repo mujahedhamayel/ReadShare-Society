@@ -5,6 +5,8 @@ import 'package:facebook/constants.dart';
 import 'package:facebook/providers/book_provider.dart';
 import 'package:facebook/providers/user_provider.dart';
 import 'package:facebook/screens/ProfilePage.dart';
+import 'package:facebook/screens/chatscreen.dart';
+import 'package:facebook/screens/map_screen.dart';
 import 'package:facebook/services/book_service.dart';
 import 'package:facebook/services/user_service.dart';
 import 'package:facebook/utils/api_util.dart';
@@ -66,9 +68,7 @@ class BookDetail extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               GestureDetector(
-                ////////// هاد الفنكشن الي بستدعي صفحة الناشر ////////////////// هون رح تعدل عليه لانه بستدعي غلط
                 onTap: () async {
-                  // Fetch the owner's details from the backend or use what you have
                   User owner = await userService
                       .fetchUserDetails(book.owner); // Fetch owner details
 
@@ -90,7 +90,7 @@ class BookDetail extends StatelessWidget {
                         text: book.owner,
                         style: const TextStyle(
                           fontWeight: FontWeight.w500,
-                          color: Colors.blue, // Make it look like a link
+                          color: Colors.blue,
                           decoration: TextDecoration.underline,
                         ),
                       ),
@@ -131,6 +131,50 @@ class _BookCoverState extends State<BookCover> {
     final userId = providerUser!.id; // Obtain the current user's ID
     final bookProvider = Provider.of<BookProvider>(context, listen: false);
     isBookmarked = bookProvider.isBookLiked(widget.book, userId);
+  }
+
+   Future<void> checkBookStatusAndProceed() async {
+    try {
+      final response = await http.get(
+        Uri.parse('http://$ip:$port/api/books/${widget.book.id}/status'),
+        headers: ApiUtil.headers(AuthToken().getToken),
+      );
+
+      if (response.statusCode == 200) {
+        final responseJson = jsonDecode(response.body);
+        final status = responseJson['status'];
+        final message = responseJson['message'];
+
+        if (status == 'booked') {
+          // Show message that the book is booked up
+          showDialog(
+            context: context,
+            builder: (BuildContext context) {
+              return AlertDialog(
+                title: const Text('Book Status'),
+                content: Text(message),
+                actions: [
+                  TextButton(
+                    onPressed: () => Navigator.of(context).pop(),
+                    child: const Text('OK'),
+                  ),
+                ],
+              );
+            },
+          );
+        } else {
+          // Proceed to show the request dialog
+          UserService userService = UserService();
+          User owner = await userService.fetchUserDetails(widget.book.owner);
+          _showRequestDialog(context, widget.book, owner);
+        }
+      } else {
+        throw Exception('Failed to load book status');
+      }
+    } catch (e) {
+      print('Failed to check book status: $e');
+      // Optionally, show an error dialog or message
+    }
   }
 
   @override
@@ -236,31 +280,29 @@ class _BookCoverState extends State<BookCover> {
                       ),
                     ),
                   )
-                : Positioned(
-                    left: 350,
-                    bottom: 20,
-                    child: GestureDetector(
-                      onTap: () => _showRequestDialog(context),
-                      child: Container(
-                        padding: const EdgeInsets.all(8),
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(10),
-                          color: const Color.fromARGB(255, 60, 27, 110),
-                        ),
-                        child: const Row(
-                          children: [
-                            Icon(
-                              Icons.book,
-                              color: Colors.white,
-                              size: 25,
-                            ),
-                            SizedBox(width: 5),
-                            Text(
-                              'Request the book',
-                              style: TextStyle(color: Colors.white),
-                            )
-                          ],
-                        ),
+                : GestureDetector(
+                    onTap: () async {
+                      await checkBookStatusAndProceed();
+                    },
+                    child: Container(
+                      padding: const EdgeInsets.all(8),
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(10),
+                        color: const Color.fromARGB(255, 60, 27, 110),
+                      ),
+                      child: const Row(
+                        children: [
+                          Icon(
+                            Icons.book,
+                            color: Colors.white,
+                            size: 25,
+                          ),
+                          SizedBox(width: 5),
+                          Text(
+                            'Request the book',
+                            style: TextStyle(color: Colors.white),
+                          )
+                        ],
                       ),
                     ),
                   ),
@@ -271,9 +313,9 @@ class _BookCoverState extends State<BookCover> {
   }
 }
 
-void _showRequestDialog(BuildContext context) {
+void _showRequestDialog(BuildContext context, Book book, User user) {
   LatLng? _selectedLocation;
-  final TextEditingController addressController = TextEditingController();
+
   showDialog(
     context: context,
     builder: (BuildContext context) {
@@ -290,42 +332,15 @@ void _showRequestDialog(BuildContext context) {
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  const Text('The prise of Book',
-                      style:
-                          TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+                  Text('The price of Book: ${book.price} ₪',
+                      style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
                   SizedBox(
                     width: double.infinity,
                     height: 200,
-                    child: GoogleMap(
-                      onMapCreated: (GoogleMapController controller) async {
-                        LatLng currentLocation = await _getCurrentLocation();
-                        controller.animateCamera(
-                            CameraUpdate.newLatLng(currentLocation));
-                      },
-                      initialCameraPosition: const CameraPosition(
-                        target: LatLng(0, 0), // Default location (initial load)
-                        zoom: 12,
-                      ),
-                      onTap: (location) {
-                        setState(() {
-                          _selectedLocation = location;
-                          addressController.text =
-                              'Lat: ${location.latitude}, Lon: ${location.longitude}';
-                        });
-                      },
-                      markers: _selectedLocation != null
-                          ? {
-                              Marker(
-                                markerId: MarkerId('selected-location'),
-                                position: _selectedLocation!,
-                              ),
-                            }
-                          : {},
+                    child: MapScreen(
+                      initialLocation: user.location!,
                     ),
                   ),
-                  const Text('Choose an option below:',
-                      style:
-                          TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
                   const SizedBox(height: 20),
                   ElevatedButton(
                     style: ElevatedButton.styleFrom(
@@ -336,42 +351,16 @@ void _showRequestDialog(BuildContext context) {
                     ),
                     onPressed: () {
                       Navigator.of(context).pop();
-                      // Navigate to chat page
-                      // Navigator.push(context, MaterialPageRoute(builder: (context) => ChatPage()));
+                      _showCompleteRequestDialog(context, book, user);
                     },
                     child: const Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        Icon(Icons.chat, color: Colors.white),
+                        Icon(Icons.arrow_forward, color: Colors.white),
                         SizedBox(width: 10),
-                        Text('Go to chat with Owner',
+                        Text('Next',
                             style: TextStyle(
-                                color: Colors.white,
-                                fontWeight: FontWeight.bold)),
-                      ],
-                    ),
-                  ),
-                  const SizedBox(height: 10),
-                  ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.green,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                    ),
-                    onPressed: () {
-                      Navigator.of(context).pop();
-                      _showCompleteRequestDialog(context);
-                    },
-                    child: const Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Icon(Icons.check_circle, color: Colors.white),
-                        SizedBox(width: 10),
-                        Text('Confirm Request',
-                            style: TextStyle(
-                                color: Colors.white,
-                                fontWeight: FontWeight.bold)),
+                                color: Colors.white, fontWeight: FontWeight.bold)),
                       ],
                     ),
                   ),
@@ -385,7 +374,7 @@ void _showRequestDialog(BuildContext context) {
   );
 }
 
-void _showCompleteRequestDialog(BuildContext context) {
+void _showCompleteRequestDialog(BuildContext context, Book book, User user) {
   final TextEditingController addressController = TextEditingController();
   final TextEditingController detailsController = TextEditingController();
   LatLng? _selectedLocation;
@@ -459,20 +448,89 @@ void _showCompleteRequestDialog(BuildContext context) {
                     const SizedBox(height: 20),
                     ElevatedButton(
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: Palette.REDcolor,
+                        backgroundColor: Colors.blue,
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(10),
                         ),
                       ),
-                      onPressed: () {
-                        Navigator.of(context).pop();
-                        print('Request details: ${detailsController.text}');
-                        print('Request address: ${addressController.text}');
+                        onPressed: () async {
+                        final message = await _requestBook(context, book, user);
+                        Navigator.of(context).pop(); // Close the current dialog
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => Chatscreen(
+                              user: user,
+                              defaultMessage:
+                                  'I want to request your book: ${book.title}',
+                            ),
+                          ),
+                        );
+                        showDialog(
+                          context: context,
+                          builder: (BuildContext context) {
+                            return AlertDialog(
+                              title: const Text('Request Status'),
+                              content: Text(message),
+                              actions: [
+                                TextButton(
+                                  onPressed: () => Navigator.of(context).pop(),
+                                  child: const Text('OK'),
+                                ),
+                              ],
+                            );
+                          },
+                        );
                       },
-                      child: const Text(
-                        'Submit',
-                        style: TextStyle(
-                            color: Colors.white, fontWeight: FontWeight.bold),
+                      child: const Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(Icons.chat, color: Colors.white),
+                          SizedBox(width: 10),
+                          Text('confirm and chat with Owner',
+                              style: TextStyle(
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.bold)),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(height: 10),
+                    ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.green,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                      ),
+                      onPressed: () async {
+                        final message = await _requestBook(context, book, user);
+                        Navigator.of(context).pop();
+                        showDialog(
+                          context: context,
+                          builder: (BuildContext context) {
+                            return AlertDialog(
+                              title: const Text('Request Sent'),
+                              content: Text(message),
+                              actions: [
+                                TextButton(
+                                  onPressed: () => Navigator.of(context).pop(),
+                                  child: const Text('OK'),
+                                ),
+                              ],
+                            );
+                          },
+                        );
+                      },
+                      child: const Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(Icons.check_circle, color: Colors.white),
+                          SizedBox(width: 10),
+                          Text('Confirm Request',
+                              style: TextStyle(
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.bold)),
+                        ],
                       ),
                     ),
                   ],
@@ -484,6 +542,27 @@ void _showCompleteRequestDialog(BuildContext context) {
       );
     },
   );
+}
+
+Future<String> _requestBook(BuildContext context, Book book, User user) async {
+  try {
+    final response = await http.post(
+      Uri.parse('http://$ip:$port/api/books/${book.id}/request'),
+      headers: ApiUtil.headers(AuthToken().getToken),
+    );
+
+    if (response.statusCode == 200) {
+      // Request was successful
+      final responseJson = jsonDecode(response.body);
+      return responseJson['message'];
+    } else {
+      final responseJson = jsonDecode(response.body);
+      return responseJson['message'];
+    }
+  } catch (e) {
+    print('Failed to request book: $e');
+    return 'Failed to request book';
+  }
 }
 
 Future<LatLng> _getCurrentLocation() async {
@@ -517,7 +596,6 @@ class BookPdfLink extends StatelessWidget {
       padding: const EdgeInsets.all(20),
       child: ElevatedButton(
         onPressed: () async {
-          // Navigate to the PDF Viewer Page
           Navigator.push(
             context,
             MaterialPageRoute(
@@ -529,27 +607,6 @@ class BookPdfLink extends StatelessWidget {
       ),
     );
   }
-
-  // Future<void> _launchURL(BuildContext context, String url) async {
-  //   final uri = Uri.parse(url);
-  //   print('Parsed URL: $uri');
-
-  //   final canLaunchResult = await canLaunchUrl(uri);
-  //   print('Can launch URL: $canLaunchResult');
-
-  //   if (canLaunchResult) {
-  //     await launchUrl(uri, mode: LaunchMode.externalApplication);
-  //   } else {
-  //     print('Could not launch URL');
-  //     _showErrorSnackBar(context, 'Could not launch $url');
-  //   }
-  // }
-
-  // void _showErrorSnackBar(BuildContext context, String message) {
-  //   ScaffoldMessenger.of(context).showSnackBar(
-  //     SnackBar(content: Text(message)),
-  //   );
-  // }
 }
 
 class BookReview extends StatefulWidget {
@@ -571,7 +628,6 @@ class _BookReviewState extends State<BookReview> {
   @override
   void initState() {
     super.initState();
-    //userRating = widget.book.userRating?.toDouble() ?? 0.0;
     averageRating = widget.book.rate.toDouble();
     _submittedReviews = widget.book.review;
     _loadUserRating();
@@ -582,13 +638,13 @@ class _BookReviewState extends State<BookReview> {
       final rating = await BookService().getUserRating(widget.book.id);
       setState(() {
         userRating = rating ?? 0.0;
-        isLoading = false; // Update the loading state
+        isLoading = false;
       });
     } catch (e) {
       print('Failed to load user rating: $e');
       setState(() {
         userRating = 0.0;
-        isLoading = false; // Update the loading state
+        isLoading = false;
       });
     }
   }
@@ -599,7 +655,6 @@ class _BookReviewState extends State<BookReview> {
     });
     try {
       await BookService().rateBook(widget.book.id, newRating);
-      // Optionally, fetch the updated book details to get the new average rating
       final updatedBook = await BookService().getBookById(widget.book.id);
       setState(() {
         averageRating = updatedBook.rate.toDouble();
@@ -634,10 +689,10 @@ class _BookReviewState extends State<BookReview> {
     }
   }
 
- @override
+  @override
   Widget build(BuildContext context) {
     return isLoading
-        ? Center(child: CircularProgressIndicator())  // Show loading indicator while fetching user rating
+        ? Center(child: CircularProgressIndicator())
         : Container(
             padding: const EdgeInsets.all(20),
             child: Column(
@@ -708,7 +763,7 @@ class _BookReviewState extends State<BookReview> {
                       ),
                       RawMaterialButton(
                         padding: const EdgeInsets.all(12.0),
-                        fillColor: Palette.REDcolor, // Changed color to red
+                        fillColor: Palette.REDcolor,
                         elevation: 0.0,
                         shape: const CircleBorder(),
                         onPressed: _submitReview,
@@ -724,6 +779,7 @@ class _BookReviewState extends State<BookReview> {
             ),
           );
   }
+
   Widget _buildInteractiveStarRating(double score) {
     return Row(
       mainAxisSize: MainAxisSize.min,

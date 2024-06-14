@@ -1,5 +1,7 @@
+import 'package:facebook/screens/map_screen.dart';
 import 'package:facebook/utils/auth_token.dart';
 import 'package:flutter/material.dart';
+import 'package:latlong2/latlong.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert'; // For jsonEncode
 import 'package:uuid/uuid.dart'; // For uuid generation if needed
@@ -24,17 +26,17 @@ class SignUpAdditionalPage extends StatefulWidget {
 class _SignUpAdditionalPageState extends State<SignUpAdditionalPage> {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   final TextEditingController _mobileNumberController = TextEditingController();
-  final TextEditingController _addressController = TextEditingController();
   final TextEditingController _dobController = TextEditingController();
+  final TextEditingController _locationController = TextEditingController();
   String? _gender;
+  LatLng? _selectedLocation;
 
-  // Function to show the date picker and update the date of birth field
   Future<void> _selectDate(BuildContext context) async {
     final DateTime? picked = await showDatePicker(
       context: context,
-      initialDate: DateTime.now(), // Initial date of the date picker
-      firstDate: DateTime(1900), // The earliest date the picker can select
-      lastDate: DateTime(2100), // The latest date the picker can select
+      initialDate: DateTime.now(),
+      firstDate: DateTime(1900),
+      lastDate: DateTime(2100),
     );
 
     if (picked != null) {
@@ -42,6 +44,68 @@ class _SignUpAdditionalPageState extends State<SignUpAdditionalPage> {
         _dobController.text = "${picked.day}/${picked.month}/${picked.year}";
       });
     }
+  }
+
+  Future<void> _selectLocation(BuildContext context) async {
+    final selectedLocation = await Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => MapScreen(
+            initialLocation: LatLng(32.220086172828864, 35.25749994011423)),
+      ),
+    );
+
+    if (selectedLocation != null) {
+      setState(() {
+        _selectedLocation = selectedLocation;
+        _locationController.text =
+            '${selectedLocation.latitude}, ${selectedLocation.longitude}';
+      });
+    }
+  }
+
+  void _signUp(BuildContext context) async {
+    final url = Uri.parse('http://$ip:$port/api/users/signup');
+    final Map<String, dynamic> body = {
+      'name': widget.userName,
+      'email': widget.email,
+      'password': widget.password,
+      'mobileNumber': _mobileNumberController.text,
+      'gender': _gender,
+      'birthday': formatDate(_dobController.text),
+    };
+
+    // Add location if it has been set
+    if (_selectedLocation != null) {
+      body['location'] = {
+        'latitude': _selectedLocation!.latitude,
+        'longitude': _selectedLocation!.longitude,
+      };
+    }
+
+    final response = await http.post(
+      url,
+      headers: <String, String>{
+        'Content-Type': 'application/json; charset=UTF-8',
+      },
+      body: jsonEncode(body),
+    );
+
+    if (response.statusCode == 200) {
+      final body = jsonDecode(response.body);
+      final backendToken = body['token'];
+      AuthToken().setToken(backendToken);
+      Navigator.pushReplacementNamed(context, '/signin');
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Failed to sign up: ${response.body}')),
+      );
+    }
+  }
+
+  String formatDate(String date) {
+    List<String> parts = date.split('/');
+    return "${parts[2]}-${parts[1]}-${parts[0]}";
   }
 
   @override
@@ -61,8 +125,8 @@ class _SignUpAdditionalPageState extends State<SignUpAdditionalPage> {
                             _AdditionalFormContent(
                               formKey: _formKey,
                               mobileNumberController: _mobileNumberController,
-                              addressController: _addressController,
                               dobController: _dobController,
+                              locationController: _locationController,
                               gender: _gender,
                               onGenderChanged: (String? newValue) {
                                 setState(() {
@@ -70,6 +134,7 @@ class _SignUpAdditionalPageState extends State<SignUpAdditionalPage> {
                                 });
                               },
                               onSelectDate: () => _selectDate(context),
+                              onSelectLocation: () => _selectLocation(context),
                             ),
                           ],
                         ),
@@ -86,8 +151,8 @@ class _SignUpAdditionalPageState extends State<SignUpAdditionalPage> {
                                     formKey: _formKey,
                                     mobileNumberController:
                                         _mobileNumberController,
-                                    addressController: _addressController,
                                     dobController: _dobController,
+                                    locationController: _locationController,
                                     gender: _gender,
                                     onGenderChanged: (String? newValue) {
                                       setState(() {
@@ -95,6 +160,8 @@ class _SignUpAdditionalPageState extends State<SignUpAdditionalPage> {
                                       });
                                     },
                                     onSelectDate: () => _selectDate(context),
+                                    onSelectLocation: () =>
+                                        _selectLocation(context),
                                   ),
                                 ),
                               ),
@@ -109,63 +176,27 @@ class _SignUpAdditionalPageState extends State<SignUpAdditionalPage> {
       ),
     );
   }
-
-  void _signUp(BuildContext context) async {
-    final url = Uri.parse('http://$ip:$port/api/users/signup');
-    final response = await http.post(
-      url,
-      headers: <String, String>{
-        'Content-Type': 'application/json; charset=UTF-8',
-      },
-      body: jsonEncode(<String, dynamic>{
-        'name': widget.userName,
-        'email': widget.email,
-        'password': widget.password,
-        'mobileNumber': _mobileNumberController.text,
-        'address': _addressController.text,
-        'gender': _gender,
-        'birthday': formatDate(_dobController.text),
-      }),
-    );
-
-    if (response.statusCode == 200) {
-      // Successful signup, navigate to Home screen
-      final body = jsonDecode(response.body);
-      final backendToken = body['token'];
-      AuthToken().setToken(backendToken);
-      Navigator.pushReplacementNamed(context, '/signin');
-    } else {
-      // If the server returns an error response, show a Snackbar with the error
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Failed to sign up: ${response.body}')),
-      );
-    }
-  }
-
-  // Helper function to format date to YYYY-MM-DD
-  String formatDate(String date) {
-    List<String> parts = date.split('/');
-    return "${parts[2]}-${parts[1]}-${parts[0]}";
-  }
 }
 
 class _AdditionalFormContent extends StatelessWidget {
   final GlobalKey<FormState> formKey;
   final TextEditingController mobileNumberController;
-  final TextEditingController addressController;
   final TextEditingController dobController;
+  final TextEditingController locationController;
   final String? gender;
   final Function(String?) onGenderChanged;
   final VoidCallback onSelectDate;
+  final VoidCallback onSelectLocation;
 
   const _AdditionalFormContent({
     required this.formKey,
     required this.mobileNumberController,
-    required this.addressController,
     required this.dobController,
+    required this.locationController,
     required this.gender,
     required this.onGenderChanged,
     required this.onSelectDate,
+    required this.onSelectLocation,
   });
 
   @override
@@ -205,18 +236,6 @@ class _AdditionalFormContent extends StatelessWidget {
                   keyboardType: TextInputType.phone,
                 ),
                 const SizedBox(height: 16),
-                TextFormField(
-                  controller: addressController,
-                  decoration: const InputDecoration(
-                    labelText: 'Address',
-                    hintText: 'Enter your address',
-                    prefixIcon: Icon(Icons.home, color: Colors.black),
-                    border: OutlineInputBorder(),
-                    labelStyle: TextStyle(color: Colors.black),
-                    hintStyle: TextStyle(color: Colors.black),
-                  ),
-                ),
-                const SizedBox(height: 16),
                 DropdownButtonFormField<String>(
                   value: gender,
                   decoration: const InputDecoration(
@@ -250,6 +269,24 @@ class _AdditionalFormContent extends StatelessWidget {
                         hintStyle: TextStyle(color: Colors.black),
                       ),
                       keyboardType: TextInputType.datetime,
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 16),
+                GestureDetector(
+                  onTap: onSelectLocation,
+                  child: AbsorbPointer(
+                    child: TextFormField(
+                      controller: locationController,
+                      decoration: const InputDecoration(
+                        labelText: 'Location',
+                        hintText: 'Select your location',
+                        prefixIcon:
+                            Icon(Icons.location_on, color: Colors.black),
+                        border: OutlineInputBorder(),
+                        labelStyle: TextStyle(color: Colors.black),
+                        hintStyle: TextStyle(color: Colors.black),
+                      ),
                     ),
                   ),
                 ),
