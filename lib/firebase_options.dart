@@ -17,10 +17,7 @@ import 'package:flutter/foundation.dart'
 class DefaultFirebaseOptions {
   static FirebaseOptions get currentPlatform {
     if (kIsWeb) {
-      throw UnsupportedError(
-        'DefaultFirebaseOptions have not been configured for web - '
-        'you can reconfigure this by running the FlutterFire CLI again.',
-      );
+      return web;
     }
     switch (defaultTargetPlatform) {
       case TargetPlatform.android:
@@ -28,10 +25,7 @@ class DefaultFirebaseOptions {
       case TargetPlatform.iOS:
         return ios;
       case TargetPlatform.macOS:
-        throw UnsupportedError(
-          'DefaultFirebaseOptions have not been configured for macos - '
-          'you can reconfigure this by running the FlutterFire CLI again.',
-        );
+        return macos;
       case TargetPlatform.windows:
         throw UnsupportedError(
           'DefaultFirebaseOptions have not been configured for windows - '
@@ -49,6 +43,16 @@ class DefaultFirebaseOptions {
     }
   }
 
+  static const FirebaseOptions web = FirebaseOptions(
+    apiKey: 'AIzaSyARgpsD8HuN2Bgs_HG9H_MSYA9ki8YM3kc',
+    appId: '1:1013057635854:web:a5ecb2beae4dd86ac35e5f',
+    messagingSenderId: '1013057635854',
+    projectId: 'book-app-1356e',
+    authDomain: 'book-app-1356e.firebaseapp.com',
+    databaseURL: 'https://book-app-1356e-default-rtdb.firebaseio.com',
+    storageBucket: 'book-app-1356e.appspot.com',
+  );
+
   static const FirebaseOptions android = FirebaseOptions(
     apiKey: 'AIzaSyDuGMkostRI9Jo8pa-KCVDsBuhjgMy1iNs',
     appId: '1:1013057635854:android:8db24c6355a22fe1c35e5f',
@@ -59,6 +63,18 @@ class DefaultFirebaseOptions {
   );
 
   static const FirebaseOptions ios = FirebaseOptions(
+    apiKey: 'AIzaSyAZyzYNaETVHiFddV_S2Wr0p8URi9SD9Hk',
+    appId: '1:1013057635854:ios:ba434df9080d6d28c35e5f',
+    messagingSenderId: '1013057635854',
+    projectId: 'book-app-1356e',
+    databaseURL: 'https://book-app-1356e-default-rtdb.firebaseio.com',
+    storageBucket: 'book-app-1356e.appspot.com',
+    iosClientId:
+        '1013057635854-1ade6267ggfidb8ajn6tlnq7pfr20dbv.apps.googleusercontent.com',
+    iosBundleId: 'com.example.bookvApp',
+  );
+
+  static const FirebaseOptions macos = FirebaseOptions(
     apiKey: 'AIzaSyAZyzYNaETVHiFddV_S2Wr0p8URi9SD9Hk',
     appId: '1:1013057635854:ios:ba434df9080d6d28c35e5f',
     messagingSenderId: '1013057635854',

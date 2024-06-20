@@ -20,9 +20,13 @@ import 'constants.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp(
-    options: DefaultFirebaseOptions.currentPlatform,
-  );
+  try {
+    await Firebase.initializeApp(
+      options: DefaultFirebaseOptions.currentPlatform,
+    );
+  } catch (e) {
+    print('Firebase initialization error: $e');
+  }
   final notificationService = NotificationService();
   notificationService.initialize();
   runApp(
@@ -30,9 +34,10 @@ void main() async {
       providers: [
         ChangeNotifierProvider(create: (_) => UserProvider()),
         ChangeNotifierProvider(create: (_) => BookProvider()),
-         ChangeNotifierProvider(create: (_) => FollowedUsersProvider()),
+        ChangeNotifierProvider(create: (_) => FollowedUsersProvider()),
       ],
       child: MaterialApp(
+        debugShowCheckedModeBanner: false,
         home: WelcomePage(),
         routes: {
           '/home': (context) => NavScreen(),
