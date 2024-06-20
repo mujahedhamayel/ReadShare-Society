@@ -22,10 +22,8 @@ import 'package:facebook/widgets/profile_avatar.dart';
 import '/config/palette.dart';
 
 class CreatePostContainer extends StatefulWidget {
-  final User currentUser;
   const CreatePostContainer({
     super.key,
-    required this.currentUser,
   });
 
   @override

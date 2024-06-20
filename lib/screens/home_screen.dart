@@ -175,14 +175,14 @@ class _HomeScreenMobile extends StatelessWidget {
           systemOverlayStyle: SystemUiOverlayStyle.dark,
         ),
         const SliverToBoxAdapter(
-          child: CreatePostContainer(currentUser: currentUser),
+          child: CreatePostContainer(),
         ),
-        SliverPadding(
-          padding: const EdgeInsets.fromLTRB(0.0, 10.0, 0.0, 5.0),
-          sliver: SliverToBoxAdapter(
-            child: Rooms(onlineUsers: onlineUsers),
-          ),
-        ),
+        // SliverPadding(
+        //   padding: const EdgeInsets.fromLTRB(0.0, 10.0, 0.0, 5.0),
+        //   sliver: SliverToBoxAdapter(
+        //     child: Rooms(onlineUsers: onlineUsers),
+        //   ),
+        // ),
         isLoading
             ? SliverToBoxAdapter(
                 child: Center(child: CircularProgressIndicator()),
@@ -216,58 +216,58 @@ class _HomeScreenDesktop extends StatelessWidget {
   Widget build(BuildContext context) {
     return Row(
       children: [
-        const Flexible(
-          flex: 2,
-          child: Align(
-            alignment: Alignment.centerLeft,
-            child: Padding(
-              padding: EdgeInsets.all(12.0),
-              child: MoreOptionsList(currentUser: currentUser),
-            ),
-          ),
-        ),
+        // const Flexible(
+        //   flex: 2,
+        //   child: Align(
+        //     alignment: Alignment.centerLeft,
+        //     child: Padding(
+        //       padding: EdgeInsets.all(12.0),
+        //       child: MoreOptionsList(currentUser: currentUser),
+        //     ),
+        //   ),
+        // ),
         const Spacer(),
-        SizedBox(
-          width: 600.0,
-          child: CustomScrollView(
-            controller: scrollController,
-            slivers: [
-              const SliverToBoxAdapter(
-                child: CreatePostContainer(currentUser: currentUser),
-              ),
-              SliverPadding(
-                padding: const EdgeInsets.fromLTRB(0.0, 10.0, 0.0, 5.0),
-                sliver: SliverToBoxAdapter(
-                  child: Rooms(onlineUsers: onlineUsers),
-                ),
-              ),
-              isLoading
-                  ? SliverToBoxAdapter(
-                      child: Center(child: CircularProgressIndicator()),
-                    )
-                  : SliverList(
-                      delegate: SliverChildBuilderDelegate(
-                        (context, index) {
-                          final Post post = posts[index];
-                          return PostContainer(post: post);
-                        },
-                        childCount: posts.length,
-                      ),
-                    ),
-            ],
-          ),
-        ),
+        // SizedBox(
+        //   width: 600.0,
+        //   child: CustomScrollView(
+        //     controller: scrollController,
+        //     slivers: [
+        //       const SliverToBoxAdapter(
+        //         child: CreatePostContainer(currentUser: currentUser),
+        //       ),
+        //       SliverPadding(
+        //         padding: const EdgeInsets.fromLTRB(0.0, 10.0, 0.0, 5.0),
+        //         sliver: SliverToBoxAdapter(
+        //           child: Rooms(onlineUsers: onlineUsers),
+        //         ),
+        //       ),
+        //       isLoading
+        //           ? SliverToBoxAdapter(
+        //               child: Center(child: CircularProgressIndicator()),
+        //             )
+        //           : SliverList(
+        //               delegate: SliverChildBuilderDelegate(
+        //                 (context, index) {
+        //                   final Post post = posts[index];
+        //                   return PostContainer(post: post);
+        //                 },
+        //                 childCount: posts.length,
+        //               ),
+        //             ),
+        //     ],
+        //   ),
+        // ),
         const Spacer(),
-        Flexible(
-          flex: 2,
-          child: Align(
-            alignment: Alignment.centerRight,
-            child: Padding(
-              padding: const EdgeInsets.all(12.0),
-              child: ContactsList(users: onlineUsers),
-            ),
-          ),
-        ),
+        // Flexible(
+        //   flex: 2,
+        //   child: Align(
+        //     alignment: Alignment.centerRight,
+        //     child: Padding(
+        //       padding: const EdgeInsets.all(12.0),
+        //       child: ContactsList(users: onlineUsers),
+        //     ),
+        //   ),
+        // ),
       ],
     );
   }

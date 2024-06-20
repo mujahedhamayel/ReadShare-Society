@@ -15,8 +15,7 @@ class User {
   final int? followersCounts;
   final int? followingCounts;
   final LatLng? location;
-  //final String mobileNumber;
-
+  final String mobileNumber;
 
   const User({
     required this.id,
@@ -33,12 +32,12 @@ class User {
     this.followersCounts,
     this.followingCounts,
     this.location,
-    //required this.mobileNumber,
+    required this.mobileNumber,
   });
 
   factory User.fromJson(Map<String, dynamic> json) {
     LatLng? parseLocation(Map<String, dynamic>? locationJson) {
-      if (locationJson == null) {
+      if (locationJson == null || locationJson.isEmpty) {
         return null;
       }
       return LatLng(locationJson['latitude'], locationJson['longitude']);
@@ -59,7 +58,7 @@ class User {
       followersCounts: json['followersCount'],
       followingCounts: json['followingCount'],
       location: parseLocation(json['location']),
-      //mobileNumber: json['mobileNumber'],
+      mobileNumber: json['mobileNumber'] ?? '',
     );
   }
 }

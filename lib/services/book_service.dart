@@ -24,13 +24,13 @@ class BookService {
 
   Future<List<Book>> fetchPDFBooks() async {
     List<Book> books = await fetchBooks();
-    
+
     return books.where((book) => book.type == 'pdf').toList();
   }
 
   Future<List<Book>> fetchPhysicalBooks() async {
     List<Book> books = await fetchBooks();
-   
+
     return books.where((book) => book.type == 'physical').toList();
   }
 
@@ -38,8 +38,8 @@ class BookService {
   Future<List<Book>> fetchLikedBooks() async {
     String token = AuthToken().getToken;
     final likedBooksUrl = '$apiUrl/liked';
-    final response =
-        await http.get(Uri.parse(likedBooksUrl), headers: ApiUtil.headers(token));
+    final response = await http.get(Uri.parse(likedBooksUrl),
+        headers: ApiUtil.headers(token));
 
     if (response.statusCode == 200) {
       List<dynamic> json = jsonDecode(response.body);
@@ -64,7 +64,7 @@ class BookService {
     }
   }
 
-   Future<void> addReview(String bookId, Review review) async {
+  Future<void> addReview(String bookId, Review review) async {
     String token = AuthToken().getToken;
     final response = await http.post(
       Uri.parse('$apiUrl/$bookId/reviews'),
@@ -81,7 +81,8 @@ class BookService {
   Future<List<Book>> fetchUserBooks() async {
     String token = AuthToken().getToken;
     final userBooksUrl = '$apiUrl/user/books';
-    final response = await http.get(Uri.parse(userBooksUrl), headers: ApiUtil.headers(token));
+    final response = await http.get(Uri.parse(userBooksUrl),
+        headers: ApiUtil.headers(token));
 
     if (response.statusCode == 200) {
       List<dynamic> json = jsonDecode(response.body);
@@ -91,7 +92,7 @@ class BookService {
     }
   }
 
-   Future<Book> getBookById(String bookId) async {
+  Future<Book> getBookById(String bookId) async {
     String token = AuthToken().getToken;
     final url = '$apiUrl/$bookId';
     final response = await http.get(
@@ -123,8 +124,8 @@ class BookService {
     }
   }
 
-   Future<double?> getUserRating(String bookId) async {
-    String token =  AuthToken().getToken;
+  Future<double?> getUserRating(String bookId) async {
+    String token = AuthToken().getToken;
     final url = '$apiUrl/$bookId/user-rating';
     final response = await http.get(
       Uri.parse(url),
@@ -139,7 +140,6 @@ class BookService {
     return responseJson['userRating']?.toDouble();
   }
 
-
   Future<void> requestBook(String bookId) async {
     String token = AuthToken().getToken;
     final response = await http.post(
@@ -152,7 +152,8 @@ class BookService {
       throw Exception(responseJson['message'] ?? 'Failed to request the book');
     }
   }
-Future<List<Request>> fetchBookRequests(String bookId) async {
+
+  Future<List<Request>> fetchBookRequests(String bookId) async {
     String token = AuthToken().getToken;
     final response = await http.get(
       Uri.parse('$apiUrl/$bookId/requests'),
@@ -179,7 +180,7 @@ Future<List<Request>> fetchBookRequests(String bookId) async {
     }
   }
 
- Future<List<Book>> fetchUserBookRequests() async {
+  Future<List<Book>> fetchUserBookRequests() async {
     String token = AuthToken().getToken;
     final url = '$apiUrl/user/book-requests';
     final response = await http.get(
@@ -189,12 +190,33 @@ Future<List<Request>> fetchBookRequests(String bookId) async {
 
     if (response.statusCode == 200) {
       List<dynamic> json = jsonDecode(response.body);
-      return json.map((book) => Book.fromJson(book)).toList();
+
+      List<Book> books = json.map((book) => Book.fromJson(book)).toList();
+      books.sort((a, b) {
+        // You can adjust this sorting logic based on your actual data structure
+        bool aAccepted =
+            a.requests.any((request) => request.status == "requested");
+        bool bAccepted =
+            b.requests.any((request) => request.status == "requested");
+        if (aAccepted && !bAccepted) return -1;
+        if (!aAccepted && bAccepted) return 1;
+        return 0;
+      });
+      return books;
     } else {
       throw Exception('Failed to load user book requests');
     }
   }
 
+  Future<void> denyRequest(String bookId, String requestId) async {
+    String token = AuthToken().getToken;
+    final response = await http.post(
+      Uri.parse('$apiUrl/$bookId/requests/$requestId/deny'),
+      headers: ApiUtil.headers(token),
+    );
+
+    if (response.statusCode != 200) {
+      throw Exception('Failed to deny request');
+    }
+  }
 }
-
-

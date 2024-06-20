@@ -1,4 +1,6 @@
+import 'package:facebook/providers/user_provider.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import '/data/data.dart';
 import '/screens/screens.dart';
 import '/widgets/widgets.dart';
@@ -31,6 +33,7 @@ class _NavScreenState extends State<NavScreen> {
   @override
   Widget build(BuildContext context) {
     final Size screenSize = MediaQuery.of(context).size;
+    final providerUser = Provider.of<UserProvider>(context).user;
     return DefaultTabController(
       length: _icons.length,
       child: Scaffold(
@@ -38,7 +41,7 @@ class _NavScreenState extends State<NavScreen> {
             ? PreferredSize(
                 preferredSize: Size(screenSize.width, 100.0),
                 child: CustomAppBarDesktop(
-                  currentUser: currentUser,
+                  currentUser: providerUser!,
                   icons: _icons,
                   selectedIndex: _selectedIndex,
                   onTap: (index) => setState(() => _selectedIndex = index),
@@ -63,8 +66,10 @@ class _NavScreenState extends State<NavScreen> {
                     }
                   },
                   backgroundColor: Colors.grey[800], // Set background color
-                  selectedItemColor: const Color.fromARGB(255, 176, 101, 101), // Set selected item color
-                  unselectedItemColor: Colors.grey[400], // Set unselected item color
+                  selectedItemColor: const Color.fromARGB(
+                      255, 176, 101, 101), // Set selected item color
+                  unselectedItemColor:
+                      Colors.grey[400], // Set unselected item color
                   items: _icons.map((icon) {
                     return BottomNavigationBarItem(
                       icon: Icon(icon),

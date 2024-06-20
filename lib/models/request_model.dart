@@ -2,7 +2,7 @@ import 'package:facebook/models/user_model.dart';
 
 class Request {
   final String id;
-  final User user;
+  final String user;
   String status;
 
   Request({
@@ -14,11 +14,8 @@ class Request {
   factory Request.fromJson(Map<String, dynamic> json) {
     return Request(
       id: json['_id'],
-      user: User.fromJson(json['user']),
+      user: json['user'],
       status: json['status'],
     );
   }
-
-
-  
 }

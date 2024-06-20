@@ -161,7 +161,10 @@ class _ProfilepageState extends State<ProfilePage> {
   @override
   Widget build(BuildContext context) {
     final providerUser = Provider.of<UserProvider>(context).user;
-    final user = widget.user ?? providerUser;
+    var user = widget.user ?? providerUser;
+
+    bool isProfileUser =
+        widget.user == null || widget.user!.id == providerUser!.id;
     if (user != null && user.followersCounts != null) {
       followerCount = user.followersCounts!;
     }
@@ -177,7 +180,7 @@ class _ProfilepageState extends State<ProfilePage> {
             isFollowing: isFollowing,
             followerCount: followerCount,
             onFollowPressed: _followUser,
-            isProfileUser: widget.user == null,
+            isProfileUser: isProfileUser,
           ),
           desktop: ProfilePageDesktop(
             scrollController: _trackingScrollController,
@@ -187,7 +190,7 @@ class _ProfilepageState extends State<ProfilePage> {
             isFollowing: isFollowing,
             followerCount: followerCount,
             onFollowPressed: _followUser,
-            isProfileUser: widget.user == null,
+            isProfileUser: isProfileUser,
           ),
           tablet: ProfilePageMobile(
             scrollController: _trackingScrollController,
@@ -197,7 +200,7 @@ class _ProfilepageState extends State<ProfilePage> {
             isFollowing: isFollowing,
             followerCount: followerCount,
             onFollowPressed: _followUser,
-            isProfileUser: widget.user == null,
+            isProfileUser: isProfileUser,
           ),
         ),
       ),

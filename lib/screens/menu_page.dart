@@ -2,6 +2,7 @@ import 'package:facebook/config/palette.dart';
 import 'package:facebook/providers/user_provider.dart';
 import 'package:facebook/screens/ProfilePage.dart';
 import 'package:facebook/screens/SignInPage.dart';
+import 'package:facebook/screens/book_requests_page.dart';
 import 'package:facebook/screens/my_books_page.dart';
 import 'package:facebook/utils/auth_token.dart';
 import 'package:flutter/material.dart';
@@ -54,7 +55,7 @@ class MenuPage extends StatelessWidget {
             onTap: () {
               Navigator.push(
                 context,
-                MaterialPageRoute(builder: (context) => const MyBooksPage()),
+                MaterialPageRoute(builder: (context) =>  UserRequestsPage()),
               );
             },
           ),

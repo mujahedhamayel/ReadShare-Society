@@ -133,7 +133,7 @@ class _BookCoverState extends State<BookCover> {
     isBookmarked = bookProvider.isBookLiked(widget.book, userId);
   }
 
-   Future<void> checkBookStatusAndProceed() async {
+  Future<void> checkBookStatusAndProceed() async {
     try {
       final response = await http.get(
         Uri.parse('http://$ip:$port/api/books/${widget.book.id}/status'),
@@ -180,6 +180,11 @@ class _BookCoverState extends State<BookCover> {
   @override
   Widget build(BuildContext context) {
     final bookProvider = Provider.of<BookProvider>(context, listen: false);
+    final currentUser = Provider.of<UserProvider>(context).user;
+
+    bool isOwner = currentUser?.name == widget.book.owner;
+    print(isOwner);
+
     return Container(
       margin: const EdgeInsets.symmetric(vertical: 10),
       padding: const EdgeInsets.only(left: 20),
@@ -245,68 +250,73 @@ class _BookCoverState extends State<BookCover> {
               ),
             ),
           ),
-          Positioned(
-            left: 350,
-            bottom: 20,
-            child: widget.book.type == 'pdf'
-                ? GestureDetector(
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) =>
-                              PdfViewerPage(pdfUrl: widget.book.pdfLink!),
-                        ),
-                      );
-                    },
-                    child: Container(
-                      padding: const EdgeInsets.all(8),
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(10),
-                        color: const Color.fromARGB(255, 60, 27, 110),
-                      ),
-                      child: const Row(
-                        children: [
-                          Icon(
-                            Icons.book,
-                            color: Colors.white,
-                            size: 25,
-                          ),
-                          Text(
-                            'Read Book',
-                            style: TextStyle(color: Colors.white),
-                          )
-                        ],
-                      ),
+          if (widget.book.type == 'pdf')
+            Positioned(
+              left: 350,
+              bottom: 20,
+              child: GestureDetector(
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) =>
+                          PdfViewerPage(pdfUrl: widget.book.pdfLink!),
                     ),
-                  )
-                : GestureDetector(
-                    onTap: () async {
-                      await checkBookStatusAndProceed();
-                    },
-                    child: Container(
-                      padding: const EdgeInsets.all(8),
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(10),
-                        color: const Color.fromARGB(255, 60, 27, 110),
-                      ),
-                      child: const Row(
-                        children: [
-                          Icon(
-                            Icons.book,
-                            color: Colors.white,
-                            size: 25,
-                          ),
-                          SizedBox(width: 5),
-                          Text(
-                            'Request the book',
-                            style: TextStyle(color: Colors.white),
-                          )
-                        ],
-                      ),
-                    ),
+                  );
+                },
+                child: Container(
+                  padding: const EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(10),
+                    color: const Color.fromARGB(255, 60, 27, 110),
                   ),
-          ),
+                  child: const Row(
+                    children: [
+                      Icon(
+                        Icons.book,
+                        color: Colors.white,
+                        size: 25,
+                      ),
+                      Text(
+                        'Read Book',
+                        style: TextStyle(color: Colors.white),
+                      )
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          if (widget.book.type == 'physical' && !isOwner)
+            Positioned(
+              left: 350,
+              bottom: 20,
+              child: GestureDetector(
+                onTap: () async {
+                  await checkBookStatusAndProceed();
+                },
+                child: Container(
+                  padding: const EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(10),
+                    color: const Color.fromARGB(255, 60, 27, 110),
+                  ),
+                  child: const Row(
+                    children: [
+                      Icon(
+                        Icons.book,
+                        color: Colors.white,
+                        size: 25,
+                      ),
+                      SizedBox(width: 5),
+                      Text(
+                        'Request the book',
+                        style: TextStyle(color: Colors.white),
+                      )
+                    ],
+                  ),
+                ),
+              ),
+            ),
         ],
       ),
     );
@@ -333,10 +343,16 @@ void _showRequestDialog(BuildContext context, Book book, User user) {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   Text('The price of Book: ${book.price} ₪',
-                      style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+                      style:
+                          TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+                 const SizedBox(height: 20), // Added spacing between price and location text
+                  const Text('The location of the book:',
+                      style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                  const SizedBox(height: 10), // Added spacing between the location text and the map
                   SizedBox(
                     width: double.infinity,
                     height: 200,
+
                     child: MapScreen(
                       initialLocation: user.location!,
                     ),
@@ -360,7 +376,8 @@ void _showRequestDialog(BuildContext context, Book book, User user) {
                         SizedBox(width: 10),
                         Text('Next',
                             style: TextStyle(
-                                color: Colors.white, fontWeight: FontWeight.bold)),
+                                color: Colors.white,
+                                fontWeight: FontWeight.bold)),
                       ],
                     ),
                   ),
@@ -376,8 +393,16 @@ void _showRequestDialog(BuildContext context, Book book, User user) {
 
 void _showCompleteRequestDialog(BuildContext context, Book book, User user) {
   final TextEditingController addressController = TextEditingController();
-  final TextEditingController detailsController = TextEditingController();
   LatLng? _selectedLocation;
+
+  // Ensure the phone number starts with a + sign and a country code
+  String formattedPhoneNumber = user.mobileNumber;
+  if (!formattedPhoneNumber.startsWith('+')) {
+    formattedPhoneNumber =
+        '+972' + formattedPhoneNumber; // Assuming +972 as the country code
+  }
+
+  print('Formatted Phone Number: $formattedPhoneNumber'); // Debug print
 
   showDialog(
     context: context,
@@ -396,64 +421,93 @@ void _showCompleteRequestDialog(BuildContext context, Book book, User user) {
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    const Text('Enter additional details:'),
+                    const Text('Call the owner for more details:'),
                     const SizedBox(height: 20),
-                    TextField(
-                      controller: detailsController,
-                      decoration: const InputDecoration(
-                        border: OutlineInputBorder(),
-                        labelText: 'Phone Number',
-                      ),
-                    ),
-                    const SizedBox(height: 20),
-                    TextField(
-                      controller: addressController,
-                      decoration: const InputDecoration(
-                        border: OutlineInputBorder(),
-                        labelText: 'Address Manual (Optional)',
-                      ),
-                    ),
-                    const SizedBox(height: 10),
-                    Container(
-                      width: double.infinity,
-                      height: 200,
-                      child: GoogleMap(
-                        onMapCreated: (GoogleMapController controller) async {
-                          LatLng currentLocation = await _getCurrentLocation();
-                          controller.animateCamera(
-                              CameraUpdate.newLatLng(currentLocation));
-                        },
-                        initialCameraPosition: const CameraPosition(
-                          target:
-                              LatLng(0, 0), // Default location (initial load)
-                          zoom: 12,
-                        ),
-                        onTap: (location) {
-                          setState(() {
-                            _selectedLocation = location;
-                            addressController.text =
-                                'Lat: ${location.latitude}, Lon: ${location.longitude}';
-                          });
-                        },
-                        markers: _selectedLocation != null
-                            ? {
-                                Marker(
-                                  markerId: MarkerId('selected-location'),
-                                  position: _selectedLocation!,
-                                ),
-                              }
-                            : {},
-                      ),
-                    ),
-                    const SizedBox(height: 20),
-                    ElevatedButton(
+                    ElevatedButton.icon(
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.blue,
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(10),
                         ),
+                        minimumSize: const Size(double.infinity, 50),
                       ),
-                        onPressed: () async {
+                      onPressed: () async {
+                        final Uri url =
+                            Uri(scheme: 'tel', path: formattedPhoneNumber);
+                        print('Attempting to launch: $url'); // Debug print
+                        if (await canLaunchUrl(url)) {
+                          await launchUrl(url);
+                        } else {
+                          print('Could not launch $url'); // Debug print
+                          // Attempt to use an alternative approach
+                          try {
+                            await launchUrl(url,
+                                mode: LaunchMode.externalApplication);
+                          } catch (e) {
+                            print('Failed to launch externally: $e');
+                          }
+                          throw 'Could not launch $url';
+                        }
+                      },
+                      icon: const Icon(Icons.phone, color: Colors.white),
+                      label: const Text(
+                        'Call Owner',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 20),
+                    // TextField(
+                    //   controller: addressController,
+                    //   decoration: const InputDecoration(
+                    //     border: OutlineInputBorder(),
+                    //     labelText: 'Address Manual (Optional)',
+                    //   ),
+                    // ),
+                    // const SizedBox(height: 10),
+                    // Container(
+                    //   width: double.infinity,
+                    //   height: 200,
+                    //   child: GoogleMap(
+                    //     onMapCreated: (GoogleMapController controller) async {
+                    //       LatLng currentLocation = await _getCurrentLocation();
+                    //       controller.animateCamera(
+                    //           CameraUpdate.newLatLng(currentLocation));
+                    //     },
+                    //     initialCameraPosition: const CameraPosition(
+                    //       target:
+                    //           LatLng(0, 0), // Default location (initial load)
+                    //       zoom: 12,
+                    //     ),
+                    //     onTap: (location) {
+                    //       setState(() {
+                    //         _selectedLocation = location;
+                    //         addressController.text =
+                    //             'Lat: ${location.latitude}, Lon: ${location.longitude}';
+                    //       });
+                    //     },
+                    //     markers: _selectedLocation != null
+                    //         ? {
+                    //             Marker(
+                    //               markerId: MarkerId('selected-location'),
+                    //               position: _selectedLocation!,
+                    //             ),
+                    //           }
+                    //         : {},
+                    //   ),
+                    //),
+                    const SizedBox(height: 20),
+                    ElevatedButton.icon(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.blue,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        minimumSize: const Size(double.infinity, 50),
+                      ),
+                      onPressed: () async {
                         final message = await _requestBook(context, book, user);
                         Navigator.of(context).pop(); // Close the current dialog
                         Navigator.push(
@@ -482,25 +536,23 @@ void _showCompleteRequestDialog(BuildContext context, Book book, User user) {
                           },
                         );
                       },
-                      child: const Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Icon(Icons.chat, color: Colors.white),
-                          SizedBox(width: 10),
-                          Text('confirm and chat with Owner',
-                              style: TextStyle(
-                                  color: Colors.white,
-                                  fontWeight: FontWeight.bold)),
-                        ],
+                      icon: const Icon(Icons.chat, color: Colors.white),
+                      label: const Text(
+                        'Confirm and Chat with Owner',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
                     ),
                     const SizedBox(height: 10),
-                    ElevatedButton(
+                    ElevatedButton.icon(
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.green,
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(10),
                         ),
+                        minimumSize: const Size(double.infinity, 50),
                       ),
                       onPressed: () async {
                         final message = await _requestBook(context, book, user);
@@ -521,16 +573,13 @@ void _showCompleteRequestDialog(BuildContext context, Book book, User user) {
                           },
                         );
                       },
-                      child: const Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Icon(Icons.check_circle, color: Colors.white),
-                          SizedBox(width: 10),
-                          Text('Confirm Request',
-                              style: TextStyle(
-                                  color: Colors.white,
-                                  fontWeight: FontWeight.bold)),
-                        ],
+                      icon: const Icon(Icons.check_circle, color: Colors.white),
+                      label: const Text(
+                        'Confirm Request',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
                     ),
                   ],

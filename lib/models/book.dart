@@ -15,8 +15,7 @@ class Book {
   String? pdfLink;
   double? userRating;
   num price;
-  //List<Request> requests;
-  
+  List<Request> requests;
 
   // num height;
 
@@ -32,31 +31,37 @@ class Book {
     this.review,
     this.id,
     this.likes,
-     this.pdfLink,
-     this.userRating,
-     this.price,
-//this.requests,
+    this.pdfLink,
+    this.userRating,
+    this.price,
+    this.requests,
     // this.height,
   );
 
   // fromJson method to create an instance of Book from a JSON object
   factory Book.fromJson(Map<String, dynamic> json) {
-    var reviewList = (json['reviews'] as List)
-        .map((reviewJson) => Review.fromJson(reviewJson))
-        .toList();
+    List<Review> reviewList = json.containsKey('reviews')
+        ? (json['reviews'] as List)
+            .map((reviewJson) => Review.fromJson(reviewJson))
+            .toList()
+        : [];
 
-    var likesList =
-        (json['likes'] as List<dynamic>).map((like) => like as String).toList();
+    var likesList = json.containsKey('likes')
+        ? (json['likes'] as List<dynamic>)
+            .map((like) => like as String)
+            .toList()
+        : [];
 
-        // var requestList = (json['requests'] as List?)
-        // ?.map((requestJson) => Request.fromJson(requestJson))
-        // .toList() ?? [];
-
+    var requestList = (json['requests'] as List?)
+            ?.map((requestJson) => Request.fromJson(requestJson))
+            .toList() ??
+        [];
 
     return Book(
       json['type'],
       json['title'],
-      json['owner'] ?? {},   //user: User.fromJson(json['user'] ?? {}), // Handle null user
+      json['owner'] ??
+          {}, //user: User.fromJson(json['user'] ?? {}), // Handle null user
       DateTime.parse(json['updatedAt']),
       json['image'],
       json['author'],
@@ -64,11 +69,11 @@ class Book {
       json['rate'] ?? 0.0,
       reviewList,
       json['_id'],
-      likesList,
+      likesList as List<String>,
       json['pdfLink'],
       json['userRating']?.toDouble(),
       json['price'],
-      //requestList,
+      requestList,
     );
   }
 

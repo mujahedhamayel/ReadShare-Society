@@ -65,16 +65,16 @@ class _BookScreenDesktop extends StatelessWidget {
   Widget build(BuildContext context) {
     return Row(
       children: [
-        const Flexible(
-          flex: 2,
-          child: Align(
-            alignment: Alignment.centerLeft,
-            child: Padding(
-              padding: EdgeInsets.all(12.0),
-              child: MoreOptionsList(currentUser: currentUser),
-            ),
-          ),
-        ),
+        // const Flexible(
+        //   flex: 2,
+        //   child: Align(
+        //     alignment: Alignment.centerLeft,
+        //     child: Padding(
+        //       padding: EdgeInsets.all(12.0),
+        //       child: MoreOptionsList(currentUser: currentUser),
+        //     ),
+        //   ),
+        // ),
         const Spacer(),
         SizedBox(
           width: 800.0,
@@ -98,16 +98,16 @@ class _BookScreenDesktop extends StatelessWidget {
           ),
         ),
         const Spacer(),
-        Flexible(
-          flex: 2,
-          child: Align(
-            alignment: Alignment.centerRight,
-            child: Padding(
-              padding: const EdgeInsets.all(12.0),
-              child: ContactsList(users: onlineUsers),
-            ),
-          ),
-        ),
+        // Flexible(
+        //   flex: 2,
+        //   child: Align(
+        //     alignment: Alignment.centerRight,
+        //     child: Padding(
+        //       padding: const EdgeInsets.all(12.0),
+        //       child: ContactsList(users: onlineUsers),
+        //     ),
+        //   ),
+        // ),
       ],
     );
   }

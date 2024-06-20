@@ -80,4 +80,21 @@ class UserService {
       throw Exception('Failed to load chatted users');
     }
   }
+
+  Future<User> fetchUserById(String userId) async {
+    final String apiUrl =
+        'http://$ip:$port/api/users/$userId'; // Update this to your actual API endpoint
+    String token = AuthToken().getToken;
+    final response = await http.get(
+      Uri.parse(apiUrl),
+      headers: ApiUtil.headers(token),
+    );
+
+    if (response.statusCode == 200) {
+      final data = jsonDecode(response.body);
+      return User.fromJson(data);
+    } else {
+      throw Exception('Failed to load user');
+    }
+  }
 }
