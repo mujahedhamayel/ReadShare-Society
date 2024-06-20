@@ -345,14 +345,18 @@ void _showRequestDialog(BuildContext context, Book book, User user) {
                   Text('The price of Book: ${book.price} ₪',
                       style:
                           TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
-                 const SizedBox(height: 20), // Added spacing between price and location text
+                  const SizedBox(
+                      height:
+                          20), // Added spacing between price and location text
                   const Text('The location of the book:',
-                      style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
-                  const SizedBox(height: 10), // Added spacing between the location text and the map
+                      style:
+                          TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                  const SizedBox(
+                      height:
+                          10), // Added spacing between the location text and the map
                   SizedBox(
                     width: double.infinity,
                     height: 200,
-
                     child: MapScreen(
                       initialLocation: user.location!,
                     ),

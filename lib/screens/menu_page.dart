@@ -2,8 +2,8 @@ import 'package:facebook/config/palette.dart';
 import 'package:facebook/providers/user_provider.dart';
 import 'package:facebook/screens/ProfilePage.dart';
 import 'package:facebook/screens/SignInPage.dart';
-import 'package:facebook/screens/book_requests_page.dart';
 import 'package:facebook/screens/my_books_page.dart';
+import 'package:facebook/screens/settings.dart';
 import 'package:facebook/utils/auth_token.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -52,18 +52,16 @@ class MenuPage extends StatelessWidget {
           ListTile(
             leading: const Icon((Icons.shopping_bag)),
             title: const Text('My Requests'),
-            onTap: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) =>  UserRequestsPage()),
-              );
-            },
+            onTap: () {},
           ),
           ListTile(
             leading: const Icon(Icons.settings),
             title: const Text('Settings'),
             onTap: () {
-              _logout(context);
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const SettingsPage()),
+              );
             },
           ),
           ListTile(

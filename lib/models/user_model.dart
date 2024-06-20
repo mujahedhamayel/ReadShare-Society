@@ -37,22 +37,34 @@ class User {
 
   factory User.fromJson(Map<String, dynamic> json) {
     LatLng? parseLocation(Map<String, dynamic>? locationJson) {
-      if (locationJson == null || locationJson.isEmpty) {
+      if (locationJson == null) {
         return null;
       }
-      return LatLng(locationJson['latitude'], locationJson['longitude']);
+      final latitude = locationJson['latitude'];
+      final longitude = locationJson['longitude'];
+
+      if (latitude != null && longitude != null) {
+        return LatLng(latitude.toDouble(), longitude.toDouble());
+      } else {
+        return null;
+      }
     }
 
     return User(
-      id: json['_id'],
-      name: json['name'],
-      email: json['email'],
+      id: json['_id'] ?? '',
+      name: json['name'] ?? '',
+      email: json['email'] ?? '',
       birthday:
           json['birthday'] != null ? DateTime.parse(json['birthday']) : null,
-      books: json['books'] ?? [],
-      likedBooks: json['likedBooks'] ?? [],
-      requests: json['requests'] ?? [],
-      followedUsers: json['followedUsers'] ?? [],
+      books: json['books'] != null ? List<dynamic>.from(json['books']) : [],
+      likedBooks: json['likedBooks'] != null
+          ? List<dynamic>.from(json['likedBooks'])
+          : [],
+      requests:
+          json['requests'] != null ? List<dynamic>.from(json['requests']) : [],
+      followedUsers: json['followedUsers'] != null
+          ? List<dynamic>.from(json['followedUsers'])
+          : [],
       imageUrl: json['imageUrl'],
       postCounts: json['postCount'],
       followersCounts: json['followersCount'],
