@@ -192,16 +192,16 @@ class BookService {
       List<dynamic> json = jsonDecode(response.body);
 
       List<Book> books = json.map((book) => Book.fromJson(book)).toList();
-      books.sort((a, b) {
-        // You can adjust this sorting logic based on your actual data structure
-        bool aAccepted =
-            a.requests.any((request) => request.status == "requested");
-        bool bAccepted =
-            b.requests.any((request) => request.status == "requested");
-        if (aAccepted && !bAccepted) return -1;
-        if (!aAccepted && bAccepted) return 1;
-        return 0;
-      });
+      // books.sort((a, b) {
+      //   // You can adjust this sorting logic based on your actual data structure
+      //   bool aAccepted =
+      //       a.requests.any((request) => request.status == "requested");
+      //   bool bAccepted =
+      //       b.requests.any((request) => request.status == "requested");
+      //   if (aAccepted && !bAccepted) return -1;
+      //   if (!aAccepted && bAccepted) return 1;
+      //   return 0;
+      // });
       return books;
     } else {
       throw Exception('Failed to load user book requests');
@@ -219,4 +219,35 @@ class BookService {
       throw Exception('Failed to deny request');
     }
   }
+
+  Future<List<Book>> fetchUserRequestsForOtherBooks() async {
+    String token = AuthToken().getToken;
+    final response = await http.get(
+      Uri.parse('$apiUrl/user/requests'),
+      headers: ApiUtil.headers(token),
+    );
+
+    if (response.statusCode == 200) {
+      List<dynamic> json = jsonDecode(response.body);
+      return json.map((bookJson) => Book.fromJson(bookJson)).toList();
+    } else {
+      throw Exception('Failed to load user requests');
+    }
+  }
+
+  Future<void> deleteRequest(String bookId, String requestId) async {
+    String token = AuthToken().getToken;
+    final url = '$apiUrl/$bookId/requests/$requestId';
+
+    final response = await http.delete(
+      Uri.parse(url),
+      headers: ApiUtil.headers(token),
+    );
+
+    if (response.statusCode != 200) {
+      throw Exception('Failed to delete request');
+    }
+  }
+
+   
 }

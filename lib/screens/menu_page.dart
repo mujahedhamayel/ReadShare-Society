@@ -2,8 +2,12 @@ import 'package:facebook/config/palette.dart';
 import 'package:facebook/providers/user_provider.dart';
 import 'package:facebook/screens/ProfilePage.dart';
 import 'package:facebook/screens/SignInPage.dart';
+import 'package:facebook/screens/book_requests_page.dart';
+import 'package:facebook/screens/continue_reading_page.dart';
 import 'package:facebook/screens/my_books_page.dart';
+import 'package:facebook/screens/saved_book.dart';
 import 'package:facebook/screens/settings.dart';
+import 'package:facebook/screens/user_requests_for_other.dart';
 import 'package:facebook/utils/auth_token.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -51,8 +55,34 @@ class MenuPage extends StatelessWidget {
           ),
           ListTile(
             leading: const Icon((Icons.shopping_bag)),
+            title: const Text('My Book Requests'),
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => UserRequestsPage()),
+              );
+            },
+          ),
+          ListTile(
+            leading: const Icon((Icons.shopping_bag)),
             title: const Text('My Requests'),
-            onTap: () {},
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                    builder: (context) => UserRequestsForOtherBooksPage()),
+              );
+            },
+          ),
+          ListTile(
+            leading: const Icon((Icons.shopping_bag)),
+            title: const Text('Continue Reading'),
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => SavedBooksPage()),
+              );
+            },
           ),
           ListTile(
             leading: const Icon(Icons.settings),

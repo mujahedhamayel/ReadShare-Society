@@ -259,8 +259,7 @@ class _BookCoverState extends State<BookCover> {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (context) =>
-                          PdfViewerPage(pdfUrl: widget.book.pdfLink!),
+                      builder: (context) => PdfViewerPage(pdfBook: widget.book),
                     ),
                   );
                 },
@@ -652,7 +651,7 @@ class BookPdfLink extends StatelessWidget {
           Navigator.push(
             context,
             MaterialPageRoute(
-              builder: (context) => PdfViewerPage(pdfUrl: book.pdfLink!),
+              builder: (context) => PdfViewerPage(pdfBook: book),
             ),
           );
         },

@@ -41,15 +41,16 @@ class _ProfilepageState extends State<ProfilePage> {
   bool isLoading = true;
   bool isFollowing = false;
   int followerCount = 0;
+  User? providerUser;
 
   @override
   void initState() {
     super.initState();
     _fetchPosts();
-    _checkIfFollowing();
     if (widget.user != null) {
       followerCount = widget.user!.followersCounts ?? 0;
     }
+    Future.microtask(() => _checkIfFollowing());
   }
 
   @override
@@ -102,7 +103,10 @@ class _ProfilepageState extends State<ProfilePage> {
 
   Future<void> _checkIfFollowing() async {
     String? token = AuthToken().getToken;
-    String url = 'http://$ip:$port/api/users/${widget.user!.id}/is-following';
+    providerUser = Provider.of<UserProvider>(context, listen: false).user;
+    var user = widget.user ?? providerUser;
+
+    String url = 'http://$ip:$port/api/users/${user!.id}/is-following';
 
     try {
       final response = await http.get(
@@ -111,9 +115,12 @@ class _ProfilepageState extends State<ProfilePage> {
       );
 
       if (response.statusCode == 200) {
-        setState(() {
-          isFollowing = jsonDecode(response.body)['isFollowing'];
-        });
+        if (mounted) {
+          // Check if the widget is still mounted before calling setState
+          setState(() {
+            isFollowing = jsonDecode(response.body)['isFollowing'];
+          });
+        }
       } else {
         print('Failed to check following status: ${response.statusCode}');
       }
@@ -162,7 +169,6 @@ class _ProfilepageState extends State<ProfilePage> {
   Widget build(BuildContext context) {
     final providerUser = Provider.of<UserProvider>(context).user;
     var user = widget.user ?? providerUser;
-
     bool isProfileUser =
         widget.user == null || widget.user!.id == providerUser!.id;
     if (user != null && user.followersCounts != null) {
