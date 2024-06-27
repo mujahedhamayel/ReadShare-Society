@@ -1,9 +1,11 @@
 import 'dart:convert';
 
 import 'package:facebook/models/models.dart';
+import 'package:facebook/providers/user_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_pdfview/flutter_pdfview.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
 import 'dart:io';
@@ -51,26 +53,47 @@ class _PdfViewerPageState extends State<PdfViewerPage> {
   }
 
   Future<void> _loadSavedPage() async {
+    final user = Provider.of<UserProvider>(context, listen: false).user;
     SharedPreferences prefs = await SharedPreferences.getInstance();
+    String userKey = 'user_${user!.id}_book_${widget.pdfBook.pdfLink}';
     setState(() {
-      _savedPage = prefs.getInt(widget.pdfBook.pdfLink!);
+      _savedPage = prefs.getInt(userKey);
     });
   }
 
   Future<void> _savePage(int page) async {
+    final user = Provider.of<UserProvider>(context, listen: false).user;
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    await prefs.setInt(widget.pdfBook.pdfLink!, page);
+    String userKey = 'user_${user!.id}_book_${widget.pdfBook.pdfLink}';
+    await prefs.setInt(userKey, page);
 
-    // Save the book information
-    List<String>? books = prefs.getStringList('savedBooks') ?? [];
+    // Save the book information for the specific user
+    String userBooksKey = 'user_${user!.id}_savedBooks';
+    List<String>? books = prefs.getStringList(userBooksKey) ?? [];
     Map<String, dynamic> bookMap = widget.pdfBook.toJson();
     bookMap['savedPage'] = page;
     String bookJson = jsonEncode(bookMap);
 
-    if (!books.contains(bookJson)) {
-      books.add(bookJson);
+    bool bookExists = false;
+
+    for (int i = 0; i < books.length; i++) {
+      Map<String, dynamic> existingBookMap = jsonDecode(books[i]);
+      print('${existingBookMap['_id']} existingBookMap');
+      if (existingBookMap['_id'] == widget.pdfBook.id) {
+        books[i] = bookJson; // Update the existing book entry
+        bookExists = true;
+        print('Updated existing book: ${widget.pdfBook.id}');
+        break;
+      }
     }
-    await prefs.setStringList('savedBooks', books);
+
+    if (!bookExists) {
+      books.add(bookJson);
+      print('Added new book: ${widget.pdfBook.id}');
+    }
+
+    await prefs.setStringList(userBooksKey, books);
+    print('Saved books for user ${user!.id}: $books');
   }
 
   Future<void> _removeBook() async {
@@ -114,7 +137,6 @@ class _PdfViewerPageState extends State<PdfViewerPage> {
                   _currentPage = page!;
                   _savePage(_currentPage); // Auto-save the current page
 
-                  // Check if the user reached the last page
                   // Check if the user reached the last page
                   if (_totalPages != null && _currentPage == _totalPages! - 1) {
                     _removeBook();

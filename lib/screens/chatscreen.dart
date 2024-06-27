@@ -61,9 +61,10 @@ class _ChatscreenState extends State<Chatscreen> {
         if (response.statusCode != 200) {
           throw Exception('message  notification not sent');
         }
-        if (widget.defaultMessage != '') {
-          await UserService().addChattedUser(widget.user.id);
-        } // cahtgpt do it here
+        print("object");
+        // if (widget.defaultMessage.isNotEmpty) {
+        await UserService().addChattedUser(widget.user.id);
+        // } // cahtgpt do it here
         // Add user to followed list if not already followed
         final followedUsersProvider =
             Provider.of<FollowedUsersProvider>(context, listen: false);

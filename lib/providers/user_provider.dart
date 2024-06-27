@@ -11,10 +11,10 @@ class UserProvider with ChangeNotifier {
     notifyListeners();
   }
 
-  void clearUser() {
-    _user = null;
-    notifyListeners();
-  }
+  // void clearUser() {
+  //   _user = null;
+  //   notifyListeners();
+  // }
   void logout() {
     _user = null;
     notifyListeners();

@@ -192,16 +192,16 @@ class BookService {
       List<dynamic> json = jsonDecode(response.body);
 
       List<Book> books = json.map((book) => Book.fromJson(book)).toList();
-      // books.sort((a, b) {
-      //   // You can adjust this sorting logic based on your actual data structure
-      //   bool aAccepted =
-      //       a.requests.any((request) => request.status == "requested");
-      //   bool bAccepted =
-      //       b.requests.any((request) => request.status == "requested");
-      //   if (aAccepted && !bAccepted) return -1;
-      //   if (!aAccepted && bAccepted) return 1;
-      //   return 0;
-      // });
+      books.sort((a, b) {
+        // You can adjust this sorting logic based on your actual data structure
+        bool aAccepted =
+            a.requests.any((request) => request.status == "requested");
+        bool bAccepted =
+            b.requests.any((request) => request.status == "requested");
+        if (aAccepted && !bAccepted) return -1;
+        if (!aAccepted && bAccepted) return 1;
+        return 0;
+      });
       return books;
     } else {
       throw Exception('Failed to load user book requests');

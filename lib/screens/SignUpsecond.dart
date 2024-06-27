@@ -1,8 +1,12 @@
+import 'package:facebook/models/user_model.dart';
+import 'package:facebook/providers/user_provider.dart';
 import 'package:facebook/screens/map_screen.dart';
+import 'package:facebook/services/notification_service.dart';
 import 'package:facebook/utils/auth_token.dart';
 import 'package:flutter/material.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:http/http.dart' as http;
+import 'package:provider/provider.dart';
 import 'dart:convert'; // For jsonEncode
 import 'package:uuid/uuid.dart'; // For uuid generation if needed
 import 'package:facebook/constants.dart';
@@ -30,6 +34,7 @@ class _SignUpAdditionalPageState extends State<SignUpAdditionalPage> {
   final TextEditingController _locationController = TextEditingController();
   String? _gender;
   LatLng? _selectedLocation;
+  final _notificationService = NotificationService();
 
   Future<void> _selectDate(BuildContext context) async {
     final DateTime? picked = await showDatePicker(
@@ -83,7 +88,7 @@ class _SignUpAdditionalPageState extends State<SignUpAdditionalPage> {
       };
     }
 
-    final response = await http.post(
+    var response = await http.post(
       url,
       headers: <String, String>{
         'Content-Type': 'application/json; charset=UTF-8',
@@ -95,7 +100,23 @@ class _SignUpAdditionalPageState extends State<SignUpAdditionalPage> {
       final body = jsonDecode(response.body);
       final backendToken = body['token'];
       AuthToken().setToken(backendToken);
-      Navigator.pushReplacementNamed(context, '/signin');
+
+      var url = Uri.parse('http://$ip:$port/api/users/profile');
+      response = await http.get(
+        url,
+        headers: <String, String>{
+          'Content-Type': 'application/json; charset=UTF-8',
+          'Authorization': 'Bearer $backendToken',
+        },
+      );
+
+      var data = jsonDecode(response.body);
+      User user = User.fromJson(data['user']);
+
+      _notificationService.saveTokenToServer();
+      
+      Provider.of<UserProvider>(context, listen: false).setUser(user);
+      Navigator.pushReplacementNamed(context, '/home');
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Failed to sign up: ${response.body}')),

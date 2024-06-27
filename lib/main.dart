@@ -48,8 +48,15 @@ void main() async {
               book: ModalRoute.of(context)?.settings.arguments as Book),
           '/userProfile': (context) => ProfilePage(
               user: ModalRoute.of(context)?.settings.arguments as User),
-          '/commentsPage': (context) => CommentsPage(
-              post: ModalRoute.of(context)?.settings.arguments as Post),
+          '/commentsPage': (context) {
+            final post = ModalRoute.of(context)?.settings.arguments as Post;
+            return CommentsPage(
+              post: post,
+              updateCommentCount: (int newCount) {
+                post.comments = newCount;
+              },
+            );
+          },
         },
       ),
     ),

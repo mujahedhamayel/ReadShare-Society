@@ -38,7 +38,7 @@ class Book {
     // this.height,
   );
 
-  // fromJson method to create an instance of Book from a JSON object
+  
   factory Book.fromJson(Map<String, dynamic> json) {
     List<Review> reviewList = json.containsKey('reviews')
         ? (json['reviews'] as List)
@@ -61,7 +61,7 @@ class Book {
       json['type'],
       json['title'],
       json['owner'] ??
-          {}, //user: User.fromJson(json['user'] ?? {}), // Handle null user
+          {}, 
       DateTime.parse(json['updatedAt']),
       json['image'],
       json['author'],
@@ -77,7 +77,7 @@ class Book {
     );
   }
 
-  // toJson method to convert an instance of Book to a JSON object (optional)
+  
   Map<String, dynamic> toJson() {
     return {
       'type': type,
@@ -97,99 +97,7 @@ class Book {
     };
   }
 
-  // static List<Book> freeBooks() {
-  //   return [
-  //     Book(
-  //       'hostory',
-  //       "This is the way.",
-  //       "istudio",
-  //       DateTime(2019, 3, 23),
-  //       'assets/images/book3.jpg',
-  //       4.7,
-  //       892,
-  //       'Ifailed the first quarter of a class in school, so I ma....',
-  //       220.0,
-  //     ),
-  //     Book(
-  //       'hostory',
-  //       "This is the way.",
-  //       "istudio",
-  //       DateTime(2019, 3, 23),
-  //       'assets/images/book3.jpg',
-  //       4.7,
-  //       892,
-  //       'Ifailed the first quarter of a class in school, so I ma....',
-  //       220.0,
-  //     ),
-  //     Book(
-  //       'hostory',
-  //       "This is the way.",
-  //       "istudio",
-  //       DateTime(2019, 3, 23),
-  //       'assets/images/book3.jpg',
-  //       4.7,
-  //       892,
-  //       'Ifailed the first quarter of a class in school, so I ma....',
-  //       220.0,
-  //     ),
-  //     Book(
-  //       'hostory',
-  //       "This is the way.",
-  //       "istudio",
-  //       DateTime(2019, 3, 23),
-  //       'assets/images/book3.jpg',
-  //       4.7,
-  //       892,
-  //       'Ifailed the first quarter of a class in school, so I ma....',
-  //       220.0,
-  //     ),
-  //     Book(
-  //       'hostory',
-  //       "This is the way.",
-  //       "istudio",
-  //       DateTime(2019, 3, 23),
-  //       'assets/images/book1.png',
-  //       4.7,
-  //       892,
-  //       'Ifailed the first quarter of a class in school, so I ma....',
-  //       220.0,
-  //     ),
-  //     Book(
-  //       'hostory',
-  //       "This is the way.",
-  //       "istudio",
-  //       DateTime(2019, 3, 23),
-  //       'assets/images/book2.jpg',
-  //       4.7,
-  //       892,
-  //       'Ifailed the first quarter of a class in school, so I ma....',
-  //       220.0,
-  //     ),
-  //     Book(
-  //       'hostory',
-  //       "This is the way.",
-  //       "istudio",
-  //       DateTime(2019, 3, 23),
-  //       'assets/images/book1.png',
-  //       4.7,
-  //       892,
-  //       'Ifailed the first quarter of a class in school, so I ma....',
-  //       220.0,
-  //     ),
-  //     Book(
-  //       'hostory',
-  //       "This is the way.",
-  //       "istudio",
-  //       DateTime(2019, 3, 23),
-  //       'assets/images/book1.png',
-  //       4.7,
-  //       892,
-  //       'Ifailed the first quarter of a class in school, so I ma....',
-  //       220.0,
-  //     )
-  //   ];
-  // }
-
+  
   static List<Book> audioBooks() {
     return [];
     //   Book(

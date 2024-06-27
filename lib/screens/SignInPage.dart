@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:facebook/services/notification_service.dart';
+import 'package:facebook/services/user_service.dart';
 import 'package:facebook/utils/auth_token.dart';
 import 'package:facebook/models/models.dart';
 import 'package:facebook/providers/user_provider.dart';
@@ -79,52 +80,23 @@ class __FormContentState extends State<_FormContent> {
       TextEditingController(text: "123456");
   bool _isPasswordVisible = false;
   bool _rememberMe = false;
-  final FirebaseMessaging _firebaseMessaging = FirebaseMessaging.instance;
   final _notificationService = NotificationService();
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
-
+  UserService _userService = UserService();
   void _signIn() async {
     if (_formKey.currentState!.validate()) {
       String email = _emailController.text;
       String password = _passwordController.text;
 
-      var url = Uri.parse('http://$ip:$port/api/users/login');
-      var response = await http.post(
-        url,
-        body: {
-          'email': email,
-          'password': password,
-        },
-      );
-
-      if (response.statusCode == 200) {
-        print("response ${response.body}");
-        final body = jsonDecode(response.body);
-        final backendToken = body['token'];
-        AuthToken().setToken(backendToken);
-
-        url = Uri.parse('http://$ip:$port/api/users/profile');
-
-        response = await http.get(
-          url,
-          headers: <String, String>{
-            'Content-Type': 'application/json; charset=UTF-8',
-            'Authorization': 'Bearer $backendToken',
-          },
-        );
-
-        var data = jsonDecode(response.body);
-        User user = User.fromJson(
-            data['user']); // Assuming your API returns a user object
+      try {
+        final result = await _userService.signIn(email, password);
+        final user = result['user'];
         Provider.of<UserProvider>(context, listen: false).setUser(user);
-        // Get the device token
-       
-       
-      _notificationService.saveTokenToServer();
-        // Save the token to your backend server
-       
+
+        _notificationService.saveTokenToServer();
+
         Navigator.pushReplacementNamed(context, '/nav_screen');
-      } else {
+      } catch (e) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
             content: Text('Login failed. Please try again.'),
@@ -248,19 +220,19 @@ class __FormContentState extends State<_FormContent> {
               ),
             ),
             _gap(),
-            TextButton(
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (context) => const ResetPassPage()),
-                );
-              },
-              child: const Text(
-                "Forgot password?",
-                style: TextStyle(color: Color.fromRGBO(226, 124, 126, 0.978)),
-              ),
-            ),
+            // TextButton(
+            //   onPressed: () {
+            //     Navigator.push(
+            //       context,
+            //       MaterialPageRoute(
+            //           builder: (context) => const ResetPassPage()),
+            //     );
+            //   },
+            //   child: const Text(
+            //     "Forgot password?",
+            //     style: TextStyle(color: Color.fromRGBO(226, 124, 126, 0.978)),
+            //   ),
+            // ),
             _gap(),
             _gap(),
             Row(

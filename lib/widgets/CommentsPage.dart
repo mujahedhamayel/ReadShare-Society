@@ -17,10 +17,13 @@ import 'package:http/http.dart' as http;
 
 class CommentsPage extends StatefulWidget {
   final Post post;
+   final Function(int) updateCommentCount;
 
   const CommentsPage({
     Key? key,
     required this.post,
+        required this.updateCommentCount,
+
   }) : super(key: key);
 
   @override
@@ -63,24 +66,24 @@ class _CommentsPageState extends State<CommentsPage> {
     final providerUser = Provider.of<UserProvider>(context, listen: false).user;
 
     if (_commentController.text.isNotEmpty && providerUser != null) {
-      // Create a new comment object
+      
       final newComment = Comment(
         user: providerUser,
         text: _commentController.text,
         timeAgo: formatDate(DateTime.now().toIso8601String()),
         likes: [],
-        id: 'temporary_id', // Use a temporary ID for optimistic update
+        id: 'temporary_id', 
       );
 
-      // Optimistically add the comment to the list
+      
       setState(() {
         _comments.add(newComment);
-          widget.post.comments++;
-
+        widget.post.comments++;
+        widget.updateCommentCount(widget.post.comments);
         _commentController.clear();
       });
 
-      // Perform the network request
+      
       final response = await http.post(
         Uri.parse('$baseUrl/posts/${widget.post.id}/comment'),
         headers: ApiUtil.headers(token),
@@ -88,22 +91,37 @@ class _CommentsPageState extends State<CommentsPage> {
       );
 
       if (response.statusCode == 201) {
-        final Comment addedComment =
-            Comment.fromJson(json.decode(response.body));
+        
+        final List<Map<String, dynamic>> commentMaps =
+            List<Map<String, dynamic>>.from(
+                json.decode(response.body)['comments']);
+
+        
+        final List<Comment> updatedComments =
+            commentMaps.map((map) => Comment.fromJson(map)).toList();
+
+       
+        final Comment? addedComment = updatedComments.firstWhere(
+          (comment) =>
+              comment.text == newComment.text &&
+              comment.user.id == newComment.user.id,
+          orElse: () => newComment,
+        );
+
         setState(() {
-          // Replace the temporary comment with the actual comment from the server
-          _comments[_comments.indexOf(newComment)] = addedComment;
+          
+          _comments[_comments.indexOf(newComment)] = addedComment!;
         });
       } else {
-        // If the request fails, remove the optimistic comment and show an error
+        
         setState(() {
           _comments.remove(newComment);
           widget.post.comments--;
-
+          widget.updateCommentCount(widget.post.comments);
         });
         print('Failed to add comment');
       }
-       Navigator.pop(context, widget.post.comments);
+     
     }
   }
 
@@ -206,7 +224,7 @@ class _CommentsPageState extends State<CommentsPage> {
                 ),
                 RawMaterialButton(
                   padding: const EdgeInsets.all(12.0),
-                  fillColor: Palette.REDcolor, // Changed color to red
+                  fillColor: Palette.REDcolor, 
                   elevation: 0.0,
                   shape: const CircleBorder(),
                   onPressed: _addComment,

@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:facebook/providers/followed_user_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -98,20 +99,20 @@ class _UserListPageState extends State<UserListPage> {
     final followedUsersProvider =
         Provider.of<FollowedUsersProvider>(context, listen: false);
 
-    // Create a map to remove duplicates using user.id as the key
+    
     Map<String, User> userMap = {};
 
-    // Add followed users to the map
+    
     for (var user in followedUsersProvider.followedUsers) {
       userMap[user.id] = user;
     }
 
-    // Add chatted users to the map
+    
     for (var user in _chattedUsers) {
       userMap[user.id] = user;
     }
 
-    // Convert the map values to a list to get unique users
+    
     WidgetsBinding.instance.addPostFrameCallback((_) {
       setState(() {
         _filteredUsers = userMap.values.toList();
@@ -242,8 +243,8 @@ class UserCardChat extends StatelessWidget {
           children: [
             CircleAvatar(
               backgroundImage: user.imageUrl != null
-                  ? NetworkImage(user.imageUrl!)
-                  : AssetImage('assets/default_avatar.png'), // Default avatar
+                  ? CachedNetworkImageProvider(user.imageUrl!)
+                  : AssetImage('assets/default_avatar.png'), 
               radius: 30,
             ),
             const SizedBox(width: 16),

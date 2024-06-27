@@ -88,11 +88,18 @@ class _PostContainerState extends State<PostContainer> {
     }
   }
 
-   void _navigateToComments() async {
+    void _navigateToComments() async {
     final updatedComments = await Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => CommentsPage(post: widget.post),
+        builder: (context) => CommentsPage(
+          post: widget.post,
+          updateCommentCount: (count) {
+            setState(() {
+              commentCount = count;
+            });
+          },
+        ),
       ),
     );
 

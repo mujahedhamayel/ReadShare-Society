@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:facebook/providers/followed_user_provider.dart';
 import 'package:facebook/providers/user_provider.dart';
+import 'package:facebook/screens/chatscreen.dart';
 import 'package:facebook/utils/auth_token.dart';
 import 'package:facebook/widgets/responsive.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -284,7 +285,18 @@ class ProfilePageMobile extends StatelessWidget {
                             ),
                             const SizedBox(width: 16.0),
                             FloatingActionButton.extended(
-                              onPressed: () {},
+                              onPressed: () {
+                                 Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => Chatscreen(
+                              user: user,
+                              defaultMessage:
+                                  '',
+                            ),
+                          ),
+                        );
+                              },
                               heroTag: 'message',
                               elevation: 0,
                               label: const Text("Message"),
@@ -624,7 +636,7 @@ class __TopPortionState extends State<_TopPortion> {
                         shape: BoxShape.circle,
                         image: DecorationImage(
                           fit: BoxFit.cover,
-                          image: NetworkImage(imageUrl),
+                          image: CachedNetworkImageProvider(imageUrl),
                         ),
                       ),
                     ),

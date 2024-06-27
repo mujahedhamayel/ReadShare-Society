@@ -3,7 +3,8 @@ import 'package:facebook/providers/user_provider.dart';
 import 'package:facebook/screens/ProfilePage.dart';
 import 'package:facebook/screens/SignInPage.dart';
 import 'package:facebook/screens/book_requests_page.dart';
-import 'package:facebook/screens/continue_reading_page.dart';
+
+import 'package:facebook/screens/discussion_room_page.dart';
 import 'package:facebook/screens/my_books_page.dart';
 import 'package:facebook/screens/saved_book.dart';
 import 'package:facebook/screens/settings.dart';
@@ -64,7 +65,7 @@ class MenuPage extends StatelessWidget {
             },
           ),
           ListTile(
-            leading: const Icon((Icons.shopping_bag)),
+            leading: const Icon((Icons.receipt_long)),
             title: const Text('My Requests'),
             onTap: () {
               Navigator.push(
@@ -75,12 +76,22 @@ class MenuPage extends StatelessWidget {
             },
           ),
           ListTile(
-            leading: const Icon((Icons.shopping_bag)),
+            leading: const Icon((Icons.book)),
             title: const Text('Continue Reading'),
             onTap: () {
               Navigator.push(
                 context,
                 MaterialPageRoute(builder: (context) => SavedBooksPage()),
+              );
+            },
+          ),
+          ListTile(
+            leading: const Icon((Icons.video_call)),
+            title: const Text('Discussions'),
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => DiscussionRoomPage()),
               );
             },
           ),
@@ -107,15 +118,16 @@ class MenuPage extends StatelessWidget {
   }
 
   void _logout(BuildContext context) {
-    // Clear user session/token
+    
     AuthToken().clearToken();
-    Provider.of<UserProvider>(context, listen: false).logout();
-
-    // Navigate back to the sign-in page
+    
     Navigator.pushAndRemoveUntil(
       context,
       MaterialPageRoute(builder: (context) => const SignInPage()),
       (Route<dynamic> route) => false,
-    );
+    ).then((onValue) {
+      Provider.of<UserProvider>(context, listen: false).logout();
+    });
+    //
   }
 }

@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:facebook/providers/book_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:facebook/config/palette.dart';
@@ -106,7 +107,7 @@ class _FavoritePageState extends State<FavoritePage> {
                                 borderRadius: BorderRadius.circular(8.0),
                                 image: DecorationImage(
                                   fit: BoxFit.cover,
-                                  image: NetworkImage(book.imgUrl),
+                                  image: CachedNetworkImageProvider(book.imgUrl),
                                 ),
                               ),
                             ),

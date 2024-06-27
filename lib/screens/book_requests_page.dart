@@ -1,9 +1,12 @@
 import 'package:facebook/models/book.dart';
 import 'package:facebook/models/user_model.dart';
 import 'package:facebook/screens/ProfilePage.dart';
+import 'package:facebook/screens/chatscreen.dart';
+import 'package:facebook/screens/map_screen.dart';
 import 'package:facebook/services/book_service.dart';
 import 'package:facebook/services/user_service.dart';
 import 'package:flutter/material.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class UserRequestsPage extends StatefulWidget {
   @override
@@ -38,7 +41,8 @@ class _UserRequestsPageState extends State<UserRequestsPage> {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return Center(child: CircularProgressIndicator());
           } else if (snapshot.hasError) {
-            return Center(child: Text('Error: ${snapshot.error}'));
+            print('Error: ${snapshot.error}');
+            return Center(child: Text('You Don\'t have any Book\'s yet'));
           } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
             return Center(child: Text('No requests found'));
           }
@@ -158,6 +162,12 @@ class BookRequestCard extends StatelessWidget {
                                   backgroundColor: Colors.red[100],
                                 ),
                               ),
+                              IconButton(
+                                icon: Icon(Icons.contact_page),
+                                onPressed: () {
+                                  _showContactDialog(context, user);
+                                },
+                              ),
                             ],
                           )
                         : Text(request.status == 'accepted'
@@ -170,6 +180,62 @@ class BookRequestCard extends StatelessWidget {
           ],
         ),
       ),
+    );
+  }
+
+  void _showContactDialog(BuildContext context, User user) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(15),
+          ),
+          title: Text('Contact User'),
+          content: Container(
+            width: 450, // Set the width
+            height: 450, // Set the height
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const Text('The location of the user:',
+                    style:
+                        TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                const SizedBox(height: 10),
+                SizedBox(
+                    width: double.infinity,
+                    height: 200,
+                    child: flutterMap(context.widget, {}, user.location)),
+                const SizedBox(height: 20),
+                ElevatedButton.icon(
+                  icon: Icon(Icons.call),
+                  label: Text('Call'),
+                  onPressed: () {
+                    final Uri url = Uri(scheme: 'tel', path: user.mobileNumber);
+                    launchUrl(url);
+                  },
+                ),
+                SizedBox(height: 10),
+                ElevatedButton.icon(
+                  icon: Icon(Icons.chat),
+                  label: Text('Chat'),
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => Chatscreen(
+                          user: user,
+                          defaultMessage: '',
+                        ),
+                      ),
+                    );
+                  },
+                ),
+              ],
+            ),
+          ),
+        );
+      },
     );
   }
 }

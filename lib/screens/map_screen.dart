@@ -15,7 +15,15 @@ class MapScreen extends StatefulWidget {
 class _MapScreenState extends State<MapScreen> {
   LatLng? _selectedLocation;
 
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    _selectedLocation = widget.initialLocation;
+  }
+
   void _onTap(LatLng location) {
+    print("location $location");
     setState(() {
       _selectedLocation = location;
     });
@@ -25,7 +33,6 @@ class _MapScreenState extends State<MapScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        
         title: Text('Select Location'),
         actions: [
           if (_selectedLocation != null)
@@ -36,45 +43,50 @@ class _MapScreenState extends State<MapScreen> {
               },
             ),
         ],
+        
       ),
-      body: FlutterMap(
-        options: MapOptions(
-          initialCenter: widget.initialLocation,
-          initialZoom: 9.2,
-          onTap: (_, latLng) => _onTap(latLng),
-        ),
-        children: [
-          TileLayer(
-            urlTemplate:
-                'https://api.mapbox.com/styles/v1/mujahed710/clxc4m1k200t801qs21xu7eae/tiles/256/{z}/{x}/{y}@2x?access_token=pk.eyJ1IjoibXVqYWhlZDcxMCIsImEiOiJjbHhjMTNiOHgwNHBwMmxzNTFkdmZ5b2QwIn0.lkvWQoml1T6mB-5yqWiBgg',
-            userAgentPackageName: 'com.example.app',
-          ),
-          RichAttributionWidget(
-            attributions: [
-              TextSourceAttribution(
-                'OpenStreetMap contributors',
-                onTap: () =>
-                    launchUrl(Uri.parse('https://openstreetmap.org/copyright')),
-              ),
-            ],
-          ),
-          if (_selectedLocation != null)
-            MarkerLayer(
-              markers: [
-                Marker(
-                  width: 80.0,
-                  height: 80.0,
-                  point: widget.initialLocation,
-                  child: Icon(
-                    Icons.location_on,
-                    color: Colors.red,
-                    size: 40.0,
-                  ),
-                ),
-              ],
-            ),
-        ],
-      ),
+      body: flutterMap(widget, _onTap, _selectedLocation),
     );
   }
+}
+
+Widget flutterMap(widget, onTap, selectedLocation) {
+  return FlutterMap(
+    options: MapOptions(
+      initialCenter: selectedLocation,
+      initialZoom: 9.2,
+      onTap: (_, latLng) => onTap(latLng),
+    ),
+    children: [
+      TileLayer(
+        urlTemplate:
+            'https://api.mapbox.com/styles/v1/mujahed710/clxc4m1k200t801qs21xu7eae/tiles/256/{z}/{x}/{y}@2x?access_token=pk.eyJ1IjoibXVqYWhlZDcxMCIsImEiOiJjbHhjMTNiOHgwNHBwMmxzNTFkdmZ5b2QwIn0.lkvWQoml1T6mB-5yqWiBgg',
+        userAgentPackageName: 'com.example.app',
+      ),
+      RichAttributionWidget(
+        attributions: [
+          TextSourceAttribution(
+            'OpenStreetMap contributors',
+            onTap: () =>
+                launchUrl(Uri.parse('https://openstreetmap.org/copyright')),
+          ),
+        ],
+      ),
+      if (selectedLocation != null)
+        MarkerLayer(
+          markers: [
+            Marker(
+              width: 80.0,
+              height: 80.0,
+              point: selectedLocation!,
+              child: Icon(
+                Icons.location_on,
+                color: Colors.red,
+                size: 40.0,
+              ),
+            ),
+          ],
+        ),
+    ],
+  );
 }

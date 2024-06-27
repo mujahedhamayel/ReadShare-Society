@@ -48,7 +48,7 @@ dependencies:
   firebase_core: 
   firebase_messaging: 
   flutter_local_notifications: ^17.1.2
-  url_launcher: ^6.0.20
+  url_launcher: ^6.1.2
   flutter_pdfview: ^1.0.4+1
   google_maps_flutter: ^2.7.0
   geolocator: ^9.0.2

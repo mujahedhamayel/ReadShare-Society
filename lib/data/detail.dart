@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:facebook/config/palette.dart';
 import 'package:facebook/constants.dart';
 import 'package:facebook/providers/book_provider.dart';
@@ -122,6 +123,7 @@ class BookCover extends StatefulWidget {
 
 class _BookCoverState extends State<BookCover> {
   bool isBookmarked = false;
+  LatLng? _selectedLocation;
 
   @override
   void initState() {
@@ -192,7 +194,7 @@ class _BookCoverState extends State<BookCover> {
       child: Stack(
         children: [
           Container(
-            padding: const EdgeInsets.only(left: 5, right: 30),
+            padding: const EdgeInsets.only(left: 5, right: 10),
             width: MediaQuery.of(context).size.width - 20,
             decoration: const BoxDecoration(
               borderRadius: BorderRadius.only(
@@ -211,14 +213,14 @@ class _BookCoverState extends State<BookCover> {
                   color: Colors.black,
                   image: DecorationImage(
                     fit: BoxFit.fill,
-                    image: NetworkImage(widget.book.imgUrl),
+                    image: CachedNetworkImageProvider(widget.book.imgUrl),
                   ),
                 ),
               ),
             ),
           ),
           Positioned(
-            left: 300,
+            right: 10,
             bottom: 20,
             child: GestureDetector(
               onTap: () async {
@@ -252,7 +254,7 @@ class _BookCoverState extends State<BookCover> {
           ),
           if (widget.book.type == 'pdf')
             Positioned(
-              left: 350,
+              right: 70,
               bottom: 20,
               child: GestureDetector(
                 onTap: () {
@@ -287,7 +289,7 @@ class _BookCoverState extends State<BookCover> {
             ),
           if (widget.book.type == 'physical' && !isOwner)
             Positioned(
-              left: 350,
+              right: 70,
               bottom: 20,
               child: GestureDetector(
                 onTap: () async {
@@ -323,8 +325,6 @@ class _BookCoverState extends State<BookCover> {
 }
 
 void _showRequestDialog(BuildContext context, Book book, User user) {
-  LatLng? _selectedLocation;
-
   showDialog(
     context: context,
     builder: (BuildContext context) {
@@ -354,12 +354,9 @@ void _showRequestDialog(BuildContext context, Book book, User user) {
                       height:
                           10), // Added spacing between the location text and the map
                   SizedBox(
-                    width: double.infinity,
-                    height: 200,
-                    child: MapScreen(
-                      initialLocation: user.location!,
-                    ),
-                  ),
+                      width: double.infinity,
+                      height: 200,
+                      child: flutterMap(context.widget, {}, user.location)),
                   const SizedBox(height: 20),
                   ElevatedButton(
                     style: ElevatedButton.styleFrom(
@@ -416,15 +413,15 @@ void _showCompleteRequestDialog(BuildContext context, Book book, User user) {
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(15),
             ),
-            title: const Text('Complete the Request'),
+            title: const Text('Complete the Request:'),
             content: Container(
               width: 450, // Set the width
-              height: 500, // Set the height
+              height: 300, // Set the height
               child: SingleChildScrollView(
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    const Text('Call the owner for more details:'),
+                    const Text('Contact with the owner for more details:'),
                     const SizedBox(height: 20),
                     ElevatedButton.icon(
                       style: ElevatedButton.styleFrom(
@@ -461,7 +458,7 @@ void _showCompleteRequestDialog(BuildContext context, Book book, User user) {
                         ),
                       ),
                     ),
-                    const SizedBox(height: 20),
+                    //const SizedBox(height: 10),
                     // TextField(
                     //   controller: addressController,
                     //   decoration: const InputDecoration(
@@ -501,7 +498,7 @@ void _showCompleteRequestDialog(BuildContext context, Book book, User user) {
                     //         : {},
                     //   ),
                     //),
-                    const SizedBox(height: 20),
+                    const SizedBox(height: 10),
                     ElevatedButton.icon(
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.blue,

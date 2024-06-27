@@ -9,7 +9,7 @@ class User {
   final List<dynamic> likedBooks;
   final List<dynamic> requests;
   final List<dynamic> followedUsers;
-  final String? imageUrl; // Assuming you have a profile image URL
+  final String? imageUrl; 
   final int? postCounts;
   final int? booksCounts;
   final int? followersCounts;

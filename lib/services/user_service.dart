@@ -9,6 +9,43 @@ import '../models/book.dart';
 class UserService {
   final String apiUrl = 'http://$ip:$port/api/users';
 
+  Future<Map<String, dynamic>> signIn(String email, String password) async {
+    var url = Uri.parse('$apiUrl/login');
+    var response = await http.post(
+      url,
+      body: {
+        'email': email,
+        'password': password,
+      },
+    );
+
+    if (response.statusCode == 200) {
+      final body = jsonDecode(response.body);
+      final backendToken = body['token'];
+      AuthToken().setToken(backendToken);
+
+      url = Uri.parse('$apiUrl/profile');
+      response = await http.get(
+        url,
+        headers: <String, String>{
+          'Content-Type': 'application/json; charset=UTF-8',
+          'Authorization': 'Bearer $backendToken',
+        },
+      );
+
+      var data = jsonDecode(response.body);
+      User user = User.fromJson(
+          data['user']); // Assuming your API returns a user object
+
+      return {
+        'token': backendToken,
+        'user': user,
+      };
+    } else {
+      throw Exception('Login failed');
+    }
+  }
+
   Future<List<User>> fetchFollowedUsers() async {
     String token = AuthToken().getToken;
     final followedUsersUrl = '$apiUrl/followed-users';
@@ -64,6 +101,8 @@ class UserService {
     if (response.statusCode != 200) {
       throw Exception('Failed to add chatted user');
     }
+    print(jsonDecode(response.body));
+    print("response : $response");
   }
 
   Future<List<User>> fetchChattedUsers() async {
